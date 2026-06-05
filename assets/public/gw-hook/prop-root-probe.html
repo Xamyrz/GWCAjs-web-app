@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>GW Prop Root Probe</title>
+    <style>
+      body {
+        font-family: monospace;
+        margin: 16px;
+      }
+
+      #status {
+        white-space: pre-wrap;
+      }
+
+      iframe {
+        width: 1px;
+        height: 1px;
+        border: 0;
+        position: absolute;
+        left: -9999px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="status">Starting PropContext root probe...</div>
+    <iframe id="target" src="/?gwDisableImageDb=1&amp;gwDisableJspi=1"></iframe>
+    <script>
+      const status = document.getElementById("status");
+      const frame = document.getElementById("target");
+
+      function setStatus(value) {
+        status.textContent = value;
+      }
+
+      function compactCandidate(candidate) {
+        const game = candidate.gameCandidates?.[0] || null;
+        return {
+          eventBackReference: candidate.eventBackReference,
+          eventContextAddress: candidate.eventContextAddress,
+          gameContextAddress: game?.gameContextAddress || null,
+          charContextAddress: game?.charContextAddress || null,
+          mapContextAddress: candidate.mapContextAddress || null,
+          propContextAddress: candidate.propContextAddress,
+          score: candidate.score,
+          source: candidate.source,
+          worldContextAddress: candidate.worldContextAddress,
+          worldPlayerNumber: candidate.world?.playerNumber ?? null,
+          playerArray: candidate.world?.playerArrayHeader || null,
+          reasons: candidate.reasons,
+        };
+      }
+
+      async function runProbe() {
+        const win = frame.contentWindow;
+        if (!win) {
+          setStatus("FAIL: iframe window unavailable");
+          return;
+        }
+
+        const startedAt = Date.now();
+        while (Date.now() - startedAt < 60000) {
+          try {
+            if (win.GWHook && win.GW?.map?.findPropContextRootCandidates) {
+              await Promise.race([
+                win.GWHook.ready,
+                new Promise((_, reject) =>
+                  setTimeout(() => reject(new Error("runtime timeout")), 50000)
+                ),
+              ]);
+
+              const roots = win.GW.map.findPropContextRootCandidates({
+                findGameContext: true,
+                gameContextLimit: 4,
+                limit: 8,
+                maxRejected: 16,
+                maxScanSlots: 4000000,
+              });
+              const gameRoots = win.GW.map.findGameContextRootCandidates({
+                limit: 4,
+                maxRejected: 16,
+                maxScanSlots: 4000000,
+              });
+
+              setStatus(
+                JSON.stringify(
+                  {
+                    buildInfo:
+                      typeof win.GWHook.getBuildInfo === "function"
+                        ? win.GWHook.getBuildInfo()
+                        : null,
+                    gameRootCandidates: gameRoots.candidates?.map((candidate) => ({
+                      charContextAddress: candidate.charContextAddress,
+                      gameContextAddress: candidate.gameContextAddress,
+                      mapContextAddress: candidate.mapContextAddress,
+                      score: candidate.score,
+                      source: candidate.source,
+                      worldContextAddress: candidate.worldContextAddress,
+                    })),
+                    propRootCandidates: roots.candidates?.map(compactCandidate),
+                    propRootLayout: roots.propContextLayout,
+                    rejected: roots.rejected,
+                    scannedSlots: roots.scannedSlots,
+                  },
+                  null,
+                  2
+                )
+              );
+              return;
+            }
+          } catch (error) {
+            setStatus(
+              JSON.stringify(
+                {
+                  error: String(error),
+                  status: "FAIL",
+                },
+                null,
+                2
+              )
+            );
+            return;
+          }
+
+          await new Promise((resolve) => setTimeout(resolve, 100));
+        }
+
+        setStatus(
+          JSON.stringify(
+            {
+              status: "TIMEOUT: runtime PropContext root finder was not detected",
+            },
+            null,
+            2
+          )
+        );
+      }
+
+      frame.addEventListener("load", () => {
+        runProbe().catch((error) => {
+          setStatus(
+            JSON.stringify(
+              {
+                error: String(error),
+                status: "FAIL",
+              },
+              null,
+              2
+            )
+          );
+        });
+      });
+    </script>
+  </body>
+</html>

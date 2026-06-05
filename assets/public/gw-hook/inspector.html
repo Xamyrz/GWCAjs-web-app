@@ -1,0 +1,740 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    >
+    <title>GW Inspector</title>
+    <style>
+      :root {
+        --bg: #0a0c0f;
+        --bg-panel: #10161d;
+        --bg-panel-alt: #0d1218;
+        --border: #243444;
+        --border-strong: #3c5d79;
+        --text: #e8eef4;
+        --text-muted: #8aa2b8;
+        --accent: #73d0ff;
+        --accent-strong: #1da6f2;
+        --good: #7dffaf;
+        --warn: #ffce6a;
+        --bad: #ff7b8b;
+        --shadow: rgba(0, 0, 0, 0.35);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+        background:
+          radial-gradient(circle at top left, rgba(29, 166, 242, 0.14), transparent 30%),
+          radial-gradient(circle at bottom right, rgba(125, 255, 175, 0.08), transparent 22%),
+          linear-gradient(180deg, #091016 0%, #07090c 100%);
+        color: var(--text);
+        font-family: "IBM Plex Mono", "Cascadia Code", "SFMono-Regular", monospace;
+      }
+
+      body {
+        display: flex;
+        flex-direction: column;
+      }
+
+      a {
+        color: var(--accent);
+      }
+
+      button,
+      input,
+      select,
+      textarea {
+        font: inherit;
+        color: inherit;
+      }
+
+      button,
+      select,
+      input,
+      textarea {
+        border: 1px solid var(--border);
+        background: rgba(12, 18, 24, 0.95);
+        border-radius: 10px;
+        padding: 8px 10px;
+      }
+
+      button {
+        cursor: pointer;
+        background:
+          linear-gradient(180deg, rgba(31, 56, 79, 0.95), rgba(17, 29, 40, 0.95));
+      }
+
+      button:hover {
+        border-color: var(--border-strong);
+      }
+
+      button:disabled {
+        cursor: wait;
+        opacity: 0.6;
+      }
+
+      input[type="checkbox"] {
+        width: 16px;
+        height: 16px;
+        padding: 0;
+      }
+
+      textarea {
+        min-height: 88px;
+        resize: vertical;
+      }
+
+      code,
+      pre {
+        font-family: inherit;
+      }
+
+      .chrome {
+        display: grid;
+        grid-template-columns: minmax(360px, 480px) minmax(0, 1fr);
+        gap: 12px;
+        min-height: 100vh;
+        padding: 12px;
+      }
+
+      .sidebar,
+      .viewer {
+        min-height: 0;
+      }
+
+      .sidebar {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .panel {
+        background:
+          linear-gradient(180deg, rgba(14, 21, 28, 0.96), rgba(9, 14, 20, 0.96));
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        box-shadow: 0 18px 30px var(--shadow);
+        overflow: hidden;
+      }
+
+      .panel-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 12px 14px;
+        border-bottom: 1px solid rgba(36, 52, 68, 0.8);
+        background:
+          linear-gradient(90deg, rgba(30, 53, 72, 0.8), rgba(16, 24, 34, 0.15));
+      }
+
+      .panel-header h2,
+      .panel-header h3 {
+        margin: 0;
+        font-size: 14px;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+
+      .panel-body {
+        padding: 12px 14px;
+      }
+
+      .toolbar {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto auto;
+        gap: 8px;
+      }
+
+      .status-grid,
+      .form-grid,
+      .compact-grid {
+        display: grid;
+        gap: 8px;
+      }
+
+      .status-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .form-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .compact-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .field label {
+        color: var(--text-muted);
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+
+      .field.full,
+      .span-2,
+      .span-3 {
+        grid-column: 1 / -1;
+      }
+
+      .muted {
+        color: var(--text-muted);
+      }
+
+      .small {
+        font-size: 12px;
+      }
+
+      .pill-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 8px;
+        border: 1px solid rgba(60, 93, 121, 0.7);
+        border-radius: 999px;
+        background: rgba(22, 36, 48, 0.75);
+        color: var(--text-muted);
+        font-size: 12px;
+      }
+
+      .pill strong {
+        color: var(--text);
+      }
+
+      .status-ok {
+        color: var(--good);
+      }
+
+      .status-warn {
+        color: var(--warn);
+      }
+
+      .status-bad {
+        color: var(--bad);
+      }
+
+      .results,
+      .json,
+      .notes {
+        width: 100%;
+      }
+
+      .results,
+      .json {
+        max-height: 280px;
+        overflow: auto;
+        white-space: pre-wrap;
+        word-break: break-word;
+        margin: 0;
+        padding: 10px;
+        border: 1px solid rgba(36, 52, 68, 0.85);
+        border-radius: 10px;
+        background: rgba(7, 12, 17, 0.92);
+      }
+
+      .viewer {
+        display: grid;
+        grid-template-rows: auto minmax(0, 1fr);
+        gap: 12px;
+      }
+
+      .surface {
+        display: grid;
+        grid-template-rows: auto minmax(0, 1fr);
+        min-height: 0;
+      }
+
+      .surface .panel-body {
+        min-height: 0;
+        padding: 0;
+      }
+
+      iframe {
+        width: 100%;
+        height: 100%;
+        border: 0;
+        background: #000;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
+        padding: 7px 8px;
+        border-bottom: 1px solid rgba(36, 52, 68, 0.55);
+        text-align: left;
+        vertical-align: top;
+        font-size: 12px;
+      }
+
+      th {
+        color: var(--text-muted);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+
+      .table-wrap {
+        max-height: 280px;
+        overflow: auto;
+        border: 1px solid rgba(36, 52, 68, 0.85);
+        border-radius: 10px;
+        background: rgba(7, 12, 17, 0.92);
+      }
+
+      .table-wrap.compact {
+        max-height: 220px;
+      }
+
+      .list-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+
+      .flash {
+        animation: flash 0.6s ease;
+      }
+
+      @keyframes flash {
+        0% {
+          background: rgba(29, 166, 242, 0.28);
+        }
+        100% {
+          background: transparent;
+        }
+      }
+
+      @media (max-width: 1180px) {
+        .chrome {
+          grid-template-columns: 1fr;
+        }
+
+        .viewer {
+          min-height: 65vh;
+        }
+      }
+
+      @media (max-width: 720px) {
+        .toolbar,
+        .status-grid,
+        .form-grid,
+        .compact-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="chrome">
+      <aside class="sidebar">
+        <section class="panel">
+          <div class="panel-header">
+            <h2>GW Inspector</h2>
+            <div class="pill-row">
+              <span class="pill"><strong id="status-text">Idle</strong></span>
+              <span class="pill">build <strong id="build-id">unknown</strong></span>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="toolbar">
+              <input
+                id="target-url"
+                type="text"
+                value="/"
+                spellcheck="false"
+                aria-label="Target URL"
+              >
+              <button id="load-target" type="button">Load</button>
+              <button id="connect-target" type="button">Connect</button>
+            </div>
+            <div class="status-grid" style="margin-top: 12px">
+              <div class="field">
+                <label>Runtime</label>
+                <div id="runtime-status" class="pill">not connected</div>
+              </div>
+              <div class="field">
+                <label>Target</label>
+                <div id="target-status" class="pill">no frame</div>
+              </div>
+              <div class="field">
+                <label>Captured</label>
+                <div id="capture-status" class="pill">unknown</div>
+              </div>
+              <div class="field">
+                <label>Map</label>
+                <div id="map-status" class="pill">unresolved</div>
+              </div>
+            </div>
+            <p id="build-summary" class="muted small" style="margin: 12px 0 0">
+              Load the client in the embedded frame, then connect once `GWHook`
+              is ready.
+            </p>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-header">
+            <h3>Bookmarks</h3>
+            <div class="list-actions">
+              <button id="bookmark-current-viewer" type="button">Save Viewer</button>
+              <button id="bookmark-current-state" type="button">Save Map State</button>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="form-grid">
+              <div class="field">
+                <label>Label</label>
+                <input id="bookmark-label" type="text" spellcheck="false">
+              </div>
+              <div class="field">
+                <label>Address</label>
+                <input id="bookmark-address" type="text" spellcheck="false">
+              </div>
+              <div class="field span-2">
+                <button id="bookmark-add" type="button">Add Bookmark</button>
+              </div>
+            </div>
+            <div class="table-wrap compact" style="margin-top: 12px">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Label</th>
+                    <th>Address</th>
+                    <th>Use</th>
+                  </tr>
+                </thead>
+                <tbody id="bookmark-table"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-header">
+            <h3>Struct Viewer</h3>
+            <button id="viewer-refresh" type="button">Refresh</button>
+          </div>
+          <div class="panel-body">
+            <div class="form-grid">
+              <div class="field">
+                <label>Preset</label>
+                <select id="viewer-preset">
+                  <option value="charContextNative">CharContext Native</option>
+                  <option value="playerNative">Player Native</option>
+                  <option value="agentLivingNative">AgentLiving Native</option>
+                  <option value="desktopGameContext">GameContext Native</option>
+                  <option value="gameplayRootObserved">Gameplay Root Observed</option>
+                  <option value="pointerBlock">Pointer Block</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Address Source</label>
+                <select id="viewer-source">
+                  <option value="manual">Manual</option>
+                  <option value="mapState">GW.map stateAddress</option>
+                  <option value="gameplayContext">GW.map gameplayContext</option>
+                  <option value="charContext">GW.map charContext</option>
+                  <option value="mapContext">GW.map mapContext</option>
+                </select>
+              </div>
+              <div class="field span-2">
+                <label>Address</label>
+                <input id="viewer-address" type="text" spellcheck="false">
+              </div>
+            </div>
+            <div id="viewer-meta" class="pill-row" style="margin-top: 12px"></div>
+            <div class="table-wrap" style="margin-top: 12px">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Field</th>
+                    <th>Offset</th>
+                    <th>Value</th>
+                    <th>Hex / Text</th>
+                  </tr>
+                </thead>
+                <tbody id="viewer-table"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-header">
+            <h3>Player Discovery</h3>
+            <div class="list-actions">
+              <button id="player-find-struct" type="button">Find Player</button>
+              <button id="player-find-agent" type="button">Find Agent</button>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="form-grid">
+              <div class="field">
+                <label>Character Name</label>
+                <input id="player-name" type="text" spellcheck="false">
+              </div>
+              <div class="field">
+                <label>Player Number</label>
+                <input id="player-number" type="text" spellcheck="false">
+              </div>
+              <div class="field">
+                <label>Agent Id</label>
+                <input id="player-agent-id" type="text" spellcheck="false">
+              </div>
+              <div class="field">
+                <label>Search Limit</label>
+                <input id="player-search-limit" type="text" value="32" spellcheck="false">
+              </div>
+            </div>
+            <pre id="player-results" class="results" style="margin-top: 12px"></pre>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-header">
+            <h3>Search</h3>
+            <button id="search-run" type="button">Run</button>
+          </div>
+          <div class="panel-body">
+            <div class="form-grid">
+              <div class="field">
+                <label>Mode</label>
+                <select id="search-mode">
+                  <option value="utf16">UTF-16</option>
+                  <option value="utf8">UTF-8</option>
+                  <option value="u32">U32</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Limit</label>
+                <input id="search-limit" type="text" value="32" spellcheck="false">
+              </div>
+              <div class="field span-2">
+                <label>Query</label>
+                <input id="search-query" type="text" spellcheck="false">
+              </div>
+              <div class="field">
+                <label>Start</label>
+                <input id="search-start" type="text" value="0x0" spellcheck="false">
+              </div>
+              <div class="field">
+                <label>End</label>
+                <input id="search-end" type="text" value="" spellcheck="false">
+              </div>
+            </div>
+            <pre id="search-results" class="results" style="margin-top: 12px"></pre>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-header">
+            <h3>Refs And Paths</h3>
+            <div class="list-actions">
+              <button id="refs-run" type="button">Refs</button>
+              <button id="paths-run" type="button">Paths</button>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="form-grid">
+              <div class="field span-2">
+                <label>Target Address</label>
+                <input id="path-target-address" type="text" spellcheck="false">
+              </div>
+              <div class="field">
+                <label>Mode</label>
+                <select id="path-mode">
+                  <option value="anchored">Anchored</option>
+                  <option value="direct">Direct</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Depth</label>
+                <input id="path-depth" type="text" value="4" spellcheck="false">
+              </div>
+              <div class="field">
+                <label>Node Bytes</label>
+                <input id="path-node-bytes" type="text" value="0x100" spellcheck="false">
+              </div>
+              <div class="field">
+                <label>Anchor Bytes</label>
+                <input id="path-anchor-bytes" type="text" value="0x800" spellcheck="false">
+              </div>
+              <div class="field">
+                <label>Max Nodes</label>
+                <input id="path-max-nodes" type="text" value="4096" spellcheck="false">
+              </div>
+              <div class="field">
+                <label>Limit</label>
+                <input id="path-max-results" type="text" value="16" spellcheck="false">
+              </div>
+            </div>
+            <pre id="refs-results" class="results" style="margin-top: 12px"></pre>
+            <pre id="path-results" class="results" style="margin-top: 12px"></pre>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-header">
+            <h3>Watches</h3>
+            <div class="list-actions">
+              <button id="watch-add" type="button">Add</button>
+              <button id="watch-refresh" type="button">Refresh</button>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="form-grid">
+              <div class="field">
+                <label>Label</label>
+                <input id="watch-label" type="text" spellcheck="false">
+              </div>
+              <div class="field">
+                <label>Interval</label>
+                <input id="watch-interval" type="text" value="500" spellcheck="false">
+              </div>
+              <div class="field span-2">
+                <label>Expression</label>
+                <input
+                  id="watch-expression"
+                  type="text"
+                  value="GW.map.getState()"
+                  spellcheck="false"
+                >
+              </div>
+            </div>
+            <div class="table-wrap" style="margin-top: 12px">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Label</th>
+                    <th>Expression</th>
+                    <th>Value</th>
+                    <th>Use</th>
+                  </tr>
+                </thead>
+                <tbody id="watch-table"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-header">
+            <h3>Diff</h3>
+            <div class="list-actions">
+              <button id="diff-capture" type="button">Capture</button>
+              <button id="diff-run" type="button">Compare</button>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="form-grid">
+              <div class="field">
+                <label>Region Start</label>
+                <input id="diff-start" type="text" value="0x0" spellcheck="false">
+              </div>
+              <div class="field">
+                <label>Length</label>
+                <input id="diff-length" type="text" value="0x100" spellcheck="false">
+              </div>
+              <div class="field span-2">
+                <label class="small">
+                  <input id="diff-zone-watch" type="checkbox">
+                  Auto capture when `GW.map.getMapId()` changes
+                </label>
+              </div>
+            </div>
+            <pre id="diff-results" class="results" style="margin-top: 12px"></pre>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-header">
+            <h3>Build Notes</h3>
+            <div class="list-actions">
+              <button id="notes-save" type="button">Save Notes</button>
+              <button id="offset-save-current" type="button">Save Current</button>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="form-grid">
+              <div class="field">
+                <label>Resolved Label</label>
+                <input id="offset-label" type="text" spellcheck="false">
+              </div>
+              <div class="field">
+                <label>Target Key</label>
+                <input id="offset-target-key" type="text" value="modules.map.stateAddress" spellcheck="false">
+              </div>
+              <div class="field span-2">
+                <label>Notes</label>
+                <textarea id="build-notes" class="notes" spellcheck="false"></textarea>
+              </div>
+            </div>
+            <div class="table-wrap compact" style="margin-top: 12px">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Label</th>
+                    <th>Target</th>
+                    <th>Address</th>
+                    <th>Use</th>
+                  </tr>
+                </thead>
+                <tbody id="offset-table"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </aside>
+
+      <section class="viewer">
+        <section class="panel">
+          <div class="panel-header">
+            <h3>Live Context</h3>
+            <div class="pill-row" id="live-context-pills"></div>
+          </div>
+        </section>
+        <section class="panel surface">
+          <div class="panel-header">
+            <h3>Embedded Client</h3>
+            <span class="muted small" id="frame-caption">same-origin iframe</span>
+          </div>
+          <div class="panel-body">
+            <iframe
+              id="target-frame"
+              src="/"
+              allow="pointer-lock; fullscreen"
+            ></iframe>
+          </div>
+        </section>
+      </section>
+    </div>
+
+    <script type="module" src="/gw-hook/inspector.js"></script>
+  </body>
+</html>

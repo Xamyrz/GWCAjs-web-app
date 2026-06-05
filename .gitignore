@@ -1,0 +1,6 @@
+extracted/
+local-mirror/
+__pycache__/
+.agents/
+.codex/
+*.zip

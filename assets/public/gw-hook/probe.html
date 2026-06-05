@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>GWHook Probe</title>
+    <style>
+      body {
+        font-family: monospace;
+        margin: 16px;
+      }
+
+      #status {
+        white-space: pre-wrap;
+      }
+
+      iframe {
+        width: 1px;
+        height: 1px;
+        border: 0;
+        position: absolute;
+        left: -9999px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="status">Starting probe...</div>
+    <iframe id="target" src="/?gwDisableImageDb=1&amp;gwDisableJspi=1"></iframe>
+    <script>
+      const status = document.getElementById("status");
+      const frame = document.getElementById("target");
+
+      function setStatus(value) {
+        status.textContent = value;
+      }
+
+      function collectDiagnostics(win) {
+        const doc = win.document;
+        const detailsArea = doc.getElementById("dialog-details-area");
+        const loadingText = doc.getElementById("loading-text");
+        const hook = win.GWHook || null;
+        const gameplayContextSlot = 5940872;
+        const gameplayContext =
+          hook && typeof hook.readU32 === "function"
+            ? hook.readU32(gameplayContextSlot)
+            : null;
+        return {
+          diagnostics:
+            win.__GWDiagnostics__ && typeof win.__GWDiagnostics__.dump === "function"
+              ? win.__GWDiagnostics__.dump()
+              : win.__GWDiagnostics__ || null,
+          dialogDetails: detailsArea ? detailsArea.value : null,
+          documentReadyState: doc.readyState,
+          gwDescribe:
+            win.GW && typeof win.GW.describe === "function" ? win.GW.describe() : null,
+          mapDescribe:
+            win.GW && win.GW.map && typeof win.GW.map.describe === "function"
+              ? win.GW.map.describe()
+              : null,
+          mapState:
+            win.GW && win.GW.map && typeof win.GW.map.getState === "function"
+              ? win.GW.map.getState()
+              : null,
+          hookBuildInfo:
+            win.GWHook && typeof win.GWHook.getBuildInfo === "function"
+              ? win.GWHook.getBuildInfo()
+              : null,
+          memoryPeek: {
+            charContext:
+              gameplayContext && hook && typeof hook.readU32 === "function"
+                ? hook.readU32(gameplayContext + 0x44)
+                : null,
+            gameplayContext,
+            gameplayContextSlot,
+            mapContext:
+              gameplayContext && hook && typeof hook.readU32 === "function"
+                ? hook.readU32(gameplayContext + 0x14)
+                : null,
+          },
+          hasModuleObject: !!win.Module,
+          loadingText: loadingText ? loadingText.textContent : null,
+          resourceUrls: win.performance
+            .getEntriesByType("resource")
+            .map((entry) => entry.name),
+          title: doc.title,
+        };
+      }
+
+      async function runProbe() {
+        const win = frame.contentWindow;
+        if (!win) {
+          setStatus("FAIL: iframe window unavailable");
+          return;
+        }
+
+        const startedAt = Date.now();
+        while (Date.now() - startedAt < 60000) {
+          try {
+            if (win.GWHook) {
+              const hook = win.GWHook;
+              await Promise.race([
+                hook.captured,
+                new Promise((_, reject) =>
+                  setTimeout(() => reject(new Error("capture timeout")), 50000)
+                ),
+              ]);
+
+              await Promise.race([
+                hook.ready,
+                new Promise((_, reject) =>
+                  setTimeout(() => reject(new Error("runtime timeout")), 50000)
+                ),
+              ]);
+
+              const snapshot = hook.getCaptureState();
+              const exportCount = hook.listExports().length;
+              setStatus(
+                JSON.stringify(
+                  {
+                    captureCount: snapshot.captures.length,
+                    diagnostics: collectDiagnostics(win),
+                    gwDescribe:
+                      win.GW && typeof win.GW.describe === "function"
+                        ? win.GW.describe()
+                        : null,
+                    mapDescribe:
+                      win.GW && win.GW.map && typeof win.GW.map.describe === "function"
+                        ? win.GW.map.describe()
+                        : null,
+                    mapState:
+                      win.GW && win.GW.map && typeof win.GW.map.getState === "function"
+                        ? win.GW.map.getState()
+                        : null,
+                    hasGWHook: true,
+                    hasInstance: !!hook.instance,
+                    hasMemory: !!hook.memory,
+                    runtimeInitialized: snapshot.runtimeInitialized,
+                    exportCount,
+                  },
+                  null,
+                  2
+                )
+              );
+              return;
+            }
+          } catch (error) {
+            setStatus(
+              JSON.stringify(
+                {
+                  diagnostics: collectDiagnostics(win),
+                  error: String(error),
+                  status: "FAIL",
+                },
+                null,
+                2
+              )
+            );
+            return;
+          }
+          await new Promise((resolve) => setTimeout(resolve, 100));
+        }
+
+        setStatus(
+          JSON.stringify(
+            {
+              diagnostics: collectDiagnostics(win),
+              status: "TIMEOUT: GWHook was not detected",
+            },
+            null,
+            2
+          )
+        );
+      }
+
+      frame.addEventListener("load", () => {
+        runProbe().catch((error) => {
+          setStatus(
+            JSON.stringify(
+              {
+                error: String(error),
+                status: "FAIL",
+              },
+              null,
+              2
+            )
+          );
+        });
+      });
+    </script>
+  </body>
+</html>

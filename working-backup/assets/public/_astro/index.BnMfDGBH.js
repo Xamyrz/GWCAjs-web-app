@@ -1,0 +1,2 @@
+const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["_astro/web.GiRm1fPc.js","_astro/Client.astro_astro_type_script_index_0_lang.wgoz1NN0.js"])))=>i.map(i=>d[i]);
+import{r as e,_ as r}from"./Client.astro_astro_type_script_index_0_lang.wgoz1NN0.js";const i=e("CapacitorPersistentAccount",{web:()=>r(()=>import("./web.GiRm1fPc.js"),__vite__mapDeps([0,1])).then(t=>new t.CapacitorPersistentAccountWeb)});export{i as CapacitorPersistentAccount};

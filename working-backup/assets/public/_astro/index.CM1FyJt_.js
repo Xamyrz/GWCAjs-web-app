@@ -1,0 +1,2 @@
+const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["_astro/web.BGyAQJst.js","_astro/Client.astro_astro_type_script_index_0_lang.wgoz1NN0.js"])))=>i.map(i=>d[i]);
+import{r as i,_ as t}from"./Client.astro_astro_type_script_index_0_lang.wgoz1NN0.js";const m=i("CommunityDevice",{web:()=>t(()=>import("./web.BGyAQJst.js"),__vite__mapDeps([0,1])).then(e=>new e.CommunityDeviceWeb)});export{m as CommunityDevice};

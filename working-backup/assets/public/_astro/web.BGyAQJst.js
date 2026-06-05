@@ -1,0 +1,1 @@
+import{a as e}from"./Client.astro_astro_type_script_index_0_lang.wgoz1NN0.js";class n extends e{async getInfo(){throw this.unavailable("getInfo is not supported on web")}}export{n as CommunityDeviceWeb};

@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>GWCAjs Probe</title>
+    <style>
+      body {
+        font-family: monospace;
+        margin: 16px;
+      }
+
+      #status {
+        white-space: pre-wrap;
+      }
+
+      iframe {
+        width: 1px;
+        height: 1px;
+        border: 0;
+        position: absolute;
+        left: -9999px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="status">Starting GWCAjs probe...</div>
+    <iframe id="target" src="/?gwDisableImageDb=1&amp;gwDisableJspi=1"></iframe>
+    <script>
+      const status = document.getElementById("status");
+      const frame = document.getElementById("target");
+
+      function setStatus(value) {
+        status.textContent = value;
+      }
+
+      async function runProbe() {
+        const win = frame.contentWindow;
+        if (!win) {
+          setStatus("FAIL: iframe window unavailable");
+          return;
+        }
+
+        const startedAt = Date.now();
+        while (Date.now() - startedAt < 60000) {
+          try {
+            if (win.GWCAjs && win.GWHook) {
+              await Promise.race([
+                win.GWHook.ready,
+                new Promise((_, reject) =>
+                  setTimeout(() => reject(new Error("runtime timeout")), 50000)
+                ),
+              ]);
+
+              const result = await win.GWCAjs.initialize();
+              setStatus(
+                JSON.stringify(
+                  {
+                    gwca: result,
+                    gwcaDescribe:
+                      typeof win.GWCAjs.describe === "function"
+                        ? win.GWCAjs.describe()
+                        : null,
+                    hookBuildInfo:
+                      typeof win.GWHook.getBuildInfo === "function"
+                        ? win.GWHook.getBuildInfo()
+                        : null,
+                  },
+                  null,
+                  2
+                )
+              );
+              return;
+            }
+          } catch (error) {
+            setStatus(
+              JSON.stringify(
+                {
+                  error: String(error),
+                  gwcaState:
+                    win.GWCAjs && typeof win.GWCAjs.getState === "function"
+                      ? win.GWCAjs.getState()
+                      : null,
+                  status: "FAIL",
+                },
+                null,
+                2
+              )
+            );
+            return;
+          }
+
+          await new Promise((resolve) => setTimeout(resolve, 100));
+        }
+
+        setStatus(
+          JSON.stringify(
+            {
+              status: "TIMEOUT: GWCAjs was not detected",
+            },
+            null,
+            2
+          )
+        );
+      }
+
+      frame.addEventListener("load", () => {
+        runProbe().catch((error) => {
+          setStatus(
+            JSON.stringify(
+              {
+                error: String(error),
+                status: "FAIL",
+              },
+              null,
+              2
+            )
+          );
+        });
+      });
+    </script>
+  </body>
+</html>

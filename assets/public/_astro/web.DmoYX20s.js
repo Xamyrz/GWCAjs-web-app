@@ -1,0 +1,1 @@
+import{a as e}from"./Client.astro_astro_type_script_index_0_lang.wgoz1NN0.js";class t extends e{async resolve(o){throw this.unimplemented("DNS resolution not implemented on web.")}}export{t as ArenaDnsWeb};
