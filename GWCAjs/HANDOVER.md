@@ -305,21 +305,34 @@ been live-tested in both an explorable and an outpost. Verified rows include:
 - `MissionArea` (`14`) -> request instance map type `1`, `isOutpost = false`
 - `Dungeon` (`18`) -> request instance map type `1`, `isOutpost = false`
 
-The desktop `GetInstanceInfoPtr()` pointer slot is still not identified in the
-browser build. Native GWCA returns the address of a static `InstanceInfo*` slot,
-not the `InstanceInfo` struct itself. `GWCAjs.Map.GetInstanceInfoPtr()` now
-looks for `modules.map.instanceInfoPtrAddress` first, with the older
-`modules.map.instanceInfoAddress` key kept only as a compatibility fallback.
-`GetInstanceType()` currently reads the verified mission-client/CharContext
-map-type field instead, so instance type behavior is covered even while the
-desktop pointer slot remains unknown. A live scan for pointer-slot candidates
-whose pointee matched `{ instance_type, current_map_info }` returned no hits in
-the normal JSPI data/global ranges. A later struct-shape scan found
-`0x5a230c`, but WAT shows this is a JSPI map-info cache:
+The desktop `GetInstanceInfoPtr()` pointer slot is not present in the browser
+build. Native GWCA returns the address of a static `InstanceInfo*` slot, not the
+`InstanceInfo` struct itself. The current JSPI mission getters instead read
+individual fields through mission Prop `0x11`; named/current WAT comparison
+found no function that materializes the native five-field struct.
+
+`GWCAjs.Map.GetInstanceInfoPtr()` now preserves the native pointer-to-pointer
+contract with a stable 24-byte WASM allocation: a four-byte pointer slot
+followed by the 20-byte `InstanceInfo` layout. Each call refreshes
+`instance_type` from the verified mission-client map type and
+`current_map_info` from the current-build AreaInfo table. JSPI has no verified
+equivalent for either terrain pointer or `terrain_count`, so those fields are
+zero. A future build can override the compatibility allocation with
+`modules.map.instanceInfoPtrAddress`; the older
+`modules.map.instanceInfoAddress` key remains a compatibility fallback.
+
+A live scan for pointer-slot candidates whose pointee matched
+`{ instance_type, current_map_info }` returned no hits in the normal JSPI
+data/global ranges. A later struct-shape scan found `0x5a230c`, but WAT shows
+this is a JSPI map-info cache:
 `0x5a2310 = MissionCliGetObserveMapType()` and
 `0x5a2314 = ConstGetMissionClientData(observeMapId)`. The following qword at
 `0x5a2318` is treated as `f64`, so this is not the desktop `InstanceInfo`
-layout.
+layout. Deterministic coverage is in `GWCAjs/Tests/InstanceInfo.test.mjs`;
+live pointer readback passed on 2026-06-07. The returned slot contained the
+expected struct pointer, reported outpost instance type `0`, and its
+`current_map_info` exactly matched `GetCurrentMapInfo().address`. The
+unavailable terrain count remained zero as intended.
 
 `GetMissionMapContext()` and `GetWorldMapContext()` now recover the same
 callback-owned contexts without installing browser-side hooks. Build `38615`
@@ -339,9 +352,44 @@ The current callback identities are:
 frame array, matches the exact callback slot, validates the context allocation
 range and embedded frame ID, then decodes the native layouts. It does not cache
 the pointer, because both callbacks free their object on frame destruction and
-do not reliably clear the callback slot. This is statically verified against
-the current and named JSPI binaries; live opening/closing tests for both map
-windows are still required.
+do not reliably clear the callback slot. This was statically verified against
+the current and named JSPI binaries, then live-tested successfully for both map
+windows on 2026-06-07.
+
+The MapTest travel-race state machine is implemented in
+`GWCAjs/Source/MapTest.js`. It preserves the native phases, status strings,
+packet burst arguments, timeout behavior, 100 ms settle period, and retry
+counter. `MapTestGetState()` is also exposed for browser diagnostics.
+
+The browser runtime does not currently expose native UI-message callback
+registration. MapTest therefore maps `kLoadMapContext` (`0x10000098`) to the
+anchor map arriving with a replaced live MapContext pointer. For
+`kStartMapLoad` (`0x100000c2`), it additionally accepts the earlier loading
+transition, while retaining the native fallback to the load-context signal.
+The controller polls on a cancellable 16 ms timer and stops itself if GWCAjs is
+terminated or reinitialized. Deterministic tests are in
+`GWCAjs/Tests/MapTest.test.mjs`.
+
+The initial live browser test on 2026-06-07 used the native defaults of three
+alternate packets and unlimited retries. It could remain on the loading/map
+change screen because the alternate map kept winning and the native `wait2`
+phase has no loading deadline. Browser defaults are now deliberately safer:
+`count = 1`, `maxTries = 1`, and `loadingTimeoutMs = 15000`. Failures stop the
+controller and appear in `MapTestGetState().failureReason`.
+
+Even one conflicting alternate travel request reproduced the stuck 100%
+loading screen. `MapTestStart(...)` therefore fails closed with
+`failureReason = "unsafe-opt-in-required"` and sends no travel packets. The
+actual race is exposed only as:
+
+```text
+MapTestStartUnsafe(mapId, altMapId, number, count, delayMs, timeoutMs,
+                   messageId, maxTries, loadingTimeoutMs)
+```
+
+Passing `maxTries = 0` restores native-style unlimited retries. This method can
+strand the client and should only be used when a page/game restart is
+acceptable.
 
 Use `GWCAjs.Map.GetActionStatuses()` to inspect patched action export status.
 

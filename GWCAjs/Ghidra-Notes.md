@@ -629,12 +629,22 @@ Current JSPI MapTypeInstanceInfo table:
 Desktop GWCA `GetInstanceInfoPtr()` returns the address of a static
 `InstanceInfo*` slot found by the native scanner pattern, while JSPI
 `MissionCliGetInstance/Map/Type/World` reads mission-client fields through
-`PropGet(0x11)`. No current JSPI equivalent of the desktop pointer slot is
-verified yet; use `modules.map.instanceInfoPtrAddress` only after live memory
-or WAT evidence identifies that slot. A live scan for pointer-slot candidates
-whose pointee matched `{ instance_type, current_map_info }` returned no hits in
-the normal JSPI data/global ranges. A later struct-shape scan found
-`0x5a230c`, but current WAT `func[7247]` writes
+`PropGet(0x11)`. Named/current WAT comparison found no current JSPI function
+that materializes the native five-field struct or pointer slot.
+
+GWCAjs therefore exposes a stable compatibility allocation with the same ABI:
+a four-byte pointer slot followed by the 20-byte struct. It refreshes
+`instance_type` from mission Prop `0x11` and `current_map_info` from the
+verified AreaInfo table on each call. The unverified terrain pointers and
+count remain zero. `modules.map.instanceInfoPtrAddress` can replace this
+allocation if a future build exposes a real slot. Live browser readback passed
+on 2026-06-07: the slot and pointee were valid, instance type was `0` in an
+outpost, and `current_map_info` exactly matched `GetCurrentMapInfo().address`.
+
+A live scan for pointer-slot candidates whose pointee matched
+`{ instance_type, current_map_info }` returned no hits in the normal JSPI
+data/global ranges. A later struct-shape scan found `0x5a230c`, but current WAT
+`func[7247]` writes
 `0x5a2310 = MissionCliGetObserveMapType()` and
 `0x5a2314 = ConstGetMissionClientData(observeMapId)`, while `func[7256]`
 treats `0x5a2318` as `f64`. This makes it a JSPI map-info cache, not the
@@ -663,7 +673,44 @@ callback:
 The implementation scans only active frames and revalidates the callback and
 frame ID on every call. It intentionally does not cache the callback context
 slot because the destroyed object can leave a stale pointer behind. Static
-matching is complete; live open/close readback remains to be tested.
+matching is complete, and live open/close readback passed on 2026-06-07.
+
+## MapTest State Machine
+
+The native MapTest helper is a travel-race state machine rather than a
+current-build internal function:
+
+- `step0` increments `tries`, travels to the anchor map using the current
+  region/language, and enters `wait0`
+- the configured anchor load message enters `wait1`
+- after `delay_ms`, `step1` sends `count` travel packets to the alternate map
+  with region `0`, configured district number, and language `0`, then enters
+  `run`
+- if the anchor remains loaded through `timeout_ms`, the test finishes `done`
+- if another map wins, or the anchor was not observed at timeout, the machine
+  waits for loading to finish, settles for 100 ms, and retries from `step0`
+
+GWCAjs implements these same phases in `GWCAjs/Source/MapTest.js`. Since the
+browser UI manager does not yet expose native callback registration,
+`kLoadMapContext` is detected by an anchor-map MapContext pointer replacement;
+`kStartMapLoad` also accepts the loading transition and then falls back to the
+same context-replacement signal. The polling controller uses a 16 ms
+cancellable timer and preserves native status strings and retry-count
+semantics.
+
+The native defaults (`count = 3`, unlimited retries) proved unsafe as browser
+defaults in a live test on 2026-06-07: repeated conflicting travel requests
+could leave the client on the loading/map-change screen. GWCAjs therefore uses
+one packet and one attempt by default, plus a 15-second loading watchdog.
+`maxTries = 0` remains available when the native unbounded stress behavior is
+specifically required. The diagnostic state records `failureReason` as
+`max-tries-reached`, `loading-timeout`, or a travel-call failure.
+
+A second live test confirmed that even one conflicting request can leave the
+browser client at a 100% loading screen after the JavaScript controller has
+already stopped. `MapTestStart` now refuses execution with
+`unsafe-opt-in-required`; only the explicitly named `MapTestStartUnsafe`
+method sends the travel race.
 
 Live browser readback confirmed the same values after reload:
 

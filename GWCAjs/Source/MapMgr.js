@@ -5,6 +5,7 @@ import {
 } from "../Include/GWCA/Constants/Constants.js";
 import { getInstanceTime } from "../Include/GWCA/Context/AgentContext.js";
 import { getIsInCinematic } from "../Include/GWCA/Context/Cinematic.js";
+import { getInstanceInfoPtrAddress } from "../Include/GWCA/Context/InstanceInfo.js";
 import { getPathingMapArray } from "../Include/GWCA/Context/MapContext.js";
 import {
   getMissionMapUIContext,
@@ -24,6 +25,7 @@ import {
 } from "../Include/GWCA/GameEntities/Map.js";
 import { isValidPointer, readValue } from "../Include/GWCA/Utilities/Memory.js";
 import { createMapInternals } from "./MapMgrInternals.js";
+import { createMapTestController } from "./MapTest.js";
 import { asHex, createModule } from "./stdafx.js";
 
 function readSchema(state, address, schema) {
@@ -144,13 +146,6 @@ function getMapTypeInstanceInfo(state, regionType) {
   return null;
 }
 
-function getInstanceInfoPtrAddress(state) {
-  return (
-    getResolvedAddress(state, "modules.map.instanceInfoPtrAddress") ||
-    getResolvedAddress(state, "modules.map.instanceInfoAddress")
-  );
-}
-
 function refreshMapState(state) {
   const charContextAddress = state.anchors?.charContextAddress || 0;
   const mapSchema = state.map?.schema || state.signatures?.modules?.map?.schema || null;
@@ -197,11 +192,7 @@ function createMapApi(state, global = globalThis) {
   const getContextAddresses = createContextAddressReader(state);
   const getCurrentState = createStateReader(state, global);
   const internals = createMapInternals(state);
-  const mapTest = {
-    active: false,
-    count: 0,
-    status: "idle",
-  };
+  let mapApi = null;
 
   function getField(fieldName) {
     const currentState = getCurrentState();
@@ -296,7 +287,31 @@ function createMapApi(state, global = globalThis) {
     }
   }
 
-  return Object.freeze({
+  const mapTest = createMapTestController({
+    getLanguage: () => getField("language") ?? Language.English,
+    getRegion,
+    global,
+    isCurrent: () => state.map?.api === mapApi,
+    readSnapshot() {
+      const current = getCurrentState();
+      return {
+        instanceType: current?.mapType,
+        mapContextAddress: getContextAddresses().mapContextAddress || 0,
+        mapId: current?.mapId,
+      };
+    },
+    sendTravel(mapId, region, districtNumber, language) {
+      return internals.callMessage("Travel", [
+        mapId,
+        region,
+        districtNumber,
+        language,
+        0,
+      ]);
+    },
+  });
+
+  mapApi = Object.freeze({
     Describe() {
       const runtimeMap = getRuntimeMap(global);
       return {
@@ -470,22 +485,45 @@ function createMapApi(state, global = globalThis) {
       ]);
     },
     MapTestStart() {
-      mapTest.active = false;
-      mapTest.status = "unavailable";
-      return false;
+      return mapTest.refuse();
+    },
+    MapTestStartUnsafe(
+      mapId,
+      altMapId,
+      number = 2,
+      count = 1,
+      delayMs = 0,
+      timeoutMs = 10000,
+      messageId = 0x10000098,
+      maxTries = 1,
+      loadingTimeoutMs = 15000
+    ) {
+      return mapTest.start(
+        mapId,
+        altMapId,
+        number,
+        count,
+        delayMs,
+        timeoutMs,
+        messageId,
+        maxTries,
+        loadingTimeoutMs
+      );
     },
     MapTestStop() {
-      mapTest.active = false;
-      mapTest.status = "stopped";
+      mapTest.stop();
     },
     MapTestGetStatus() {
-      return mapTest.status;
+      return mapTest.getStatus();
     },
     MapTestIsActive() {
-      return mapTest.active;
+      return mapTest.isActive();
     },
     MapTestGetCount() {
-      return mapTest.count;
+      return mapTest.getCount();
+    },
+    MapTestGetState() {
+      return mapTest.getState();
     },
     GetMissionMapIconArray() {
       return getMissionMapIcons(state);
@@ -508,7 +546,7 @@ function createMapApi(state, global = globalThis) {
       return getMapInfo(state, getField("mapId") ?? 0);
     },
     GetInstanceInfoPtr() {
-      return getInstanceInfoPtrAddress(state);
+      return getInstanceInfoPtrAddress(state, getCurrentState());
     },
     GetMapTypeInstanceInfo(regionType) {
       return getMapTypeInstanceInfo(state, regionType);
@@ -654,6 +692,7 @@ function createMapApi(state, global = globalThis) {
       return withRefreshedMapState(promote(target, options));
     },
   });
+  return mapApi;
 }
 
 export const MapModule = createModule("MapMgr", async function initModule(
