@@ -88,14 +88,14 @@ Use the explicit Map-side helpers to recover the native char context by characte
 
 Promotion writes the runtime `modules.gameplay.charContextAddress` override and updates the GWCAjs in-memory anchor cache. Do not replace this with an implicit Player scan fallback.
 
-Once a validated char context is promoted, `PlayerMgr` now tries one additional bounded path before any disabled broad scan:
+With MapMgr promoting the PropContext/GameContext root during initialize,
+`PlayerMgr` no longer performs root discovery. It trusts the promoted anchors:
 
-- scan only aligned pointer fields inside `charContext + 0x000..0x4ff`
-- accept a pointer only if it validates as:
-  - a game context whose `+0x44` field equals the promoted char context and whose `+0x2c` world validates, or
-  - a world context whose `+0x67c` player number matches the char context `+0x2ac` and whose player array at `+0x80c` has a sane buffer/capacity
+- `state.anchors.gameplayContextAddress`
+- `state.anchors.charContextAddress`
+- `state.anchors.worldContextAddress`
 
-`GWCAjs.Player.DescribeFastPlayerPath().charContextPointerCandidates` reports these bounded candidates and their rejection reasons.
+From there, player lookup follows the GWCA-style chain directly.
 
 GWCA desktop `PlayerMgr` is simpler than the earlier JS fallbacks:
 
@@ -355,20 +355,11 @@ GWCAjs.Map.FindGameContextRootReferences(root, {
 
 `wasm-objdump` around the current `GmContext.cpp` assertion constant (`1078109`) showed a const-table accessor shape, not the main `GameContext` root. Do not infer the root from that function index.
 
-Use the explicit runtime finder for the GWCA-style root:
-
-- `GWCAjs.Player.FindGameContextCandidates({ referenceLimit: 8192 })`
-- if needed, broaden offsets with `GWCAjs.Player.FindGameContextCandidates({ strict: false, referenceLimit: 8192 })`
-- promote a validated strict candidate with `GWCAjs.Player.PromoteGameContextAddress(candidate.gameContextAddress)`
-- or do both strict steps with `GWCAjs.Player.PromoteGameContextFromCurrentCharContext()`
-
-The public runtime mirror also exposes the same probe as
-`GWCAjs.runtime.player.findGameContextCandidates(...)` /
-`GWCAjs.runtime.player.promoteGameContextAddress(...)`, plus
-`GWCAjs.runtime.player.promoteGameContextFromCurrentCharContext()`. After
-promotion, the runtime Player module caches `world + 0x80c` as the player
-array, so `getPlayerAddress()` can follow the GWCA chain without using the dead
-prop handles.
+Use the MapMgr root finders for GWCA-style root recovery. PlayerMgr no longer
+exports `FindGameContextCandidates`, `PromoteGameContextAddress`, or
+`PromoteGameContextFromCurrentCharContext`; those diagnostic/promote paths moved
+to MapMgr so PlayerMgr can stay focused on GWCA-style player/title access from
+the promoted `WorldContext`.
 
 ## Player action function pass
 
@@ -438,11 +429,21 @@ The cached current-player slot has no TTL; it is invalidated only by failed poin
 For hot action calls, `ChangeSecondProfession()` uses a fast-only agent-id lookup:
 
 1. cached current `Player` slot at `+0x00`
-2. PropGet-equivalent path: prop `0x11` player number + prop `0x0b` player array
+2. direct `WorldContext.players[char.player_number].agent_id`
 3. direct `WorldContext.playerControlledChar.agent_id`
 4. return `false`
 
-Do not run broad scan fallbacks from hot or read APIs. A live-client crash was observed when `GetPlayerAddress()` fell through to `GW.player.getPlayer({ scan: true })` with no return value. `resolveContextChain()` also keeps its char-context reference scan disabled by default; re-enable only through an explicit diagnostic path.
+Player action diagnostics:
+
+- `GWCAjs.Player.GetInternalFunction("ChangeSecondProfession")` reports the
+  disabled high-level `CharCli*` wrapper export.
+- `GWCAjs.Player.GetInternalFunction("SendOrderSetProfessionSecondary")`
+  reports the lower-level message function that the public API actually calls.
+- `GWCAjs.Player.GetActionStatus("ChangeSecondProfession")` is the preferred
+  public availability check; it reports `available: true` when either the direct
+  wrapper or lower-level message path is callable.
+
+Do not run broad scan fallbacks from hot or read APIs. A live-client crash was observed when `GetPlayerAddress()` fell through to `GW.player.getPlayer({ scan: true })` with no return value. `resolveContextChain()` now only validates MapMgr-promoted anchors.
 
 After a crash was observed following `GetPlayerAddress()`, current-player address reads were changed back to fast-only:
 
