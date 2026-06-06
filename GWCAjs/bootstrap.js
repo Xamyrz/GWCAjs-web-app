@@ -6,6 +6,9 @@ function install(global = globalThis) {
   }
 
   const api = Object.freeze({
+    get Context() {
+      return GWCA.getContextManager();
+    },
     get Map() {
       return GWCA.getMapManager();
     },

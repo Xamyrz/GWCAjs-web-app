@@ -1,4 +1,5 @@
 import { debugLog } from "./Debug.js";
+import { ContextModule } from "./Context.js";
 import { GameThreadModule } from "./GameThreadMgr.js";
 import { disableHooks as disableHookBase, enableHooks as enableHookBase, HookBaseModule } from "./Hooker.js";
 import { MapModule } from "./MapMgr.js";
@@ -12,6 +13,7 @@ import { UIModule } from "./UIMgr.js";
 const modules = [
   MemoryModule,
   ScannerModule,
+  ContextModule,
   HookBaseModule,
   GameThreadModule,
   RenderModule,
@@ -25,6 +27,7 @@ function createState() {
     anchors: {},
     build: null,
     buildId: null,
+    context: null,
     error: null,
     hook: null,
     hooksEnabled: false,
@@ -82,14 +85,22 @@ function describeCapture() {
 function buildResult(reused = false) {
   return {
     anchors: {
+      baseContextTableAddress: asHex(
+        state.anchors.baseContextTableAddress || 0
+      ),
+      basePtrAddress: asHex(state.anchors.basePtrAddress || 0),
       charContextAddress: asHex(state.anchors.charContextAddress || 0),
       contextSlotAddress: asHex(state.anchors.contextSlotAddress || 0),
       gameplayContextAddress: asHex(state.anchors.gameplayContextAddress || 0),
       mapContextAddress: asHex(state.anchors.mapContextAddress || 0),
+      worldContextAddress: asHex(state.anchors.worldContextAddress || 0),
     },
     build: state.build,
     buildId: state.buildId,
     capture: describeCapture(),
+    context: state.context?.api?.Describe
+      ? state.context.api.Describe()
+      : null,
     hooksEnabled: state.hooksEnabled,
     initialized: state.initialized,
     map: state.map?.api?.Describe ? state.map.api.Describe() : null,
@@ -179,6 +190,10 @@ export function describe() {
 
 export function getMapManager() {
   return state.map?.api || null;
+}
+
+export function getContextManager() {
+  return state.context?.api || null;
 }
 
 export function getPlayerManager() {

@@ -51,6 +51,15 @@ const SHARED_GAMEPLAY_SIGNATURES = Object.freeze({
 const BUILTIN_BUILD_SIGNATURES = Object.freeze({
   "10830b7275570948a0ac9c9ea6700b7a38": {
     ...SHARED_GAMEPLAY_SIGNATURES,
+    modules: {
+      ...SHARED_GAMEPLAY_SIGNATURES.modules,
+      map: {
+        ...SHARED_GAMEPLAY_SIGNATURES.modules.map,
+        areaInfoAddress: 0x1cbe60,
+        areaInfoCount: 883,
+        regionIdAddress: 0x5a4628,
+      },
+    },
     aliases: ["b5ecbd4c"],
   },
   "103f50bb0ce2d744bfbf88a91afce2328b": {
@@ -82,6 +91,9 @@ const BUILTIN_BUILD_SIGNATURES = Object.freeze({
       },
       map: {
         ...SHARED_GAMEPLAY_SIGNATURES.modules.map,
+        areaInfoAddress: 0x1cbe60,
+        areaInfoCount: 883,
+        regionIdAddress: 0x5a4628,
         stateAddress: "modules.gameplay.charContextAddress",
       },
       player: {
@@ -90,7 +102,7 @@ const BUILTIN_BUILD_SIGNATURES = Object.freeze({
         propContextTableSlotAddress: 0x28b680,
       },
     },
-    aliases: ["bcc4a791"],
+    aliases: ["69d4850a", "bcc4a791"],
   },
 });
 

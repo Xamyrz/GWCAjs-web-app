@@ -38,16 +38,24 @@ What should not be assumed to match:
 
 The initialization code now uses the existing wasm gameplay anchor chain as the first trusted source.
 
-The current build is now imported separately in Ghidra and should be treated as the primary verification target for the live client:
+The current JSPI build is imported separately in Ghidra and is the primary
+verification target for the live client:
 
-- project path: `/38615/Gw.wasm`
-- executable path: `/home/xamyr/Projects/net.arena.guildwars.reforged/Gw-Webapp/extracted/Gw.wasm`
+- project path: `/38615/Gw.jspi.wasm`
+- executable path: `/home/xamyr/Projects/gw-webapp-gwca/extracted/38615/Gw.jspi.wasm`
 - numeric client build: `38615`
+- build ID: `103f50bb0ce2d744bfbf88a91afce2328b`
 
-The older symbolized build remains useful for comparison, but it should not be treated as the source of truth for live offsets:
+The older symbolized JSPI build is the preferred semantic comparison target,
+but it is not the source of truth for live offsets:
 
-- project path: `/older version GW/Gw.wasm`
+- project path: `/older version GW/Gw.jspi.wasm`
 - numeric client build: `38549`
+
+The sibling current `/38615/Gw.wasm` program has a different build ID,
+`10830b7275570948a0ac9c9ea6700b7a38`. Use it as supporting evidence only.
+Browser-runtime signatures and export indexes must be confirmed in the
+matching `Gw.jspi.wasm`.
 
 ## Verified runtime findings for build 38615
 
@@ -70,7 +78,8 @@ This means the previous assumptions for build `103f50bb0ce2d744bfbf88a91afce2328
 Next Ghidra pass should:
 
 1. find the real gameplay/world context root for the active build; `0x005aa688` currently looks like a HelpGuide/UI context slot, not the gameplay world root
-2. identify xrefs that populate the real world/player arrays in `/38615/Gw.wasm`
+2. identify xrefs that populate the real world/player arrays in
+   `/38615/Gw.jspi.wasm`
 3. verify the semantic owner of any candidate `+0x20` pointer before using it as a map-context pointer
 4. document the char-context layout around the validated `playerName` hit
 
@@ -83,8 +92,8 @@ Latest live diagnostic after disabling unsafe Player scans showed:
 
 Use the explicit Map-side helpers to recover the native char context by character name:
 
-- `GWCAjs.Map.FindNativeCharContextsByPlayerName(name, { limit: 16 })`
-- `GWCAjs.Map.PromoteNativeCharContextByPlayerName(name, { limit: 16 })`
+- `GWCAjs.Context.FindNativeCharContextsByPlayerName(name, { limit: 16 })`
+- `GWCAjs.Context.PromoteNativeCharContextByPlayerName(name, { limit: 16 })`
 
 Promotion writes the runtime `modules.gameplay.charContextAddress` override and updates the GWCAjs in-memory anchor cache. Do not replace this with an implicit Player scan fallback.
 
@@ -125,29 +134,33 @@ helper only. The proper GWCA-style browser anchor should be either:
   `+0x2c -> WorldContext`, `world + 0x67c == char + 0x2ac`, and
   `world + 0x80c` is a sane player array.
 
-Base-context discovery lives on Map/runtime, not Player:
+Base-context discovery lives on the central Context/runtime layer, not a
+manager:
 
-- `GWCAjs.Map.FindBaseContextCandidates({ gameContextAddress })` uses a known
+The older `GWCAjs.Map` discovery and promotion names remain compatibility
+delegates, but new probes should use `GWCAjs.Context`.
+
+- `GWCAjs.Context.FindBaseContextCandidates({ gameContextAddress })` uses a known
   GameContext to locate `baseContextTable = referenceToGame - 0x18`. Searching
   for slots pointing at that table (`basePtrAddress`) is opt-in with
   `findBasePtrSlots: true`; do not enable it during the first live probe.
-- `GWCAjs.Map.FindBaseContextCandidates()` performs a bounded no-name table
+- `GWCAjs.Context.FindBaseContextCandidates()` performs a bounded no-name table
   scan around the current gameplay-context anchor and validates slot `6` as the
   GWCA-style GameContext.
-- `GWCAjs.Map.PromoteBaseContextCandidate(candidate)` writes resolver entries
+- `GWCAjs.Context.PromoteBaseContextCandidate(candidate)` writes resolver entries
   for `modules.gameplay.basePtrAddress`, `contextAddress`, `charContextAddress`,
   `mapContextAddress`, and `worldContextAddress`.
 
 Useful live sequence after the current name-bootstrap has found GameContext:
 
 ```js
-const fast = GWCAjs.Map.FindBaseContextCandidates({
+const fast = GWCAjs.Context.FindBaseContextCandidates({
   gameContextAddress: GWCAjs.Player.DescribeFastPlayerPath().gameplayContextAddress,
   referenceLimit: 256,
 });
 fast.candidates;
-GWCAjs.Map.PromoteBaseContextCandidate(fast.candidates[0]);
-GWCAjs.Map.GetContextAddresses();
+GWCAjs.Context.PromoteBaseContextCandidate(fast.candidates[0]);
+GWCAjs.Context.GetContextAddresses();
 ```
 
 If this returns multiple table candidates, compare their `table` details before
@@ -175,7 +188,7 @@ with a small limit. By default this scans only the static-data range
 `0x100000..0x300000`, not the whole heap:
 
 ```js
-const withBasePtr = GWCAjs.Map.FindBaseContextCandidates({
+const withBasePtr = GWCAjs.Context.FindBaseContextCandidates({
   gameContextAddress: GWCAjs.Player.DescribeFastPlayerPath().gameplayContextAddress,
   findBasePtrSlots: true,
   referenceLimit: 256,
@@ -283,13 +296,13 @@ signature.
 Runtime probe:
 
 ```js
-GWCAjs.Map.FindPropContextRootCandidates({
+GWCAjs.Context.FindPropContextRootCandidates({
   findGameContext: true,
   limit: 8,
 });
 ```
 
-`MapMgr` now attempts this PropContext-root scan first during initialization
+Central `Context` initialization attempts this PropContext-root scan first
 with `limit: 1`, then promotes the candidate directly as the GWCA-style
 GameContext if `propContextAddress` validates as a GameContext. The older direct
 GameContext scan remains as fallback if this root shape stops matching after a
@@ -298,14 +311,14 @@ future update.
 No-name direct GameContext scan:
 
 ```js
-const roots = GWCAjs.Map.FindGameContextRootCandidates({
+const roots = GWCAjs.Context.FindGameContextRootCandidates({
   anchorRadius: 0x800000,
   limit: 8,
   maxRejected: 64,
   maxScanSlots: 4000000,
 });
 roots.candidates;
-GWCAjs.Map.PromoteGameContextRootCandidate(roots.candidates[0]);
+GWCAjs.Context.PromoteGameContextRootCandidate(roots.candidates[0]);
 GWCAjs.Player.GetPlayerAddress();
 ```
 
@@ -314,7 +327,7 @@ This scans candidate GameContext addresses directly and validates
 `char + 0x2ac == world + 0x67c`, and the player-array/controlled-agent chain.
 It does not use character name.
 
-`MapMgr` now attempts this no-name scan during initialization:
+Central `Context` initialization attempts this no-name scan:
 
 - start from the existing gameplay-context anchor as a search neighborhood only
 - scan/promote one validated GameContext root
@@ -326,8 +339,8 @@ To investigate whether there is a reload-stable WASM root pointer even without
 desktop `base_ptr`, inspect references to the validated root addresses:
 
 ```js
-const root = GWCAjs.Map.FindGameContextRootCandidates({ limit: 1 }).candidates[0];
-GWCAjs.Map.FindGameContextRootReferences(root, {
+const root = GWCAjs.Context.FindGameContextRootCandidates({ limit: 1 }).candidates[0];
+GWCAjs.Context.FindGameContextRootReferences(root, {
   ranges: [
     { name: "staticData", start: 0x100000, end: 0x300000 },
     { name: "lowDynamic", start: 0x300000, end: 0x1000000 },
@@ -344,7 +357,7 @@ Reference results now include `owner` and `external` classification. Use
 `externalOnly: true` to hide fields inside the already-known root objects:
 
 ```js
-GWCAjs.Map.FindGameContextRootReferences(root, {
+GWCAjs.Context.FindGameContextRootReferences(root, {
   externalOnly: true,
   ranges: [
     { name: "staticData", start: 0x100000, end: 0x300000 },
@@ -365,28 +378,32 @@ the promoted `WorldContext`.
 
 The first export-patching attempt targeted the `CharCli*` wrapper functions and was disabled after `SetActiveTitle()` hit the Emscripten prop-context assertion. The current safer targets are the lower-level `CharMsgSend*` functions called by those wrappers.
 
-The symbolized older build (`38549`) gives names, but function indexes must come from the current `38615` WASM. The first live action test used older-build indexes and called the wrong current functions.
+The symbolized older JSPI build (`38549`) gives names, but function indexes
+must come from the current `38615` JSPI binary. The first live action test used
+older-build indexes and called the wrong current functions.
 
-Resolved by matching the symbolized `38549` packet-builder bodies against `extracted/Gw.wasm` (`38615`) and cross-checking current wrapper call sites in `wasm-objdump -d`:
+Resolved by matching the symbolized `38549` JSPI packet-builder bodies against
+`extracted/38615/Gw.jspi.wasm` and cross-checking current wrapper call sites in
+`wasm-objdump -d`:
 
 - `CharMsgSendOrderGuildAdjustFaction(unsigned int, ECharFaction, unsigned int)`
   - old symbolized index: `6895`
-  - current `38615` address: `ram:80a148d6`
+  - current `38615` JSPI address: `ram:802bfe73`
   - current `38615` function index: `6893`
   - packet: opcode `0x35`, size `0x10`, fields `opcode, always0, allegiance, amount`
 - `CharMsgSendOrderSetProfessionSecondary(unsigned long, ECharProfession)`
   - old symbolized index: `6905`
-  - current `38615` address: `ram:80a15825`
+  - current `38615` JSPI address: `ram:802c01bf`
   - current `38615` function index: `6903`
   - packet: opcode `0x41`, size `0x0c`, fields `opcode, agentId, profession`
 - `CharMsgSendSetTitle(unsigned int)`
   - old symbolized index: `6926`
-  - current `38615` address: `ram:80a19238`
+  - current `38615` JSPI address: `ram:802c0f5b`
   - current `38615` function index: `6924`
   - packet: opcode `0x58`, size `0x08`, fields `opcode, titleId`
 - `CharMsgSendSetTitleNone()`
   - old symbolized index: `6927`
-  - current `38615` address: `ram:80a1938b`
+  - current `38615` JSPI address: `ram:802c0f9e`
   - current `38615` function index: `6925`
   - packet: opcode `0x59`, size `0x04`, fields `opcode`
 
@@ -412,7 +429,7 @@ These four action exports are now patched unconditionally by `assets/public/gw-h
 - `CharCliPlayerGetAgent(playerId)` -> `PropGet(0x0b) + 0x80c` -> player array buffer
 - `agent_id` -> `playerArray.buffer + playerId * 0x50 + 0x00`
 
-Relevant current-build function indexes from `/extracted/38615/Gw.wasm.txt`:
+Relevant current-build function indexes from the current JSPI disassembly:
 
 - `CharCliPlayerGetAgent(unsigned int)`: old `func[8926]`, current `func[8924]`
 - `CharCliAgentGetControlled()`: old `func[8927]`, current `func[8925]`
@@ -467,3 +484,49 @@ JS prop reads now prefer the active slot table when present, then fall back to t
 `CharCliPlayerGetAgent(playerId)` validates/grows against the player array capacity before reading `buffer + playerId * 0x50`. The JS fast path therefore treats capacity as the usable slot bound and only requires a plausible `agent_id` at the computed slot. This avoids rejecting live arrays whose `size` is temporarily `0` or behind the current player number while capacity is already populated.
 
 As a fallback, it validates candidate world-context pointers across 4-byte-aligned offsets from `gameContext + 0x00` through `+0x7c`, then accepts `playerArray.buffer + playerNumber * stride` when `player + 0x00` contains a plausible `agent_id`; it does not validate the full `Player` struct. Use `GWCAjs.Player.DescribeFastPlayerPath()` to inspect both the prop-table path and the fixed-offset world-context path without scans.
+
+## MapMgr Action Research
+
+Old named build `38549` confirms:
+
+- `PartyClient::MsgSendTravelMission(...)` builds packet opcode `0xb1` with
+  size `0x18`.
+- `Cinematic::MsgSendAbortRequest()` builds packet opcode `0x63` with size
+  `0x04`.
+- `MapQueryAltitude(MapPoint const&, float, float*, Coord3f*)` uses Prop `5`
+  and requires writable temporary arguments and output storage.
+
+Broad current-build similarity searches timed out in Ghidra MCP on
+2026-06-06. Do not patch exports from guessed index deltas. `Travel`,
+`SkipCinematic`, and `QueryAltitude` remain unavailable until each current
+function index and raw WASM signature is independently verified.
+
+## MapMgr Read-Only Data Anchors
+
+Live JSPI build `38615`
+(`103f50bb0ce2d744bfbf88a91afce2328b`):
+
+- `ConstGetMissionClientData(EMission)` is current `func[17482]`.
+- Its body bounds-checks against `883`, multiplies the map ID by `0x7c`, and
+  adds table base `0x1cbe60`.
+- `NetGameClientGetCurrTerritory()` is current `func[10164]`.
+- It reads the signed territory value at linear-memory address `0x5a4628`.
+- Current `func[10165]` is the neighboring setter; its `-3` guard and store to
+  `0x5a4628` confirm the getter's semantics.
+
+The corresponding named functions in `/older version GW/Gw.jspi.wasm` were
+used to recover semantics. The final constants and indexes were independently
+verified from `extracted/38615/Gw.jspi.wasm` and
+`/38615/Gw.jspi.wasm`.
+
+Static samples from the current AreaInfo table:
+
+- map `548`: campaign `4`, region `19`, type `2` (`ExplorableZone`)
+- map `644`: campaign `4`, region `19`, type `13` (`City`)
+
+Live browser readback confirmed the same values after reload:
+
+- `GetServerRegionPtr()` -> `0x5a4628`
+- `GetRegion()` -> server territory `2`
+- outpost current map `644` returned the AreaInfo entry at `0x1df690`
+- explorable current map `548` returned the AreaInfo entry at `0x1dc810`

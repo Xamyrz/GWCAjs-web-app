@@ -2777,7 +2777,7 @@ export function createMapModule(runtime) {
   function getRegionId() {
     const regionAddress = getAddress("modules.map.regionIdAddress");
     if (regionAddress) {
-      return readAddressValue(regionAddress);
+      return safeReadI32(regionAddress);
     }
     return readField("regionId");
   }

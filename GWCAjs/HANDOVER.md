@@ -23,7 +23,7 @@ Use these in this order:
 
 1. Current runtime code under `assets/public/gw-runtime/` and
    `GWCAjs/Source/`.
-2. The current-build Ghidra program `/38615/Gw.wasm`.
+2. The live-runtime Ghidra program `/38615/Gw.jspi.wasm`.
 3. This handover.
 4. `GWCAjs/Ghidra-Notes.md`, which is chronological and contains some
    superseded experiments.
@@ -69,7 +69,12 @@ Location: `GWCAjs/Source/`
 The main implemented areas are:
 
 - `GWCA.js`: top-level initialization and module order.
-- `MapMgr.js`: owns and promotes context anchors.
+- `Context.js`: discovers and promotes the GameContext root and owns shared
+  context anchors, mirroring the central `base_ptr` ownership in native
+  `gwca/Source/GWCA.cpp`.
+- `MapMgr.js`: consumes shared context anchors and exposes map-specific state.
+  Its older context discovery methods remain as compatibility delegates to
+  `GWCAjs.Context`.
 - `PlayerMgr.js`: exposes the GWCA-style player API and title operations.
 - `PlayerMgrState.js`: owns player address caching, fast-path resolution, and
   player diagnostics.
@@ -139,23 +144,35 @@ specific hypothesis is ready to test. Avoid broad repeated scans.
 ### Current build
 
 - Build: `38615`
-- Ghidra program: `/38615/Gw.wasm`
+- Live build ID: `103f50bb0ce2d744bfbf88a91afce2328b`
+- Ghidra program: `/38615/Gw.jspi.wasm`
 - Raw WASM:
-  `/home/xamyr/Projects/net.arena.guildwars.reforged/Gw-Webapp/extracted/Gw.wasm`
+  `/home/xamyr/Projects/gw-webapp-gwca/extracted/38615/Gw.jspi.wasm`
 
-The current build is authoritative for function indexes, addresses, layouts,
-and runtime behavior.
+This JSPI binary exactly matches the build ID reported by the live browser
+runtime. It is authoritative for linear-memory addresses, function indexes,
+layouts, and runtime behavior.
 
-The research notes also reference a current-build text disassembly named
-`38615/Gw.wasm.txt`. Confirm its local location before scripting against it.
+The sibling `/38615/Gw.wasm` program has build ID
+`10830b7275570948a0ac9c9ea6700b7a38`. It is useful for comparison, but it is
+not the live binary and must not be used as the sole proof for a JSPI
+signature.
 
 ### Older named build
 
 - Build: `38549`
-- Ghidra program: `/older version GW/Gw.wasm`
+- Ghidra program: `/older version GW/Gw.jspi.wasm`
 
-This build has substantially better names and is useful as a semantic map.
-Its function indexes and addresses are not authoritative for build 38615.
+This JSPI build has substantially better names and is the preferred semantic
+map for the live JSPI binary. Its function indexes and addresses are not
+authoritative for build 38615.
+
+Use the two JSPI programs as the primary comparison pair:
+
+1. Find the named function in `/older version GW/Gw.jspi.wasm`.
+2. Record its constants, control flow, callees, and neighboring functions.
+3. Match that body independently in `/38615/Gw.jspi.wasm`.
+4. Take all final indexes and addresses from the current JSPI program.
 
 There is no universal function-index delta between builds. A small cluster may
 share a delta, but each target must be independently matched and verified.
@@ -185,14 +202,15 @@ WorldContext + 0x80c is a sane player array
 controlled agent matches the selected player entry
 ```
 
-`MapMgr.initialize()` now prefers the PropContext-root search, promotes the
-first strongly validated candidate, and falls back to the older direct
-GameContext scan only when necessary.
+Central `Context` initialization now prefers the PropContext-root search,
+promotes the first strongly validated candidate, and falls back to the older
+direct GameContext scan only when necessary. This happens before manager
+initialization, as native GWCA discovers `base_ptr` in `GWCA::Initialize()`.
 
 Implementation:
 
 - `assets/public/gw-runtime/modules/map.js`
-- `GWCAjs/Source/MapMgr.js`
+- `GWCAjs/Source/Context.js`
 
 ### Desktop-style base pointer
 
@@ -232,6 +250,63 @@ or authorize every executable function. Calling functions is a separate
 problem involving current-build function identification, exporting, ABI
 verification, pointer ownership, and any required game-thread semantics.
 
+## MapMgr State
+
+The native `MapMgr.h` API names are represented in `GWCAjs.Map`.
+
+Implemented read-only paths include:
+
+- CharContext map, district, language, observation, and instance-type fields.
+- WorldContext unlocked maps, mission-map icons, and foe counters.
+- AgentContext instance time.
+- GameContext cinematic state.
+- MapContext pathing-map array.
+- Current-build AreaInfo table.
+- Optional MapTypeInstanceInfo table when build signatures provide its
+  address.
+- District-to-region and district-to-language conversions.
+
+Desktop-derived secondary offsets are guarded by pointer, array, and range
+validation but still require an in-game test on build `38615`.
+
+Live testing on build `38615` confirmed the core read-only state in both an
+outpost and an explorable area. A map transition replaced the MapContext
+pointer while the GameContext root remained stable. Shared context accessors
+now re-read GameContext child pointers on demand instead of trusting the
+initial child-address snapshot. Post-fix live testing confirmed that
+`GetContextAddresses().mapContextAddress` follows the new child pointer and
+`GetPathingMap()` remains valid in both the outpost and explorable area.
+
+The live JSPI build `103f50bb0ce2d744bfbf88a91afce2328b` has statically
+verified read-only anchors for:
+
+- server region at `0x5a4628`
+- AreaInfo table at `0x1cbe60`, count `883`, stride `0x7c`
+
+These anchors are wired only into matching build signatures and were live
+readback-tested in both an outpost and an explorable area:
+
+- outpost `mapId = 644`: `currentMapInfo.type = 13`, `region = 19`
+- explorable `mapId = 548`: `currentMapInfo.type = 2`, `region = 19`
+- `GetRegion()` returned server territory `2` from `regionIdAddress = 0x5a4628`
+
+`GetFoesKilled()` and `GetFoesToKill()` read the same Prop `0x0b` fields used
+by the current JSPI hard-mode UI (`+0x84c` killed, `+0x850` active/remaining).
+The hard-mode UI hides its progress widget when the active count is `0`, so
+normal-mode explorable instances can legitimately report `0/0` even when the
+AreaInfo entry is vanquishable.
+
+The following actions are represented but unavailable until their current
+build targets and ABI are verified:
+
+- `QueryAltitude`
+- `Travel`
+- `SkipCinematic`
+- `EnterChallenge`
+- `CancelEnterChallenge`
+
+Use `GWCAjs.Map.GetActionStatuses()` to inspect their current status.
+
 ## PlayerMgr State
 
 `PlayerMgr.js` now trusts MapMgr's promoted anchors and uses the real
@@ -253,6 +328,7 @@ Useful diagnostics:
 ```js
 await GWCAjs.initialize();
 GWCAjs.Map.GetContextAddresses();
+GWCAjs.Context.GetContextAddresses();
 GWCAjs.Player.GetPlayerAddress();
 GWCAjs.Player.DescribeFastPlayerPath();
 GWCAjs.Player.GetActionStatuses();
@@ -280,10 +356,10 @@ Current build 38615 patched exports:
 
 | Purpose | Current index | Current address | Opcode |
 | --- | ---: | --- | ---: |
-| Adjust guild faction | 6893 | `ram:80a148d6` | `0x35` |
-| Set secondary profession | 6903 | `ram:80a15825` | `0x41` |
-| Set active title | 6924 | `ram:80a19238` | `0x58` |
-| Remove active title | 6925 | `ram:80a1938b` | `0x59` |
+| Adjust guild faction | 6893 | `ram:802bfe73` | `0x35` |
+| Set secondary profession | 6903 | `ram:802c01bf` | `0x41` |
+| Set active title | 6924 | `ram:802c0f5b` | `0x58` |
+| Remove active title | 6925 | `ram:802c0f9e` | `0x59` |
 
 `GWCAjs.Player.ChangeSecondProfession(1)` has been verified in game by the
 project owner.

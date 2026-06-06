@@ -11,14 +11,24 @@ import {
   readValue,
 } from "../Utilities/Memory.js";
 import { getCharContextPlayerNumber } from "./CharContext.js";
-import { GAME_CONTEXT_OFFSETS } from "./GameContext.js";
+import {
+  getCharContextAddress,
+  getGameContextAddress,
+  getWorldContextAddress as getLiveWorldContextAddress,
+} from "./GameContext.js";
 
 export const WORLD_CONTEXT_OFFSETS = Object.freeze({
+  foesKilled: 0x84c,
+  foesToKill: 0x850,
+  missionMapIcons: 0x7ec,
   playerControlledChar: 0x680,
   playerNumber: 0x67c,
   players: 0x80c,
   titles: 0x81c,
+  unlockedMap: 0x60c,
 });
+
+const MISSION_MAP_ICON_SIZE = 0x28;
 
 export const PLAYER_CONTROLLED_CHARACTER_OFFSETS = Object.freeze({
   agentId: 0x14,
@@ -105,11 +115,10 @@ function validateWorldContext(state, worldContextAddress, expectedPlayerNumber) 
 }
 
 export function resolveWorldContext(state) {
-  const charContextAddress = state.anchors?.charContextAddress || 0;
+  const charContextAddress = getCharContextAddress(state);
   const expectedPlayerNumber = getCharContextPlayerNumber(state);
   const memoryLimit = getMemoryLimit(state);
-  const gameContextAddress = state.anchors?.gameplayContextAddress || 0;
-  const anchoredWorldContextAddress = state.anchors?.worldContextAddress || 0;
+  const gameContextAddress = getGameContextAddress(state);
   const cached = contextChainCache.get(state);
   if (
     cached &&
@@ -131,15 +140,7 @@ export function resolveWorldContext(state) {
     }
   }
 
-  const worldContextAddress = isValidPointer(state, anchoredWorldContextAddress)
-    ? anchoredWorldContextAddress
-    : isValidPointer(state, gameContextAddress)
-      ? readValue(
-          state,
-          "u32",
-          gameContextAddress + GAME_CONTEXT_OFFSETS.world
-        )
-      : 0;
+  const worldContextAddress = getLiveWorldContextAddress(state);
   const world = validateWorldContext(
     state,
     worldContextAddress,
@@ -202,6 +203,72 @@ export function getWorldTitleArray(state) {
         worldContextAddress: resolved.worldContextAddress,
       }
     : null;
+}
+
+export function getWorldMissionMapIconArray(state) {
+  const resolved = resolveWorldContext(state);
+  if (!resolved?.worldContextAddress) {
+    return null;
+  }
+  const array = readArray(
+    state,
+    resolved.worldContextAddress + WORLD_CONTEXT_OFFSETS.missionMapIcons,
+    MISSION_MAP_ICON_SIZE
+  );
+  return array
+    ? {
+        ...array,
+        source: "worldContext",
+        worldContextAddress: resolved.worldContextAddress,
+      }
+    : null;
+}
+
+export function getWorldUnlockedMapArray(state) {
+  const resolved = resolveWorldContext(state);
+  if (!resolved?.worldContextAddress) {
+    return null;
+  }
+  const array = readArray(
+    state,
+    resolved.worldContextAddress + WORLD_CONTEXT_OFFSETS.unlockedMap,
+    4
+  );
+  return array
+    ? {
+        ...array,
+        source: "worldContext",
+        worldContextAddress: resolved.worldContextAddress,
+      }
+    : null;
+}
+
+export function getWorldFoeCounts(state) {
+  const resolved = resolveWorldContext(state);
+  if (!resolved?.worldContextAddress) {
+    return {
+      killed: 0,
+      remaining: 0,
+    };
+  }
+  const killed = readValue(
+    state,
+    "u32",
+    resolved.worldContextAddress + WORLD_CONTEXT_OFFSETS.foesKilled
+  );
+  const remaining = readValue(
+    state,
+    "u32",
+    resolved.worldContextAddress + WORLD_CONTEXT_OFFSETS.foesToKill
+  );
+  return {
+    killed:
+      Number.isInteger(killed) && killed >= 0 && killed < 1000000 ? killed : 0,
+    remaining:
+      Number.isInteger(remaining) && remaining >= 0 && remaining < 1000000
+        ? remaining
+        : 0,
+  };
 }
 
 export function getPlayerControlledCharacter(state) {

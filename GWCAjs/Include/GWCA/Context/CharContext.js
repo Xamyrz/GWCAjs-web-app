@@ -2,13 +2,14 @@ import {
   isReasonablePlayerNumber,
 } from "../GameEntities/Player.js";
 import { readValue } from "../Utilities/Memory.js";
+import { getCharContextAddress } from "./GameContext.js";
 
 export const CHAR_CONTEXT_OFFSETS = Object.freeze({
   playerNumber: 0x2ac,
 });
 
 export function getCharContextPlayerNumber(state) {
-  const charContextAddress = state.anchors?.charContextAddress || 0;
+  const charContextAddress = getCharContextAddress(state);
   if (!charContextAddress) {
     return 0;
   }

@@ -8,3 +8,4 @@ export {
   terminate,
 } from "../../Source/GWCA.js";
 
+export { getContextManager as GetContextManager } from "../../Source/GWCA.js";
