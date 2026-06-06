@@ -9,10 +9,19 @@ function install(global = globalThis) {
     get Context() {
       return GWCA.getContextManager();
     },
+    get context() {
+      return GWCA.getContextManager();
+    },
     get Map() {
       return GWCA.getMapManager();
     },
+    get map() {
+      return GWCA.getMapManager();
+    },
     get Player() {
+      return GWCA.getPlayerManager();
+    },
+    get player() {
       return GWCA.getPlayerManager();
     },
     describe: GWCA.describe,

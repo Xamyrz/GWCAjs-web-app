@@ -9,7 +9,18 @@ export function createCaptureRuntime(global) {
     { name: "__gwca_msg_send_set_title_none", functionIndex: 6925 },
   ]);
 
-  const GWCA_EXPORT_PATCHES = PLAYER_ACTION_EXPORT_PATCHES;
+  const MAP_ACTION_EXPORT_PATCHES = Object.freeze([
+    { name: "__gwca_map_query_altitude", functionIndex: 5557 },
+    { name: "__gwca_party_select_challenge_mission", functionIndex: 10577 },
+    { name: "__gwca_party_cancel_enter_challenge", functionIndex: 10574 },
+    { name: "__gwca_msg_send_travel_mission", functionIndex: 10632 },
+    { name: "__gwca_msg_send_abort_cinematic", functionIndex: 7768 },
+  ]);
+
+  const GWCA_EXPORT_PATCHES = Object.freeze([
+    ...PLAYER_ACTION_EXPORT_PATCHES,
+    ...MAP_ACTION_EXPORT_PATCHES,
+  ]);
 
   const listeners = new Map();
   const importWrappers = new Map();

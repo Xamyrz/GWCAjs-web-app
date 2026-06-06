@@ -50,6 +50,25 @@ function normalizeInteger(value, fallback = 0) {
   return Number.isInteger(normalized) ? normalized : fallback;
 }
 
+function isInteger(value) {
+  return Number.isInteger(Number(value));
+}
+
+function normalizeMapPoint(position, y, z) {
+  if (position && typeof position === "object") {
+    return {
+      x: Number(position.x ?? position.X ?? 0),
+      y: Number(position.y ?? position.Y ?? 0),
+      z: Number(position.z ?? position.Z ?? 0),
+    };
+  }
+  return {
+    x: Number(position ?? 0),
+    y: Number(y ?? 0),
+    z: Number(z ?? 0),
+  };
+}
+
 function getResolvedAddress(state, path) {
   return state.scanner?.tryResolveAddress(path) || 0;
 }
@@ -121,6 +140,13 @@ function getMapTypeInstanceInfo(state, regionType) {
   return null;
 }
 
+function getInstanceInfoPtrAddress(state) {
+  return (
+    getResolvedAddress(state, "modules.map.instanceInfoPtrAddress") ||
+    getResolvedAddress(state, "modules.map.instanceInfoAddress")
+  );
+}
+
 function refreshMapState(state) {
   const charContextAddress = state.anchors?.charContextAddress || 0;
   const mapSchema = state.map?.schema || state.signatures?.modules?.map?.schema || null;
@@ -166,7 +192,7 @@ function createStateReader(state, global = globalThis) {
 function createMapApi(state, global = globalThis) {
   const getContextAddresses = createContextAddressReader(state);
   const getCurrentState = createStateReader(state, global);
-  const internals = createMapInternals();
+  const internals = createMapInternals(state);
   const mapTest = {
     active: false,
     count: 0,
@@ -297,14 +323,50 @@ function createMapApi(state, global = globalThis) {
     GetInternalFunctions() {
       return internals.getInternalFunctions();
     },
+    CallInternalFunction(name, ...args) {
+      return internals.call(name, args);
+    },
     GetMissionMapContext() {
       return null;
     },
     GetWorldMapContext() {
       return null;
     },
-    QueryAltitude() {
-      return 0;
+    QueryAltitude(position, radiusOrY = 0, outputOrZ = null, radius = 0, output = null) {
+      const numericPoint = typeof position !== "object";
+      const outputTarget = numericPoint ? output : outputOrZ;
+      const writeFailure = (reason) => {
+        if (outputTarget && typeof outputTarget === "object") {
+          outputTarget.altitude = 0;
+          outputTarget.error = null;
+          outputTarget.ok = false;
+          outputTarget.reason = reason;
+          outputTarget.result = 0;
+          outputTarget.terrainNormal = null;
+        }
+        return 0;
+      };
+      if (position == null) {
+        return writeFailure("QueryAltitude requires a position.");
+      }
+      const point = numericPoint
+        ? normalizeMapPoint(position, radiusOrY, outputOrZ)
+        : normalizeMapPoint(position);
+      const queryRadius = numericPoint ? radius : radiusOrY;
+      if (![point.x, point.y, point.z].every(Number.isFinite)) {
+        return writeFailure("QueryAltitude position contains invalid coordinates.");
+      }
+      const result = internals.queryAltitude(point, queryRadius);
+      if (outputTarget && typeof outputTarget === "object") {
+        outputTarget.altitude = result.altitude;
+        outputTarget.error = result.error || null;
+        outputTarget.ok = result.ok;
+        outputTarget.reason = result.reason;
+        outputTarget.result = result.result ?? 0;
+        outputTarget.terrainNormal = result.terrainNormal;
+        return result.result ?? 0;
+      }
+      return result;
     },
     GetCharContextAddress() {
       return getContextAddresses().charContextAddress || null;
@@ -380,8 +442,28 @@ function createMapApi(state, global = globalThis) {
     LanguageFromDistrict(district) {
       return languageFromDistrict(district);
     },
-    Travel() {
-      return false;
+    Travel(
+      mapId,
+      region = getRegion(),
+      districtNumber = 0,
+      language = getField("language") ?? Language.English
+    ) {
+      if (!isInteger(mapId) || normalizeInteger(mapId, 0) <= 0) {
+        return false;
+      }
+      const normalizedRegion = normalizeInteger(region, getRegion());
+      const normalizedDistrictNumber = normalizeInteger(districtNumber, 0);
+      const normalizedLanguage = normalizeInteger(
+        language,
+        getField("language") ?? Language.English
+      );
+      return internals.callMessage("Travel", [
+        normalizeInteger(mapId, 0),
+        normalizedRegion,
+        normalizedDistrictNumber,
+        normalizedLanguage,
+        0,
+      ]);
     },
     MapTestStart() {
       mapTest.active = false;
@@ -422,7 +504,7 @@ function createMapApi(state, global = globalThis) {
       return getMapInfo(state, getField("mapId") ?? 0);
     },
     GetInstanceInfoPtr() {
-      return getResolvedAddress(state, "modules.map.instanceInfoAddress");
+      return getInstanceInfoPtrAddress(state);
     },
     GetMapTypeInstanceInfo(regionType) {
       return getMapTypeInstanceInfo(state, regionType);
@@ -431,13 +513,15 @@ function createMapApi(state, global = globalThis) {
       return getIsInCinematic(state);
     },
     SkipCinematic() {
-      return false;
+      return internals.callMessage("SkipCinematic", []);
     },
-    EnterChallenge() {
-      return false;
+    EnterChallenge(identifier = 0x36d) {
+      return internals.selectChallengeMission(
+        normalizeInteger(identifier, 0x36d)
+      );
     },
     CancelEnterChallenge() {
-      return false;
+      return internals.callMessage("CancelEnterChallenge", []);
     },
     IsAvailable() {
       return !!getContextAddresses().mapContextAddress;

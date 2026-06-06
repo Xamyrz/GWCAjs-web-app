@@ -38,25 +38,32 @@ export function getStoredCharacterName(global = globalThis) {
 
 export function createPlayerStateView(state, global = globalThis) {
   function getConfiguredCharacterName() {
-    const stored =
-      state.player?.storedCharacterName || getStoredCharacterName(global);
-    if (typeof stored === "string" && stored.trim()) {
-      return stored.trim();
+    const currentPlayerAddress = resolveCurrentPlayerAddressFast();
+    if (currentPlayerAddress) {
+      const player = readPlayer(state, currentPlayerAddress);
+      if (typeof player?.name === "string" && player.name.trim()) {
+        return player.name.trim();
+      }
     }
 
     const charContextAddress = state.anchors?.charContextAddress || 0;
-    if (!charContextAddress) {
-      return null;
+    if (charContextAddress) {
+      const nameOffset = state.scanner?.getDefinition(
+        "modules.gameplay.charContextAddress.nameOffset"
+      );
+      const offset =
+        typeof nameOffset === "number" && Number.isFinite(nameOffset)
+          ? nameOffset | 0
+          : 0x74;
+      const liveName = readUtf16(state, charContextAddress + offset, 20);
+      if (liveName) {
+        return liveName;
+      }
     }
 
-    const nameOffset = state.scanner?.getDefinition(
-      "modules.gameplay.charContextAddress.nameOffset"
-    );
-    const offset =
-      typeof nameOffset === "number" && Number.isFinite(nameOffset)
-        ? nameOffset | 0
-        : 0x74;
-    return readUtf16(state, charContextAddress + offset, 20) || null;
+    const stored =
+      state.player?.storedCharacterName || getStoredCharacterName(global);
+    return typeof stored === "string" && stored.trim() ? stored.trim() : null;
   }
 
   function getCurrentPlayerNumber() {

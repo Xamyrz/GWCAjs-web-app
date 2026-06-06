@@ -93,6 +93,19 @@ function getTitleData(state, titleId) {
   };
 }
 
+function getRuntimePlayer(global = globalThis) {
+  return global.GW?.player || null;
+}
+
+function toMapPoint2(position) {
+  if (!position || typeof position !== "object") {
+    return null;
+  }
+  const x = Number(position.x);
+  const y = Number(position.y);
+  return Number.isFinite(x) && Number.isFinite(y) ? { x, y } : null;
+}
+
 function getActiveTitleId(state, playerState) {
   const player = playerState.getPlayer();
   if (!player?.activeTitleTier) {
@@ -120,6 +133,29 @@ function getActiveTitleId(state, playerState) {
 function createPlayerApi(state, global = globalThis) {
   const internals = createPlayerInternals(state);
   const playerState = createPlayerStateView(state, global);
+
+  function getPosition(options = {}) {
+    const runtimePlayer = getRuntimePlayer(global);
+    if (!runtimePlayer || typeof runtimePlayer.getPosition !== "function") {
+      return null;
+    }
+    const controlledAgentId = playerState.getControlledCharacterAgentId();
+    const agentId = controlledAgentId || playerState.getPlayer()?.agentId || 0;
+    const position = runtimePlayer.getPosition({
+      ...options,
+      agentId: options.agentId || agentId,
+    });
+    const mapPoint = toMapPoint2(position);
+    if (mapPoint) {
+      return mapPoint;
+    }
+    const directPosition =
+      agentId &&
+      typeof runtimePlayer.getDirectAgentPositionByAgentId === "function"
+        ? runtimePlayer.getDirectAgentPositionByAgentId(agentId)
+        : null;
+    return toMapPoint2(directPosition);
+  }
 
   return Object.freeze({
     Describe() {
@@ -191,6 +227,101 @@ function createPlayerApi(state, global = globalThis) {
         }
       }
       return playerState.getPlayer(playerId)?.agentId || 0;
+    },
+    GetAgent(options = {}) {
+      const runtimePlayer = getRuntimePlayer(global);
+      return runtimePlayer && typeof runtimePlayer.getAgent === "function"
+        ? runtimePlayer.getAgent(options)
+        : null;
+    },
+    GetAgentAddress(options = {}) {
+      const runtimePlayer = getRuntimePlayer(global);
+      return runtimePlayer &&
+        typeof runtimePlayer.getAgentAddress === "function"
+        ? runtimePlayer.getAgentAddress(options) || 0
+        : 0;
+    },
+    GetPosition: getPosition,
+    getPosition,
+    getposition: getPosition,
+    GetDirectAgentContext() {
+      const runtimePlayer = getRuntimePlayer(global);
+      return runtimePlayer &&
+        typeof runtimePlayer.getDirectAgentContext === "function"
+        ? runtimePlayer.getDirectAgentContext()
+        : null;
+    },
+    InspectAgentContextCandidates() {
+      const runtimePlayer = getRuntimePlayer(global);
+      return runtimePlayer &&
+        typeof runtimePlayer.inspectAgentContextCandidates === "function"
+        ? runtimePlayer.inspectAgentContextCandidates()
+        : [];
+    },
+    GetDirectAgentAddressByAgentId(agentId) {
+      const runtimePlayer = getRuntimePlayer(global);
+      return runtimePlayer &&
+        typeof runtimePlayer.getDirectAgentAddressByAgentId === "function"
+        ? runtimePlayer.getDirectAgentAddressByAgentId(agentId) || 0
+        : 0;
+    },
+    GetDirectAgentPositionByAgentId(agentId) {
+      const runtimePlayer = getRuntimePlayer(global);
+      return runtimePlayer &&
+        typeof runtimePlayer.getDirectAgentPositionByAgentId === "function"
+        ? runtimePlayer.getDirectAgentPositionByAgentId(agentId)
+        : null;
+    },
+    DiscoverAgent(options = {}) {
+      const runtimePlayer = getRuntimePlayer(global);
+      return runtimePlayer && typeof runtimePlayer.discoverAgent === "function"
+        ? runtimePlayer.discoverAgent(options)
+        : null;
+    },
+    PromoteAgentAddress(address) {
+      const runtimePlayer = getRuntimePlayer(global);
+      return runtimePlayer &&
+        typeof runtimePlayer.promoteAgentAddress === "function"
+        ? runtimePlayer.promoteAgentAddress(address)
+        : {
+            available: false,
+            error: "Runtime player promotion is not available",
+          };
+    },
+    PromotePlayerAddress(address) {
+      const runtimePlayer = getRuntimePlayer(global);
+      return runtimePlayer &&
+        typeof runtimePlayer.promotePlayerAddress === "function"
+        ? runtimePlayer.promotePlayerAddress(address)
+        : {
+            available: false,
+            error: "Runtime player promotion is not available",
+          };
+    },
+    ClearPromotions() {
+      const runtimePlayer = getRuntimePlayer(global);
+      if (runtimePlayer && typeof runtimePlayer.clearPromotions === "function") {
+        runtimePlayer.clearPromotions();
+        return true;
+      }
+      return false;
+    },
+    FindAgentLivingCandidatesByAgentId(agentId, options = {}) {
+      const runtimePlayer = getRuntimePlayer(global);
+      return runtimePlayer &&
+        typeof runtimePlayer.findAgentLivingCandidatesByAgentId === "function"
+        ? runtimePlayer.findAgentLivingCandidatesByAgentId(agentId, options)
+        : [];
+    },
+    FindAgentLivingCandidatesByPlayerNumber(playerNumber, options = {}) {
+      const runtimePlayer = getRuntimePlayer(global);
+      return runtimePlayer &&
+        typeof runtimePlayer.findAgentLivingCandidatesByPlayerNumber === "function"
+        ? runtimePlayer.findAgentLivingCandidatesByPlayerNumber(
+            playerNumber,
+            options
+          )
+        : [];
     },
     GetPlayerArray() {
       return playerState.getPlayerArray();

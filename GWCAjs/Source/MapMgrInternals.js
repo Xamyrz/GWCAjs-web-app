@@ -1,47 +1,178 @@
 const INTERNAL_FUNCTIONS = Object.freeze({
   QueryAltitude: Object.freeze({
     callable: false,
+    exportName: "__gwca_map_query_altitude",
     functionName:
       "MapQueryAltitude(MapPoint const&, float, float*, Coord3f*)",
+    functionIndex: 5557,
     reason:
-      "Current-build function index and temporary WASM argument storage are not verified.",
+      "Experimental: patched into the runtime exports; uses temporary WASM argument and output storage.",
+    requiresPropContext: true,
+    rawWasmSignature: "(i32, f32, i32, i32) -> i32",
+    signature: "int(MapPoint*, radius, float*, Coord3f*)",
   }),
   Travel: Object.freeze({
     callable: false,
+    exportName: "__gwca_msg_send_travel_mission",
     functionName:
       "PartyClient::MsgSendTravelMission(EMission, ETerritory, unsigned int, ELanguage, int)",
+    functionIndex: 10632,
     message: Object.freeze({
       opcode: 0xb1,
       size: 0x18,
+      fields: Object.freeze([
+        "opcode",
+        "mapId",
+        "region",
+        "districtNumber",
+        "language",
+        "unknown0",
+      ]),
     }),
     reason:
-      "Opcode and old-build body are known, but the current-build function index is not verified.",
+      "Experimental: lower-level message sender patched into the runtime exports.",
+    rawWasmSignature: "(i32, i32, i32, i32, i32) -> nil",
+    signature: "void(mapId, region, districtNumber, language, unknown0)",
   }),
   SkipCinematic: Object.freeze({
     callable: false,
+    exportName: "__gwca_msg_send_abort_cinematic",
     functionName: "Cinematic::MsgSendAbortRequest()",
+    functionIndex: 7768,
     message: Object.freeze({
       opcode: 0x63,
       size: 0x04,
+      fields: Object.freeze(["opcode"]),
     }),
     reason:
-      "Opcode and old-build body are known, but the current-build function index is not verified.",
+      "Experimental: lower-level message sender patched into the runtime exports.",
+    rawWasmSignature: "() -> nil",
+    signature: "void()",
   }),
   EnterChallenge: Object.freeze({
     callable: false,
+    exportName: "__gwca_party_select_challenge_mission",
+    functionName: "PartyCliSelectMission(int)",
+    functionIndex: 10577,
     reason:
-      "The browser runtime does not yet expose the native kSendEnterMission UI-message path.",
+      "Experimental: current JSPI wrapper for selecting the challenge mission path.",
+    rawWasmSignature: "(i32) -> nil",
+    signature: "void(identifier)",
   }),
   CancelEnterChallenge: Object.freeze({
     callable: false,
+    exportName: "__gwca_party_cancel_enter_challenge",
+    functionName: "PartyCliRedirectCancel()",
+    functionIndex: 10574,
     reason:
-      "No verified current-build message function or UI-message path is exported.",
+      "Experimental: current JSPI party redirect cancel wrapper.",
+    rawWasmSignature: "() -> nil",
+    signature: "void()",
   }),
 });
 
-export function createMapInternals() {
+const MAP_ID_COUNT = 0x36d;
+const PROP_CONTEXT_SLOT_ADDRESS = 0x28b680;
+
+function getRawExports(state) {
+  if (typeof state?.hook?.getRawExports !== "function") {
+    return null;
+  }
+  try {
+    return state.hook.getRawExports();
+  } catch (error) {
+    return null;
+  }
+}
+
+function isCallable(state, value) {
+  const exportsObject = getRawExports(state);
+  return !!(
+    value?.exportName &&
+    exportsObject &&
+    typeof exportsObject[value.exportName] === "function"
+  );
+}
+
+function cloneFunctionInfo(state, value) {
+  if (!value || typeof value !== "object") {
+    return null;
+  }
+  const callable = isCallable(state, value);
+  return {
+    ...value,
+    callable,
+    exportAvailable: callable,
+    reason: callable
+      ? "Export patched into the runtime; call semantics still need in-game verification."
+      : value.reason,
+  };
+}
+
+export function createMapInternals(state) {
+  function getActivePropContextAddress() {
+    const anchoredAddress = state?.anchors?.gameplayContextAddress || 0;
+    if (anchoredAddress) {
+      return anchoredAddress >>> 0;
+    }
+    if (typeof state?.scanner?.tryResolveAddress === "function") {
+      return (
+        state.scanner.tryResolveAddress("modules.gameplay.contextAddress") || 0
+      ) >>> 0;
+    }
+    return 0;
+  }
+
+  function withPropContext(callback) {
+    if (
+      typeof state?.hook?.readU32 !== "function" ||
+      typeof state?.hook?.writeU32 !== "function"
+    ) {
+      return callback();
+    }
+
+    const propContextAddress = getActivePropContextAddress();
+    if (!propContextAddress) {
+      return callback();
+    }
+
+    const previous = state.hook.readU32(PROP_CONTEXT_SLOT_ADDRESS) || 0;
+    state.hook.writeU32(PROP_CONTEXT_SLOT_ADDRESS, propContextAddress);
+    try {
+      return callback();
+    } finally {
+      state.hook.writeU32(PROP_CONTEXT_SLOT_ADDRESS, previous);
+    }
+  }
+
+  function malloc(size) {
+    const exportsObject = getRawExports(state);
+    if (typeof exportsObject?.malloc !== "function") {
+      throw new Error("malloc export is not available");
+    }
+    return exportsObject.malloc(size);
+  }
+
+  function free(address) {
+    if (!address) {
+      return;
+    }
+    if (typeof state?.hook?.free === "function") {
+      state.hook.free(address);
+      return;
+    }
+    const exportsObject = getRawExports(state);
+    if (typeof exportsObject?.free === "function") {
+      exportsObject.free(address);
+    }
+  }
+
+  function getInternalFunction(name) {
+    return cloneFunctionInfo(state, INTERNAL_FUNCTIONS[name]);
+  }
+
   function getActionStatus(name) {
-    const internalFunction = INTERNAL_FUNCTIONS[name] || null;
+    const internalFunction = getInternalFunction(name);
     return {
       available: internalFunction?.callable === true,
       internalFunction,
@@ -52,7 +183,116 @@ export function createMapInternals() {
     };
   }
 
+  function call(name, args) {
+    const info = INTERNAL_FUNCTIONS[name];
+    const internalFunction = getInternalFunction(name);
+    if (!info?.exportName) {
+      return {
+        called: false,
+        internalFunction,
+        reason: "Unknown internal function.",
+      };
+    }
+    if (
+      !internalFunction?.callable ||
+      typeof state?.hook?.callExport !== "function"
+    ) {
+      return {
+        called: false,
+        internalFunction,
+        reason: "Internal function export is not available in this runtime.",
+      };
+    }
+
+    try {
+      return {
+        called: true,
+        internalFunction,
+        result: info.requiresPropContext
+          ? withPropContext(() => state.hook.callExport(info.exportName, ...args))
+          : state.hook.callExport(info.exportName, ...args),
+      };
+    } catch (error) {
+      return {
+        called: false,
+        error: error instanceof Error ? error.message : String(error),
+        internalFunction,
+        reason: "Internal function call failed.",
+      };
+    }
+  }
+
+  function queryAltitude(point, radius = 0, options = {}) {
+    const includeTerrainNormal = options.includeTerrainNormal !== false;
+    let pointAddress = 0;
+    let altitudeAddress = 0;
+    let normalAddress = 0;
+
+    try {
+      pointAddress = malloc(16);
+      altitudeAddress = malloc(4);
+      normalAddress = includeTerrainNormal ? malloc(16) : 0;
+
+      state.hook.writeF32(pointAddress, point.x);
+      state.hook.writeF32(pointAddress + 4, point.y);
+      state.hook.writeF32(pointAddress + 8, point.z || 0);
+      state.hook.writeF32(altitudeAddress, 0);
+      if (normalAddress) {
+        state.hook.writeF32(normalAddress, 0);
+        state.hook.writeF32(normalAddress + 4, 0);
+        state.hook.writeF32(normalAddress + 8, -1);
+      }
+
+      const callResult = call("QueryAltitude", [
+        pointAddress,
+        Number(radius) || 0,
+        altitudeAddress,
+        normalAddress,
+      ]);
+      if (!callResult.called) {
+        return {
+          ...callResult,
+          altitude: 0,
+          ok: false,
+          terrainNormal: null,
+        };
+      }
+
+      const altitude = state.hook.readF32(altitudeAddress);
+      return {
+        ...callResult,
+        altitude,
+        ok: callResult.result !== 0,
+        terrainNormal: normalAddress
+          ? {
+              x: state.hook.readF32(normalAddress),
+              y: state.hook.readF32(normalAddress + 4),
+              z: state.hook.readF32(normalAddress + 8),
+            }
+          : null,
+      };
+    } catch (error) {
+      return {
+        altitude: 0,
+        called: false,
+        error: error instanceof Error ? error.message : String(error),
+        internalFunction: getInternalFunction("QueryAltitude"),
+        ok: false,
+        reason: "QueryAltitude call failed.",
+        terrainNormal: null,
+      };
+    } finally {
+      free(normalAddress);
+      free(altitudeAddress);
+      free(pointAddress);
+    }
+  }
+
   return Object.freeze({
+    call,
+    callMessage(name, args) {
+      return call(name, args).called === true;
+    },
     getActionStatus,
     getActionStatuses() {
       return Object.fromEntries(
@@ -63,10 +303,19 @@ export function createMapInternals() {
       );
     },
     getInternalFunction(name) {
-      return INTERNAL_FUNCTIONS[name] || null;
+      return getInternalFunction(name);
     },
     getInternalFunctions() {
-      return { ...INTERNAL_FUNCTIONS };
+      return Object.fromEntries(
+        Object.entries(INTERNAL_FUNCTIONS).map(([name, value]) => [
+          name,
+          cloneFunctionInfo(state, value),
+        ])
+      );
+    },
+    queryAltitude,
+    selectChallengeMission(identifier = MAP_ID_COUNT) {
+      return call("EnterChallenge", [identifier]).called === true;
     },
   });
 }

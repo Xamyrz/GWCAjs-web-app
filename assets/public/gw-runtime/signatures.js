@@ -34,6 +34,16 @@ const SHARED_GAMEPLAY_SIGNATURES = Object.freeze({
       },
     },
     player: {
+      agentContextLayout: {
+        agentArray: 0x14c,
+        agentCount: 0x154,
+        instanceTimer: 0x1ac,
+        worldX0: 0x1b0,
+        worldY0: 0x1b4,
+        worldX1: 0x1b8,
+        worldY1: 0x1bc,
+      },
+      agentPropId: 0x02,
       propArrayLayout: {
         bufferBase: 0x80c,
         capacityBase: 0x810,
@@ -93,6 +103,8 @@ const BUILTIN_BUILD_SIGNATURES = Object.freeze({
         ...SHARED_GAMEPLAY_SIGNATURES.modules.map,
         areaInfoAddress: 0x1cbe60,
         areaInfoCount: 883,
+        mapTypeInstanceInfoAddress: 0x160b84,
+        mapTypeInstanceInfoCount: 31,
         regionIdAddress: 0x5a4628,
         stateAddress: "modules.gameplay.charContextAddress",
       },

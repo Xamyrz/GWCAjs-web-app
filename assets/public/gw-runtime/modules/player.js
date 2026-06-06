@@ -46,6 +46,29 @@ const AGENT_LIVING_OFFSETS = Object.freeze({
   skill: 0x1b8,
 });
 
+const AGENT_CONTEXT_OFFSETS = Object.freeze({
+  agentArray: 0x14c,
+  agentCount: 0x154,
+  instanceTimer: 0x1ac,
+  worldX0: 0x1b0,
+  worldY0: 0x1b4,
+  worldX1: 0x1b8,
+  worldY1: 0x1bc,
+});
+
+const AGENT_OFFSETS = Object.freeze({
+  stopMovementTime: 0x48,
+  movementStartTime: 0x58,
+  x: 0x78,
+  y: 0x7c,
+  z: 0x80,
+  stoppedX: 0x88,
+  stoppedY: 0x8c,
+  stoppedZ: 0x90,
+  velocityX: 0xb0,
+  velocityY: 0xb4,
+});
+
 const PLAYER_CONTROLLED_CHARACTER_OFFSETS = Object.freeze({
   agentId: 0x14,
   compositeId: 0x18,
@@ -54,6 +77,7 @@ const PLAYER_CONTROLLED_CHARACTER_OFFSETS = Object.freeze({
 });
 
 const GAME_CONTEXT_OFFSETS = Object.freeze({
+  agent: 0x08,
   character: 0x44,
   map: 0x14,
   world: 0x2c,
@@ -74,6 +98,8 @@ export function createPlayerModule(runtime) {
     playerName: null,
     worldContextAddress: 0,
   };
+
+  let cachedAgentContext = null;
 
   let promotedAgentAddress = 0;
   let promotedPlayerAddress = 0;
@@ -149,15 +175,36 @@ export function createPlayerModule(runtime) {
     return runtime.hook?.memory?.buffer?.byteLength || 0;
   }
 
+  function getLiveCurrentPlayerName() {
+    const expectedPlayerNumber = getExpectedPlayerNumber();
+    const playerArray = getDirectPlayerArray();
+    if (
+      !playerArray ||
+      !isReasonablePlayerNumber(expectedPlayerNumber) ||
+      expectedPlayerNumber >= getArraySlotCount(playerArray)
+    ) {
+      return null;
+    }
+
+    const address =
+      (playerArray.buffer + expectedPlayerNumber * playerArray.stride) >>> 0;
+    const player = readPlayerStruct(address);
+    if (
+      isStructurallyPlausiblePlayer(player) &&
+      player.playerNumber === expectedPlayerNumber &&
+      typeof player.name === "string" &&
+      player.name.trim()
+    ) {
+      return player.name.trim();
+    }
+
+    return null;
+  }
+
   function getConfiguredCharacterName() {
-    try {
-      const storedName =
-        globalThis.localStorage?.getItem(CHARACTER_NAME_STORAGE_KEY) ?? null;
-      if (typeof storedName === "string" && storedName.trim()) {
-        return storedName.trim();
-      }
-    } catch (error) {
-      // Ignore localStorage failures and fall through to live inspection.
+    const livePlayerName = getLiveCurrentPlayerName();
+    if (livePlayerName) {
+      return livePlayerName;
     }
 
     const charContextAddress =
@@ -169,6 +216,16 @@ export function createPlayerModule(runtime) {
       if (name) {
         return name;
       }
+    }
+
+    try {
+      const storedName =
+        globalThis.localStorage?.getItem(CHARACTER_NAME_STORAGE_KEY) ?? null;
+      if (typeof storedName === "string" && storedName.trim()) {
+        return storedName.trim();
+      }
+    } catch (error) {
+      // Ignore localStorage failures and fall through to live inspection.
     }
 
     return null;
@@ -389,6 +446,58 @@ export function createPlayerModule(runtime) {
 
   function isReasonablePartySize(value) {
     return typeof value === "number" && Number.isFinite(value) && value >= 0 && value <= 12;
+  }
+
+  function isReasonableCoordinate(value) {
+    return (
+      typeof value === "number" &&
+      Number.isFinite(value) &&
+      Math.abs(value) >= 0.001 &&
+      Math.abs(value) < 1000000
+    );
+  }
+
+  function isReasonableAgentPosition(position) {
+    return (
+      position &&
+      isReasonableCoordinate(position.x) &&
+      isReasonableCoordinate(position.y) &&
+      typeof position.z === "number" &&
+      Number.isFinite(position.z) &&
+      Math.abs(position.z) < 1000000
+    );
+  }
+
+  function isReasonableDirectAgentPosition(position, bounds = null) {
+    if (
+      !position ||
+      typeof position.x !== "number" ||
+      typeof position.y !== "number" ||
+      typeof position.z !== "number" ||
+      !Number.isFinite(position.x) ||
+      !Number.isFinite(position.y) ||
+      !Number.isFinite(position.z) ||
+      Math.abs(position.x) >= 1000000 ||
+      Math.abs(position.y) >= 1000000 ||
+      Math.abs(position.z) >= 1000000
+    ) {
+      return false;
+    }
+    if (
+      bounds &&
+      Number.isFinite(bounds.x0) &&
+      Number.isFinite(bounds.x1) &&
+      Number.isFinite(bounds.y0) &&
+      Number.isFinite(bounds.y1)
+    ) {
+      return (
+        position.x >= bounds.x0 &&
+        position.x <= bounds.x1 &&
+        position.y >= bounds.y0 &&
+        position.y <= bounds.y1
+      );
+    }
+    return true;
   }
 
   function isReasonablePointer(value) {
@@ -1004,6 +1113,278 @@ export function createPlayerModule(runtime) {
     return entry;
   }
 
+  function getAgentContextLayout() {
+    const definition = getDefinition("modules.player.agentContextLayout");
+    return definition && typeof definition === "object" ? definition : AGENT_CONTEXT_OFFSETS;
+  }
+
+  function getPropAgentContextAddress() {
+    const agentPropId =
+      getConfiguredPropId("modules.player.agentPropId") || 0x02;
+    const handle = getPropHandle(agentPropId);
+    return {
+      address: isReasonablePointer(handle) ? handle >>> 0 : 0,
+      propId: agentPropId,
+      source: "propTable",
+    };
+  }
+
+  function getGameplayAgentContextAddress() {
+    const gameplayContextAddress =
+      typeof runtime.map?.getGameplayContextAddress === "function"
+        ? runtime.map.getGameplayContextAddress() || 0
+        : 0;
+    const address = isReasonablePointer(gameplayContextAddress)
+      ? safeReadU32(gameplayContextAddress + GAME_CONTEXT_OFFSETS.agent)
+      : 0;
+    return {
+      address: isReasonablePointer(address) ? address >>> 0 : 0,
+      gameplayContextAddress,
+      propId: 0x02,
+      source: "gameplayContext",
+    };
+  }
+
+  function getAgentContextAddressCandidates() {
+    const candidates = [
+      getPropAgentContextAddress(),
+      getGameplayAgentContextAddress(),
+    ].filter((candidate) => candidate.address);
+    const seen = new Set();
+    return candidates.filter((candidate) => {
+      if (seen.has(candidate.address)) {
+        return false;
+      }
+      seen.add(candidate.address);
+      return true;
+    });
+  }
+
+  function readDirectAgentContextCandidate(candidate, layout) {
+    const contextAddress = candidate?.address || 0;
+    if (!contextAddress || !layout) {
+      return null;
+    }
+
+    const agentArrayOffset =
+      typeof layout.agentArray === "number"
+        ? layout.agentArray | 0
+        : AGENT_CONTEXT_OFFSETS.agentArray;
+    const agentCountOffset =
+      typeof layout.agentCount === "number"
+        ? layout.agentCount | 0
+        : AGENT_CONTEXT_OFFSETS.agentCount;
+    const instanceTimerOffset =
+      typeof layout.instanceTimer === "number"
+        ? layout.instanceTimer | 0
+        : AGENT_CONTEXT_OFFSETS.instanceTimer;
+    const worldX0Offset =
+      typeof layout.worldX0 === "number"
+        ? layout.worldX0 | 0
+        : AGENT_CONTEXT_OFFSETS.worldX0;
+    const worldY0Offset =
+      typeof layout.worldY0 === "number"
+        ? layout.worldY0 | 0
+        : AGENT_CONTEXT_OFFSETS.worldY0;
+    const worldX1Offset =
+      typeof layout.worldX1 === "number"
+        ? layout.worldX1 | 0
+        : AGENT_CONTEXT_OFFSETS.worldX1;
+    const worldY1Offset =
+      typeof layout.worldY1 === "number"
+        ? layout.worldY1 | 0
+        : AGENT_CONTEXT_OFFSETS.worldY1;
+    const agentArray = safeReadU32(contextAddress + agentArrayOffset);
+    const agentCount = safeReadU32(contextAddress + agentCountOffset);
+
+    if (
+      !isReasonablePointer(agentArray) ||
+      typeof agentCount !== "number" ||
+      !Number.isFinite(agentCount) ||
+      agentCount <= 0 ||
+      agentCount > 0x100000
+    ) {
+      return null;
+    }
+
+    const agentArrayEnd = agentArray + agentCount * 4;
+    if (agentArrayEnd <= agentArray || agentArrayEnd > getMemoryLimit()) {
+      return null;
+    }
+
+    const instanceTimer = safeReadU32(contextAddress + instanceTimerOffset) || 0;
+    const worldBounds = {
+      x0: safeReadF32(contextAddress + worldX0Offset),
+      y0: safeReadF32(contextAddress + worldY0Offset),
+      x1: safeReadF32(contextAddress + worldX1Offset),
+      y1: safeReadF32(contextAddress + worldY1Offset),
+    };
+
+    return {
+      address: contextAddress,
+      agentArray,
+      agentArrayEnd,
+      agentCount,
+      instanceTimer,
+      layout: {
+        agentArray: agentArrayOffset,
+        agentCount: agentCountOffset,
+        instanceTimer: instanceTimerOffset,
+        worldX0: worldX0Offset,
+        worldY0: worldY0Offset,
+        worldX1: worldX1Offset,
+        worldY1: worldY1Offset,
+      },
+      propId: candidate.propId || 0x02,
+      source: candidate.source,
+      worldBounds,
+    };
+  }
+
+  function getDirectAgentContext() {
+    const layout = getAgentContextLayout();
+    const candidates = getAgentContextAddressCandidates();
+    if (!layout || candidates.length === 0) {
+      cachedAgentContext = null;
+      return null;
+    }
+
+    for (const candidate of candidates) {
+      const context = readDirectAgentContextCandidate(candidate, layout);
+      if (!context) {
+        continue;
+      }
+      if (cachedAgentContext?.address === context.address) {
+        Object.assign(cachedAgentContext, context);
+        return cachedAgentContext;
+      }
+      cachedAgentContext = context;
+      return cachedAgentContext;
+    }
+
+    cachedAgentContext = null;
+    return null;
+  }
+
+  function inspectAgentContextCandidates() {
+    const layout = getAgentContextLayout();
+    return getAgentContextAddressCandidates().map((candidate) => {
+      const context = readDirectAgentContextCandidate(candidate, layout);
+      return {
+        ...candidate,
+        context,
+        valid: !!context,
+      };
+    });
+  }
+
+  function clampToBounds(value, lower, upper) {
+    if (typeof value !== "number" || !Number.isFinite(value)) {
+      return value;
+    }
+    if (
+      typeof lower !== "number" ||
+      typeof upper !== "number" ||
+      !Number.isFinite(lower) ||
+      !Number.isFinite(upper)
+    ) {
+      return value;
+    }
+    if (value < lower) {
+      return lower;
+    }
+    if (value > upper) {
+      return upper;
+    }
+    return value;
+  }
+
+  function readDirectAgentPosition(agentAddress, context) {
+    if (!isReasonablePointer(agentAddress) || !context) {
+      return null;
+    }
+
+    const stopMovementTime =
+      safeReadU32(agentAddress + AGENT_OFFSETS.stopMovementTime) || 0;
+    if (
+      stopMovementTime &&
+      context.instanceTimer >= stopMovementTime
+    ) {
+      const stoppedPosition = {
+        x: safeReadF32(agentAddress + AGENT_OFFSETS.stoppedX),
+        y: safeReadF32(agentAddress + AGENT_OFFSETS.stoppedY),
+        z: safeReadF32(agentAddress + AGENT_OFFSETS.stoppedZ),
+      };
+      return isReasonableDirectAgentPosition(stoppedPosition, context.worldBounds)
+        ? {
+            ...stoppedPosition,
+            source: "AgentContext.stoppedPosition",
+          }
+        : null;
+    }
+
+    const x = safeReadF32(agentAddress + AGENT_OFFSETS.x);
+    const y = safeReadF32(agentAddress + AGENT_OFFSETS.y);
+    const z = safeReadF32(agentAddress + AGENT_OFFSETS.z);
+    const velocityX = safeReadF32(agentAddress + AGENT_OFFSETS.velocityX);
+    const velocityY = safeReadF32(agentAddress + AGENT_OFFSETS.velocityY);
+    const movementStartTime =
+      safeReadU32(agentAddress + AGENT_OFFSETS.movementStartTime) || 0;
+    const elapsedSeconds =
+      context.instanceTimer && movementStartTime
+        ? Math.max(0, context.instanceTimer - movementStartTime) * 0.001
+        : 0;
+    const predictedX =
+      typeof velocityX === "number" && Number.isFinite(velocityX)
+        ? x + velocityX * elapsedSeconds
+        : x;
+    const predictedY =
+      typeof velocityY === "number" && Number.isFinite(velocityY)
+        ? y + velocityY * elapsedSeconds
+        : y;
+    const position = {
+      x: clampToBounds(predictedX, context.worldBounds.x0, context.worldBounds.x1),
+      y: clampToBounds(predictedY, context.worldBounds.y0, context.worldBounds.y1),
+      z,
+    };
+    return isReasonableDirectAgentPosition(position, context.worldBounds)
+      ? {
+          ...position,
+          source: elapsedSeconds
+            ? "AgentContext.predictedPosition"
+            : "AgentContext.position",
+        }
+      : null;
+  }
+
+  function getDirectAgentAddressByAgentId(agentId) {
+    const normalizedAgentId =
+      typeof agentId === "number" && Number.isFinite(agentId) ? agentId >>> 0 : 0;
+    const context = getDirectAgentContext();
+    if (!context || normalizedAgentId >= context.agentCount) {
+      return 0;
+    }
+    const address = safeReadU32(context.agentArray + normalizedAgentId * 4);
+    return isReasonablePointer(address) ? address >>> 0 : 0;
+  }
+
+  function getDirectAgentPositionByAgentId(agentId) {
+    const context = getDirectAgentContext();
+    const address = getDirectAgentAddressByAgentId(agentId);
+    if (!context || !address) {
+      return null;
+    }
+    const position = readDirectAgentPosition(address, context);
+    return position
+      ? {
+          ...position,
+          address,
+          agentId: agentId >>> 0,
+          contextAddress: context.address,
+        }
+      : null;
+  }
+
   function getDirectPlayerAddress(options = {}) {
     const playerArray = getDirectPlayerArray(options);
     if (!playerArray) {
@@ -1080,17 +1461,37 @@ export function createPlayerModule(runtime) {
     expectedAgentId,
     expectedPlayerNumber
   ) {
+    if (
+      !candidate ||
+      candidate.agentId !== expectedAgentId ||
+      !isReasonableAgentPosition(candidate.position) ||
+      (candidate.type & 0xdb) === 0 ||
+      !isReasonableProfession(candidate.primary) ||
+      !isReasonableProfession(candidate.secondary) ||
+      !isReasonablePlayerNumber(candidate.playerNumber) ||
+      typeof candidate.hp !== "number" ||
+      !Number.isFinite(candidate.hp) ||
+      candidate.hp < 0 ||
+      candidate.hp > 1.2 ||
+      typeof candidate.level !== "number" ||
+      !Number.isFinite(candidate.level) ||
+      candidate.level < 1 ||
+      candidate.level > 30
+    ) {
+      return { reasons: ["structural-reject"], score: 0 };
+    }
+
     let score = 0;
     const reasons = [];
 
-    if (candidate.agentId === expectedAgentId) {
-      score += 10;
-      reasons.push("agentId");
-    }
-    if ((candidate.type & 0xdb) !== 0) {
-      score += 3;
-      reasons.push("livingType");
-    }
+    score += 10;
+    reasons.push("agentId");
+    score += 3;
+    reasons.push("livingType");
+    score += 4;
+    reasons.push("position");
+    score += 2;
+    reasons.push("profession");
     if (
       typeof expectedPlayerNumber === "number" &&
       expectedPlayerNumber > 0 &&
@@ -1099,18 +1500,10 @@ export function createPlayerModule(runtime) {
       score += 6;
       reasons.push("playerNumber");
     }
-    if (typeof candidate.hp === "number" && candidate.hp >= 0 && candidate.hp <= 1.2) {
-      score += 3;
-      reasons.push("hp");
-    }
-    if (
-      typeof candidate.level === "number" &&
-      candidate.level >= 1 &&
-      candidate.level <= 30
-    ) {
-      score += 1;
-      reasons.push("level");
-    }
+    score += 3;
+    reasons.push("hp");
+    score += 1;
+    reasons.push("level");
 
     return { reasons, score };
   }
@@ -2087,6 +2480,7 @@ export function createPlayerModule(runtime) {
     cache.playerAddress = 0;
     cache.playerName = null;
     cache.worldContextAddress = 0;
+    cachedAgentContext = null;
   }
 
   return Object.freeze({
@@ -2174,8 +2568,50 @@ export function createPlayerModule(runtime) {
       return player ? player.playerNumber : null;
     },
     getPosition(options) {
+      const player = getPlayer(options);
+      const optionAgentId =
+        typeof options?.agentId === "number" && Number.isFinite(options.agentId)
+          ? options.agentId >>> 0
+          : 0;
+      const agentId = optionAgentId || (
+        player && typeof player.agentId === "number" ? player.agentId >>> 0 : 0
+      );
+      const directPosition = agentId
+        ? getDirectAgentPositionByAgentId(agentId)
+        : null;
+      if (directPosition) {
+        const { address, agentId: resolvedAgentId, contextAddress, source, ...position } =
+          directPosition;
+        return {
+          ...position,
+          agentAddress: address,
+          agentId: resolvedAgentId,
+          contextAddress,
+          source,
+        };
+      }
+
       const agent = getAgent(options);
       return agent ? { ...agent.position } : null;
+    },
+    getDirectAgentAddressByAgentId(agentId) {
+      return getDirectAgentAddressByAgentId(agentId);
+    },
+    getDirectAgentContext() {
+      const context = getDirectAgentContext();
+      return context
+        ? {
+            ...context,
+            layout: { ...context.layout },
+            worldBounds: { ...context.worldBounds },
+          }
+        : null;
+    },
+    inspectAgentContextCandidates() {
+      return inspectAgentContextCandidates();
+    },
+    getDirectAgentPositionByAgentId(agentId) {
+      return getDirectAgentPositionByAgentId(agentId);
     },
     inspectAgentLiving(address) {
       return readAgentLivingStruct(address);

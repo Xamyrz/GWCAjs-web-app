@@ -497,9 +497,93 @@ Old named build `38549` confirms:
   and requires writable temporary arguments and output storage.
 
 Broad current-build similarity searches timed out in Ghidra MCP on
-2026-06-06. Do not patch exports from guessed index deltas. `Travel`,
-`SkipCinematic`, and `QueryAltitude` remain unavailable until each current
-function index and raw WASM signature is independently verified.
+2026-06-06. Do not patch exports from guessed index deltas.
+
+QueryAltitude was later verified against the current JSPI WAT and Ghidra:
+
+- current function index: `5557`
+- current address: `ram:80256d05`
+- old named function:
+  `MapQueryAltitude(MapPoint const&, float, float*, Coord3f*)`
+- raw signature: `(i32, f32, i32, i32) -> i32`
+- uses `PropGet(5)`, path engine pointer `+0x78`, path props `+0x74`,
+  props `+0x7c`, and terrain pointer `+0x84`
+- `GWCAjs.Map.QueryAltitude()` allocates temporary WASM storage for
+  `{x,y,z}`, altitude output, and optional `Coord3f` terrain-normal output
+- Naked JS export calls trap in `PropGet(5)` with
+  `ASSERTION FAILED: s_propContext` because current `PropGet` reads slot
+  `0x28b680`. `GWCAjs` wraps only `QueryAltitude` by temporarily writing the
+  resolved gameplay context / prop table address into `0x28b680` and restoring
+  the previous value after the synchronous call.
+
+EnterChallenge and CancelEnterChallenge were verified in the current party
+client wrapper cluster:
+
+- `EnterChallenge`: current `func[10577]` at `ram:803888df`
+  (`PartyCliSelectMission(int)`), raw signature `(i32) -> nil`
+- `func[10577]` calls the party-table select-mission routine with hard-coded
+  mission `0x373` and the caller-provided identifier; GWCAjs passes
+  `MapID::Count` (`0x36d`) by default, matching native GWCA
+- `CancelEnterChallenge`: current `func[10574]` at `ram:8038889d`
+  (`PartyCliRedirectCancel()`), raw signature `() -> nil`
+
+Current `func[6860]` is `CharMsgSendChallengeAbort(unsigned int)`, packet
+opcode `0x11`, size `0x08`; it is not the MapMgr CancelEnterChallenge path.
+
+Agent position fast path:
+
+- Old named `AgentGetPosition(unsigned long)` at `ram:802bd0dd` takes
+  `(out MapPoint*, agentId)` and reads `PropGet(2)`.
+- The old body validates `agentId < *(AgentContext + 0x154)`, reads the agent
+  pointer from `*(AgentContext + 0x14c) + agentId * 4`, and calls
+  `IAgent::CAgent::GetPointAtTime(out, agent, *(AgentContext + 0x1ac))`.
+- `IAgent::CAgent::GetPointAtTime(unsigned int) const` at old
+  `ram:802b7c98` shows the underlying stable offsets:
+  - stopped movement time: `Agent + 0x48`
+  - movement start time: `Agent + 0x58`
+  - current point: `Agent + 0x78/0x7c/0x80`
+  - stopped point: `Agent + 0x88/0x8c/0x90`
+  - velocity: `Agent + 0xb0/0xb4`
+  - bounds: `AgentContext + 0x1b0/0x1b4/0x1b8/0x1bc`
+- GWCAjs uses this direct memory path for `GWCAjs.Player.GetPosition()` rather
+  than exporting the accessor, which avoids the slow AgentLiving scan and keeps
+  current player position available for `Map.QueryAltitude`.
+
+Travel was later verified against the current JSPI WAT:
+
+- current function index: `10632`
+- old named function: `PartyClient::MsgSendTravelMission(EMission,
+  ETerritory, unsigned int, ELanguage, int)`
+- raw signature: `(i32, i32, i32, i32, i32) -> nil`
+- packet opcode: `0xb1`
+- packet size sent through `MsgConnSendStruct`: `0x18`
+- field order:
+  - `+0x00`: opcode `0xb1`
+  - `+0x04`: map id / mission
+  - `+0x08`: territory / server region
+  - `+0x0c`: district number
+  - `+0x10`: `language & 0xff`
+  - `+0x14`: final int flag, currently passed as `0` by GWCAjs
+
+The current body is `func[10632]` and calls current `func[10328]`
+(`NetGameClientGetMsgConn`) then `func[5937]` (`MsgConnSendStruct`). It is now
+patched as `__gwca_msg_send_travel_mission`; live in-game travel behavior was
+verified on 2026-06-06.
+
+SkipCinematic was later verified against the current JSPI WAT:
+
+- current function index: `7768`
+- old named function: `Cinematic::MsgSendAbortRequest()`
+- raw signature: `() -> nil`
+- packet opcode: `0x63`
+- packet size sent through `MsgConnSendStruct`: `0x04`
+- packet field order:
+  - `+0x00`: opcode `0x63`
+
+The current body is `func[7768]` and calls current `func[10328]`
+(`NetGameClientGetMsgConn`) then `func[5937]` (`MsgConnSendStruct`). It is now
+patched as `__gwca_msg_send_abort_cinematic`; live in-cinematic behavior was
+verified on 2026-06-06.
 
 ## MapMgr Read-Only Data Anchors
 
@@ -523,6 +607,41 @@ Static samples from the current AreaInfo table:
 
 - map `548`: campaign `4`, region `19`, type `2` (`ExplorableZone`)
 - map `644`: campaign `4`, region `19`, type `13` (`City`)
+
+Current JSPI MapTypeInstanceInfo table:
+
+- base `0x160b84`
+- count `31`
+- stride `0x0c`
+- row shape: `request_instance_map_type:u32`, `is_outpost:u32`,
+  `map_region_type:u32`
+- native `GetMapTypeInstanceInfo()` returns the first row matching the requested
+  region type and the native outpost rule
+- live-tested rows:
+  - `ExplorableZone` (`2`) at `0x160c3c`, request type `1`, outpost `false`
+  - `City` (`13`) at `0x160bd8`, request type `0`, outpost `true`
+  - `MissionArea` (`14`) at `0x160c48`, request type `1`, outpost `false`
+  - `Dungeon` (`18`) at `0x160c54`, request type `1`, outpost `false`
+
+Desktop GWCA `GetInstanceInfoPtr()` returns the address of a static
+`InstanceInfo*` slot found by the native scanner pattern, while JSPI
+`MissionCliGetInstance/Map/Type/World` reads mission-client fields through
+`PropGet(0x11)`. No current JSPI equivalent of the desktop pointer slot is
+verified yet; use `modules.map.instanceInfoPtrAddress` only after live memory
+or WAT evidence identifies that slot. A live scan for pointer-slot candidates
+whose pointee matched `{ instance_type, current_map_info }` returned no hits in
+the normal JSPI data/global ranges. A later struct-shape scan found
+`0x5a230c`, but current WAT `func[7247]` writes
+`0x5a2310 = MissionCliGetObserveMapType()` and
+`0x5a2314 = ConstGetMissionClientData(observeMapId)`, while `func[7256]`
+treats `0x5a2318` as `f64`. This makes it a JSPI map-info cache, not the
+desktop `InstanceInfo` layout.
+
+`GetMissionMapContext()` and `GetWorldMapContext()` are hook-cached UI frame
+contexts in native GWCA, populated from `message->wParam` and cleared on frame
+destroy. The older JSPI build names `IUi::Game::Map::CWorldMap` and related
+mission-map methods, but no stable current-build context pointer or
+browser-exposed frame callback path is verified.
 
 Live browser readback confirmed the same values after reload:
 

@@ -53,6 +53,15 @@ export const ScannerModule = createModule("Scanner", async function initModule(
 
   state.scanner = Object.freeze({
     getDefinition(path) {
+      if (
+        runtimeResolver &&
+        typeof runtimeResolver.getDefinition === "function"
+      ) {
+        const definition = runtimeResolver.getDefinition(path);
+        if (typeof definition !== "undefined") {
+          return definition;
+        }
+      }
       return getByPath(state.signatures, path);
     },
     resolveAddress(target) {
