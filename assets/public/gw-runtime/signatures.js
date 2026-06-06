@@ -103,10 +103,16 @@ const BUILTIN_BUILD_SIGNATURES = Object.freeze({
         ...SHARED_GAMEPLAY_SIGNATURES.modules.map,
         areaInfoAddress: 0x1cbe60,
         areaInfoCount: 883,
+        missionMapCallbackTableIndex: 4000,
         mapTypeInstanceInfoAddress: 0x160b84,
         mapTypeInstanceInfoCount: 31,
         regionIdAddress: 0x5a4628,
         stateAddress: "modules.gameplay.charContextAddress",
+        worldMapCallbackTableIndex: 4143,
+      },
+      ui: {
+        frameArrayBufferAddress: 0x5a0aac,
+        frameArrayCountAddress: 0x5a0ab4,
       },
       player: {
         ...SHARED_GAMEPLAY_SIGNATURES.modules.player,

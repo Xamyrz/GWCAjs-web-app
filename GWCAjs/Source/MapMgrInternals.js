@@ -56,6 +56,7 @@ const INTERNAL_FUNCTIONS = Object.freeze({
     functionIndex: 10577,
     reason:
       "Experimental: current JSPI wrapper for selecting the challenge mission path.",
+    requiresPropContext: true,
     rawWasmSignature: "(i32) -> nil",
     signature: "void(identifier)",
   }),
@@ -66,6 +67,7 @@ const INTERNAL_FUNCTIONS = Object.freeze({
     functionIndex: 10574,
     reason:
       "Experimental: current JSPI party redirect cancel wrapper.",
+    requiresPropContext: true,
     rawWasmSignature: "() -> nil",
     signature: "void()",
   }),

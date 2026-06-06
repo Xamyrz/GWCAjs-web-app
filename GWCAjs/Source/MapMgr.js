@@ -7,6 +7,10 @@ import { getInstanceTime } from "../Include/GWCA/Context/AgentContext.js";
 import { getIsInCinematic } from "../Include/GWCA/Context/Cinematic.js";
 import { getPathingMapArray } from "../Include/GWCA/Context/MapContext.js";
 import {
+  getMissionMapUIContext,
+  getWorldMapUIContext,
+} from "../Include/GWCA/Context/MapUIContext.js";
+import {
   getWorldFoeCounts,
   getWorldMissionMapIconArray,
   getWorldUnlockedMapArray,
@@ -327,10 +331,10 @@ function createMapApi(state, global = globalThis) {
       return internals.call(name, args);
     },
     GetMissionMapContext() {
-      return null;
+      return getMissionMapUIContext(state);
     },
     GetWorldMapContext() {
-      return null;
+      return getWorldMapUIContext(state);
     },
     QueryAltitude(position, radiusOrY = 0, outputOrZ = null, radius = 0, output = null) {
       const numericPoint = typeof position !== "object";

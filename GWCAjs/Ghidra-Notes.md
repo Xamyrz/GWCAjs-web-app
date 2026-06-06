@@ -526,6 +526,9 @@ client wrapper cluster:
   `MapID::Count` (`0x36d`) by default, matching native GWCA
 - `CancelEnterChallenge`: current `func[10574]` at `ram:8038889d`
   (`PartyCliRedirectCancel()`), raw signature `() -> nil`
+- both wrappers begin with `PropGet(0x13)` and therefore require the active
+  PropContext slot `0x28b680`; GWCAjs installs the validated root for each
+  synchronous export call and restores the previous slot afterward
 
 Current `func[6860]` is `CharMsgSendChallengeAbort(unsigned int)`, packet
 opcode `0x11`, size `0x08`; it is not the MapMgr CancelEnterChallenge path.
@@ -637,11 +640,30 @@ the normal JSPI data/global ranges. A later struct-shape scan found
 treats `0x5a2318` as `f64`. This makes it a JSPI map-info cache, not the
 desktop `InstanceInfo` layout.
 
-`GetMissionMapContext()` and `GetWorldMapContext()` are hook-cached UI frame
-contexts in native GWCA, populated from `message->wParam` and cleared on frame
-destroy. The older JSPI build names `IUi::Game::Map::CWorldMap` and related
-mission-map methods, but no stable current-build context pointer or
-browser-exposed frame callback path is verified.
+`GetMissionMapContext()` and `GetWorldMapContext()` are callback-owned UI frame
+contexts in native GWCA. The browser build can recover them without patching a
+callback:
+
+- current `func[6520]` (`ram:802ae89e`) confirms the active frame pointer array
+  global at `0x5a0aac` and count at `0x5a0ab4`
+- frame callbacks use the array header at frame `+0xa8`; callback entries are
+  `0x0c` bytes, with the indirect table index at `+0x00` and callback context
+  slot at `+0x04`
+- frame ID is at frame `+0xbc`
+- old named `MapWindowFrameProc` is `func[16047]`; its independently matched
+  current body is `func[16088]` (`ram:805aa1c4`), indirect table slot `4000`
+- mission-map create message `9` allocates `0x48`; destroy message `0xb` frees
+  it; the embedded frame ID is at context `+0x14`
+- old named `MapFullScreenFrameProc` is `func[16134]`; its matched current
+  wrapper is `func[16175]` (`ram:805b3b70`), indirect table slot `4143`, with
+  current implementation `func[16176]`
+- world-map create allocates `0x224`; destroy frees it; the embedded frame ID
+  is at context `+0x00`
+
+The implementation scans only active frames and revalidates the callback and
+frame ID on every call. It intentionally does not cache the callback context
+slot because the destroyed object can leave a stale pointer behind. Static
+matching is complete; live open/close readback remains to be tested.
 
 Live browser readback confirmed the same values after reload:
 

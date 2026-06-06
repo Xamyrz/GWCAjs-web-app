@@ -321,12 +321,27 @@ the normal JSPI data/global ranges. A later struct-shape scan found
 `0x5a2318` is treated as `f64`, so this is not the desktop `InstanceInfo`
 layout.
 
-`GetMissionMapContext()` and `GetWorldMapContext()` remain unresolved. Native
-GWCA does not scan stable globals for these; it captures them from UI frame
-callbacks (`message->wParam`) and clears them on frame destruction. The JSPI
-symbol-bearing build has `CWorldMap`/mission-map UI methods, but no verified
-stable context pointer or browser-exposed UI hook path yet. Keep these returning
-`null` until a callback/cache address is verified live.
+`GetMissionMapContext()` and `GetWorldMapContext()` now recover the same
+callback-owned contexts without installing browser-side hooks. Build `38615`
+keeps active frame pointers in the array at `0x5a0aac`, with its count at
+`0x5a0ab4`. Each frame has a callback array at `+0xa8` and frame ID at `+0xbc`;
+callback entries are `0x0c` bytes and their `+0x04` field is the context slot
+used as `message->wParam`.
+
+The current callback identities are:
+
+- mission map: current `func[16088]`, indirect table slot `4000`, context size
+  `0x48`, embedded frame ID at `+0x14`
+- world map: current `func[16175]`/`func[16176]`, indirect table slot `4143`,
+  context size `0x224`, embedded frame ID at `+0x00`
+
+`GWCAjs/Include/GWCA/Context/MapUIContext.js` scans only the bounded active
+frame array, matches the exact callback slot, validates the context allocation
+range and embedded frame ID, then decodes the native layouts. It does not cache
+the pointer, because both callbacks free their object on frame destruction and
+do not reliably clear the callback slot. This is statically verified against
+the current and named JSPI binaries; live opening/closing tests for both map
+windows are still required.
 
 Use `GWCAjs.Map.GetActionStatuses()` to inspect patched action export status.
 
@@ -377,11 +392,14 @@ party-client wrapper targets:
 - `EnterChallenge` raw signature: `(i32) -> nil`
 - `GWCAjs.Map.EnterChallenge()` passes `MapID::Count` (`0x36d`) by default,
   matching native GWCA's `kSendEnterMission` payload
+- the wrapper calls `PropGet(0x13)`, so GWCAjs temporarily installs the
+  validated PropContext root in slot `0x28b680` around the export call
 - `CancelEnterChallenge` export patch:
   `__gwca_party_cancel_enter_challenge`
 - `CancelEnterChallenge` current function index: `10574`
 - `CancelEnterChallenge` old named function: `PartyCliRedirectCancel()`
 - `CancelEnterChallenge` raw signature: `() -> nil`
+- the cancel wrapper uses the same temporary PropContext handling
 
 Current `func[6860]` is `CharMsgSendChallengeAbort(unsigned int)` with packet
 opcode `0x11`, size `0x08`. Do not confuse it with MapMgr
