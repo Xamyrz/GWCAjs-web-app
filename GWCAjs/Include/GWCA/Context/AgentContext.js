@@ -1,6 +1,5 @@
 import {
-  GAME_CONTEXT_OFFSETS,
-  getGameContextChildAddress,
+  getNamedGameContextChildAddress,
 } from "./GameContext.js";
 import { readValue } from "../Utilities/Memory.js";
 
@@ -9,10 +8,7 @@ export const AGENT_CONTEXT_OFFSETS = Object.freeze({
 });
 
 export function getAgentContextAddress(state) {
-  return getGameContextChildAddress(
-    state,
-    GAME_CONTEXT_OFFSETS.agent
-  );
+  return getNamedGameContextChildAddress(state, "agent");
 }
 
 export function getInstanceTime(state) {

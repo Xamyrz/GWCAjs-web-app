@@ -1,5 +1,6 @@
 import { DEFAULT_BUILD_ID, findBuildSignatures } from "/gw-runtime/signatures.js";
 
+import { createTemporaryBufferPool } from "../Include/GWCA/Utilities/TemporaryBuffer.js";
 import { debugLog } from "./Debug.js";
 import { createModule, getHook, getRuntime } from "./stdafx.js";
 
@@ -34,13 +35,18 @@ function getLookupKeys(buildInfo) {
 
 function readType(hook, type, address, options = {}) {
   switch (type) {
+    case "i8":
+      return hook.readI8(address);
     case "u8":
       return hook.readU8(address);
+    case "i16":
+      return hook.readI16(address);
     case "u16":
       return hook.readU16(address);
     case "u32":
-    case "ptr":
       return hook.readU32(address);
+    case "ptr":
+      return hook.readPointer(address);
     case "i32":
       return hook.readI32(address);
     case "f32":
@@ -48,9 +54,52 @@ function readType(hook, type, address, options = {}) {
     case "f64":
       return hook.readF64(address);
     case "utf8":
-      return hook.readUtf8(address, options.maxLength ?? options.length);
+      return hook.readUtf8(address, options.length ?? options.maxLength);
+    case "utf16":
+      return hook.readUtf16(address, options.units ?? options.maxUnits);
+    case "bytes":
+      return hook.readBytes(address, options.length ?? 0);
     default:
       throw new Error("Unsupported memory read type: " + type);
+  }
+}
+
+function writeType(hook, type, address, value, options = {}) {
+  switch (type) {
+    case "i8":
+      return hook.writeI8(address, value);
+    case "u8":
+      return hook.writeU8(address, value);
+    case "i16":
+      return hook.writeI16(address, value);
+    case "u16":
+      return hook.writeU16(address, value);
+    case "u32":
+      return hook.writeU32(address, value);
+    case "ptr":
+      return hook.writePointer(address, value);
+    case "i32":
+      return hook.writeI32(address, value);
+    case "f32":
+      return hook.writeF32(address, value);
+    case "f64":
+      return hook.writeF64(address, value);
+    case "utf8":
+      return hook.writeUtf8(
+        address,
+        value,
+        options.length ?? options.maxLength
+      );
+    case "utf16":
+      return hook.writeUtf16(
+        address,
+        value,
+        options.units ?? options.maxUnits
+      );
+    case "bytes":
+      return hook.writeBytes(address, value);
+    default:
+      throw new Error("Unsupported memory write type: " + type);
   }
 }
 
@@ -79,15 +128,50 @@ export const MemoryModule = createModule("MemoryMgr", async function initModule(
   state.buildId = buildId;
   state.lookupKeys = lookupKeys;
   state.signatures = signatures || { modules: {} };
-  state.memory = Object.freeze({
-    byteLength: hook.memory.buffer.byteLength,
-    pageCount:
-      buildInfo?.memoryPageCount ??
-      Math.floor(hook.memory.buffer.byteLength / (64 * 1024)),
+  const memoryApi = {
+    get byteLength() {
+      return hook.memory?.buffer?.byteLength || 0;
+    },
+    get pageCount() {
+      return Math.floor((hook.memory?.buffer?.byteLength || 0) / (64 * 1024));
+    },
+    assertRange(address, length, alignment) {
+      return hook.assertRange(address, length, alignment);
+    },
+    free(address) {
+      return hook.free(address);
+    },
+    isAligned(address, alignment) {
+      return hook.isAligned(address, alignment);
+    },
+    isValidPointer(address, options) {
+      return hook.isValidPointer(address, options);
+    },
+    isValidRange(address, length, alignment) {
+      return hook.isValidRange(address, length, alignment);
+    },
+    malloc(size) {
+      return hook.malloc(size);
+    },
     readType(type, address, options) {
       return readType(hook, type, address, options);
     },
-  });
+    withAllocation(size, callback) {
+      return hook.withAllocation(size, callback);
+    },
+    withUtf8(text, callback) {
+      return hook.withUtf8(text, callback);
+    },
+    withUtf16(text, callback) {
+      return hook.withUtf16(text, callback);
+    },
+    writeType(type, address, value, options) {
+      return writeType(hook, type, address, value, options);
+    },
+  };
+  state.memory = memoryApi;
+  memoryApi.temporaryBuffers = createTemporaryBufferPool(state);
+  state.memory = Object.freeze(memoryApi);
 
   debugLog("memory initialized", {
     buildId,
@@ -101,5 +185,6 @@ export const MemoryModule = createModule("MemoryMgr", async function initModule(
     hasMemory: true,
     lookupKeys,
     pageCount: state.memory.pageCount,
+    temporaryBuffers: state.memory.temporaryBuffers.describe(),
   };
 });

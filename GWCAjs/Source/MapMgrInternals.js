@@ -147,28 +147,6 @@ export function createMapInternals(state) {
     }
   }
 
-  function malloc(size) {
-    const exportsObject = getRawExports(state);
-    if (typeof exportsObject?.malloc !== "function") {
-      throw new Error("malloc export is not available");
-    }
-    return exportsObject.malloc(size);
-  }
-
-  function free(address) {
-    if (!address) {
-      return;
-    }
-    if (typeof state?.hook?.free === "function") {
-      state.hook.free(address);
-      return;
-    }
-    const exportsObject = getRawExports(state);
-    if (typeof exportsObject?.free === "function") {
-      exportsObject.free(address);
-    }
-  }
-
   function getInternalFunction(name) {
     return cloneFunctionInfo(state, INTERNAL_FUNCTIONS[name]);
   }
@@ -226,53 +204,53 @@ export function createMapInternals(state) {
 
   function queryAltitude(point, radius = 0, options = {}) {
     const includeTerrainNormal = options.includeTerrainNormal !== false;
-    let pointAddress = 0;
-    let altitudeAddress = 0;
-    let normalAddress = 0;
-
     try {
-      pointAddress = malloc(16);
-      altitudeAddress = malloc(4);
-      normalAddress = includeTerrainNormal ? malloc(16) : 0;
-
-      state.hook.writeF32(pointAddress, point.x);
-      state.hook.writeF32(pointAddress + 4, point.y);
-      state.hook.writeF32(pointAddress + 8, point.z || 0);
-      state.hook.writeF32(altitudeAddress, 0);
-      if (normalAddress) {
-        state.hook.writeF32(normalAddress, 0);
-        state.hook.writeF32(normalAddress + 4, 0);
-        state.hook.writeF32(normalAddress + 8, -1);
+      const temporaryBuffers = state?.memory?.temporaryBuffers;
+      if (!temporaryBuffers) {
+        throw new Error("Temporary buffer pool is not available");
       }
+      const bufferSize = includeTerrainNormal ? 36 : 20;
+      return temporaryBuffers.withBuffer(bufferSize, (lease) => {
+        const pointAddress = lease.address;
+        const altitudeAddress = pointAddress + 16;
+        const normalAddress = includeTerrainNormal ? pointAddress + 20 : 0;
 
-      const callResult = call("QueryAltitude", [
-        pointAddress,
-        Number(radius) || 0,
-        altitudeAddress,
-        normalAddress,
-      ]);
-      if (!callResult.called) {
+        state.hook.writeF32(pointAddress, point.x);
+        state.hook.writeF32(pointAddress + 4, point.y);
+        state.hook.writeF32(pointAddress + 8, point.z || 0);
+        if (normalAddress) {
+          state.hook.writeF32(normalAddress + 8, -1);
+        }
+
+        const callResult = call("QueryAltitude", [
+          pointAddress,
+          Number(radius) || 0,
+          altitudeAddress,
+          normalAddress,
+        ]);
+        if (!callResult.called) {
+          return {
+            ...callResult,
+            altitude: 0,
+            ok: false,
+            terrainNormal: null,
+          };
+        }
+
+        const altitude = state.hook.readF32(altitudeAddress);
         return {
           ...callResult,
-          altitude: 0,
-          ok: false,
-          terrainNormal: null,
+          altitude,
+          ok: callResult.result !== 0,
+          terrainNormal: normalAddress
+            ? {
+                x: state.hook.readF32(normalAddress),
+                y: state.hook.readF32(normalAddress + 4),
+                z: state.hook.readF32(normalAddress + 8),
+              }
+            : null,
         };
-      }
-
-      const altitude = state.hook.readF32(altitudeAddress);
-      return {
-        ...callResult,
-        altitude,
-        ok: callResult.result !== 0,
-        terrainNormal: normalAddress
-          ? {
-              x: state.hook.readF32(normalAddress),
-              y: state.hook.readF32(normalAddress + 4),
-              z: state.hook.readF32(normalAddress + 8),
-            }
-          : null,
-      };
+      });
     } catch (error) {
       return {
         altitude: 0,
@@ -283,10 +261,6 @@ export function createMapInternals(state) {
         reason: "QueryAltitude call failed.",
         terrainNormal: null,
       };
-    } finally {
-      free(normalAddress);
-      free(altitudeAddress);
-      free(pointAddress);
     }
   }
 

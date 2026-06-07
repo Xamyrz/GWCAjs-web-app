@@ -21,13 +21,18 @@ Execution plan: [`COMPLETION_PLAN.md`](COMPLETION_PLAN.md)
 - [x] `MapMgr` implementation is complete.
 - [x] Existing `InstanceInfo` deterministic test passes.
 - [x] Existing `MapTest` deterministic test passes.
+- [x] Memory safety, strings, scoped allocation, and growth test passes.
+- [x] Array, pointer-array, and list deterministic test passes.
+- [x] Temporary-buffer lifecycle and altitude deterministic test passes.
+- [x] GameContext child refresh and validation test passes.
+- [x] Live memory range, pointer, and scoped-allocation smoke test passes.
 - [ ] Full cross-manager regression suite exists.
 - [ ] Method-level native-to-JS API parity ledger exists.
 
 ## Session Invariants
 
 - [x] Python project server is reachable on port `8000`.
-- [ ] Verify port `8000` at the start of every work session.
+- [x] Verify port `8000` at the start of every work session.
 - [ ] Record the active game build and WASM build ID before live testing.
 - [ ] Confirm `Gw.jspi.wasm` is the live binary before using an address/index.
 - [ ] Keep live scans bounded and hypothesis-driven.
@@ -37,18 +42,18 @@ Execution plan: [`COMPLETION_PLAN.md`](COMPLETION_PLAN.md)
 
 ### Memory And Containers
 
-- [ ] Refresh all typed views after WASM memory growth.
-- [ ] Add shared checked range/alignment helpers.
-- [ ] Complete integer, float, pointer, and pointer-slot reads/writes.
-- [ ] Add bounded UTF-8 read/write helpers.
-- [ ] Add bounded UTF-16 read/write helpers.
-- [ ] Add scoped `malloc`/`free` helpers.
-- [ ] Add reusable temporary string/packet buffers.
-- [ ] Complete checked `Array` readers.
-- [ ] Complete pointer-array readers.
-- [ ] Complete `List` readers.
-- [ ] Add deterministic tests for invalid pointers, capacities, and memory
-  growth.
+- [x] Refresh all typed views after WASM memory growth.
+- [x] Add shared checked range/alignment helpers.
+- [x] Complete integer, float, pointer, and pointer-slot reads/writes.
+- [x] Add bounded UTF-8 read/write helpers.
+- [x] Add bounded UTF-16 read/write helpers.
+- [x] Add scoped `malloc`/`free` helpers.
+- [x] Add reusable temporary string/packet buffers.
+- [x] Complete checked `Array` readers.
+- [x] Complete pointer-array readers.
+- [x] Complete `List` readers.
+- [x] Add deterministic tests for invalid pointers and memory growth.
+- [x] Add deterministic tests for invalid array/list capacities.
 
 ### Contexts
 
@@ -58,6 +63,8 @@ Execution plan: [`COMPLETION_PLAN.md`](COMPLETION_PLAN.md)
 - [x] WorldContext.
 - [x] Cinematic state.
 - [x] AgentContext path used by current player position.
+- [x] On-demand pointer accessors for all GameContext children.
+- [x] Pointer-only candidates are distinguished from validated contexts.
 - [ ] AccountContext.
 - [ ] Full AgentContext reader.
 - [ ] GadgetContext.
@@ -67,7 +74,7 @@ Execution plan: [`COMPLETION_PLAN.md`](COMPLETION_PLAN.md)
 - [ ] PreGameContext.
 - [ ] TextParser.
 - [ ] TradeContext.
-- [ ] On-demand child-pointer refresh tests.
+- [x] On-demand child-pointer refresh tests.
 - [ ] Character-switch invalidation tests.
 
 ### Build And Calls
@@ -92,7 +99,7 @@ Execution plan: [`COMPLETION_PLAN.md`](COMPLETION_PLAN.md)
 - [ ] Shared scoped PropContext guard.
 - [ ] Shared internal-call argument validation.
 - [ ] Shared action status schema.
-- [ ] Export-presence tests.
+- [x] Export-presence tests.
 - [ ] Build mismatch fails closed.
 - [ ] New-build snapshot/dump checklist automated or scripted.
 
@@ -129,22 +136,29 @@ Execution plan: [`COMPLETION_PLAN.md`](COMPLETION_PLAN.md)
 - [x] Action diagnostics.
 - [x] Deterministic `InstanceInfo` and `MapTest` coverage.
 - [x] Live validation across map transitions.
+- [x] Live-regress `QueryAltitude()` after temporary-buffer migration.
 - [ ] Include in final full-client regression run.
 
 ## Manager Implementation Checklist
 
 ### GuildMgr
 
-- [ ] Validate `GameContext + 0x3c` as GuildContext.
-- [ ] Implement `Guild`, `GuildPlayer`, `GuildHistory`, `CapeDesign`,
+- [x] Statically validate `GameContext + 0x3c` as GuildContext for build
+  `38615`.
+- [x] Live-validate `GameContext + 0x3c` with guild-specific invariants.
+- [x] Implement `Guild`, `GuildPlayer`, `GuildHistory`, `CapeDesign`,
   `TownAlliance`, and `GHKey` readers as needed.
-- [ ] Implement guild array, current guild, guild lookup, player guild index,
+- [x] Implement guild array, current guild, guild lookup, player guild index,
   announcement, and announcer reads.
-- [ ] Verify string bounds, guild keys, ranks, and array cross-references.
-- [ ] Implement travel-to-hall and leave-hall actions.
-- [ ] Add deterministic layout/action tests.
-- [ ] Live test guild state and guild hall lifecycle.
-- [ ] Register and expose `GWCAjs.Guild`.
+- [x] Verify string bounds, guild keys, ranks, and array cross-references.
+- [x] Implement travel-to-hall and leave-hall actions.
+- [x] Expose explicit action diagnostics for hall travel/leave.
+- [x] Add deterministic layout/action tests.
+- [x] Live test read-only guild state in an outpost.
+- [x] Live test read-only guild state in a guild hall.
+- [x] Live test `GetCurrentGH()` and `Describe().currentGuildHall`.
+- [ ] Live test guild hall lifecycle/actions.
+- [x] Register and expose `GWCAjs.Guild`.
 
 ### AgentMgr
 

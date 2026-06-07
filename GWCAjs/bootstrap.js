@@ -18,6 +18,12 @@ function install(global = globalThis) {
     get map() {
       return GWCA.getMapManager();
     },
+    get Guild() {
+      return GWCA.getGuildManager();
+    },
+    get guild() {
+      return GWCA.getGuildManager();
+    },
     get Player() {
       return GWCA.getPlayerManager();
     },

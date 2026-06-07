@@ -1,6 +1,7 @@
 import { debugLog } from "./Debug.js";
 import { ContextModule } from "./Context.js";
 import { GameThreadModule } from "./GameThreadMgr.js";
+import { GuildModule } from "./GuildMgr.js";
 import { disableHooks as disableHookBase, enableHooks as enableHookBase, HookBaseModule } from "./Hooker.js";
 import { MapModule } from "./MapMgr.js";
 import { MemoryModule } from "./MemoryMgr.js";
@@ -19,6 +20,7 @@ const modules = [
   RenderModule,
   UIModule,
   MapModule,
+  GuildModule,
   PlayerModule,
 ];
 
@@ -31,6 +33,7 @@ function createState() {
     error: null,
     hook: null,
     hooksEnabled: false,
+    guild: null,
     initialized: false,
     initializing: null,
     lookupKeys: [],
@@ -49,6 +52,13 @@ export const state = createState();
 function clearState(options = {}) {
   const { preserveInitializing = false } = options;
   const pending = state.initializing;
+  try {
+    state.memory?.temporaryBuffers?.dispose?.();
+  } catch (error) {
+    debugLog("temporary buffer disposal failed", {
+      error: error instanceof Error ? error.message : String(error),
+    });
+  }
   const next = createState();
   for (const key of Object.keys(next)) {
     state[key] = next[key];
@@ -102,6 +112,7 @@ function buildResult(reused = false) {
       ? state.context.api.Describe()
       : null,
     hooksEnabled: state.hooksEnabled,
+    guild: state.guild?.api?.Describe ? state.guild.api.Describe() : null,
     initialized: state.initialized,
     map: state.map?.api?.Describe ? state.map.api.Describe() : null,
     modules: describeModuleResults(),
@@ -190,6 +201,10 @@ export function describe() {
 
 export function getMapManager() {
   return state.map?.api || null;
+}
+
+export function getGuildManager() {
+  return state.guild?.api || null;
 }
 
 export function getContextManager() {

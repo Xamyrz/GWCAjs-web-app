@@ -783,6 +783,19 @@ func[10577] PartyCliSelectMission(int)
 func[10632] PartyClient::MsgSendTravelMission(...)
 ```
 
+Additional Guild hall action validation:
+
+```text
+func[10631] PartyClient::MsgSendTravelGuildHall(Guid const&, int)
+func[10633] PartyClient::MsgSendTravelMissionLogin(int)
+```
+
+`IUi::GameFrameProc` registers `0x10000180` (`kGuildHall`) and `0x10000182`
+(`kLeaveGuildHall`). Both route through
+`IUi::MapSelect(unsigned int, IUi::CMission const&, int)`: mode `0` reaches
+`PartyClient::MsgSendTravelGuildHall`, while mode `2` reaches
+`PartyClient::MsgSendTravelMissionLogin`.
+
 `wasm-validate` passes for the synthesized binary. It was imported as
 `/38615-symbol-map/Gw.jspi.named.wasm`.
 

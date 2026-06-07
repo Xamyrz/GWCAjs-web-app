@@ -1,6 +1,6 @@
 # GWCAjs Browser/WASM Handover
 
-Last updated: 2026-06-06
+Last updated: 2026-06-07
 
 Target game build: `38615`
 
@@ -90,6 +90,104 @@ being duplicated inside `PlayerMgr.js`.
 Many other manager files are placeholders or incomplete, including Guild,
 Party, Agent, Item, Skillbar, Chat, Quest, Merchant, Trade, Camera, Effect,
 Event, FriendList, and Storage managers.
+
+### Shared memory foundation
+
+The hook and GWCAjs memory layers now provide:
+
+- automatic typed-view refresh after `WebAssembly.Memory.grow()`
+- checked ranges and optional alignment
+- signed/unsigned 8-, 16-, and 32-bit values, floats, pointers, and pointer
+  slots
+- bounded UTF-8 and UTF-16 reads/writes
+- checked `malloc`/`free` plus scoped sync/async allocation helpers
+- scoped UTF-8 and UTF-16 callback helpers
+
+Deterministic coverage is in `GWCAjs/Tests/Memory.test.mjs`. It checks invalid
+ranges and pointers, string capacity failures, cleanup after successful and
+failed callbacks, invalid allocator results, and memory growth.
+
+The memory helpers passed a live build `38615` smoke test on 2026-06-07:
+
+```text
+GWHook.isValidRange(0x10000, 4) -> true
+GWHook.isValidPointer(0x10000) -> true
+GWHook.withAllocation(...write/read 12345...) -> 12345
+```
+
+The shared container layer now includes:
+
+- strict `Array<T>` header validation with `size <= capacity`
+- capacity-bound slot lookup for live arrays whose size temporarily lags
+- optional explicit null-buffer empty arrays
+- checked pointer-array decoding with nullable slots
+- bounded `TList<T>` traversal using the stored embedded-link offset
+- circular sentinel, tagged-end, cycle, traversal-limit, and back-link checks
+
+Deterministic coverage is in `GWCAjs/Tests/Containers.test.mjs`. Reusable
+temporary buffers are provided by
+`Include/GWCA/Utilities/TemporaryBuffer.js`. The pool:
+
+- reuses best-fit idle allocations
+- clears requested bytes before each checkout
+- gives concurrent and nested calls exclusive leases
+- releases synchronous and asynchronous callbacks in `finally`
+- bounds retained idle buffers and bytes
+- frees idle buffers at `GWCAjs.terminate()`
+- safely frees active leases when they return after termination
+- provides reusable UTF-8 and UTF-16 callback helpers
+
+`MapMgr.QueryAltitude()` is the first consumer. It now uses one packed
+temporary block instead of three independent allocations. Deterministic
+coverage in `GWCAjs/Tests/TemporaryBuffer.test.mjs` verifies reuse, clearing,
+concurrent checkout, exceptions, async cleanup, UTF strings, termination
+disposal, and altitude argument/result layout.
+
+The migrated path passed a controlled live build `38615` regression on
+2026-06-07. At the current player position it returned:
+
+```text
+result=1
+ok=true
+altitude=-3460.92578125
+terrainNormal=(0.0519233271, 0.0207693316, -0.9969278574)
+```
+
+Callback-heavy code must not retain lease addresses after release.
+
+### Shared GameContext navigation
+
+`Include/GWCA/Context/GameContext.js` now owns named descriptors and
+on-demand accessors for:
+
+```text
++0x08 AgentContext
++0x14 MapContext
++0x18 TextParser
++0x28 AccountContext
++0x2c WorldContext
++0x30 CinematicContext
++0x38 GadgetContext
++0x3c GuildContext
++0x40 ItemContext
++0x44 CharContext
++0x4c PartyContext
++0x58 TradeContext
+```
+
+Every call re-reads the child slot from the current root. Char/Map/World
+anchors are fallback discovery hints only when no valid root is available; an
+invalid child under a valid root does not fall back to a stale anchor.
+
+Agent, Map, World, Cinematic, and Char are labeled `validated`. Account,
+TextParser, Gadget, Item, Party, and Trade are labeled `pointer-only` until
+manager-specific invariants prove their layouts. Guild is labeled
+`live-tested-readonly` after build `38615` outpost validation. The public
+Context API reports all addresses and these verification levels.
+
+Deterministic coverage in `GWCAjs/Tests/ContextChildren.test.mjs` verifies
+child replacement, root-slot replacement, invalid pointers, stale-anchor
+rejection, and fallback behavior when the root is unavailable.
 
 ### Desktop reference
 
@@ -565,19 +663,24 @@ wrapper still needs:
 
 ## Guild Work
 
-The likely manager entry is:
+The manager entry is statically confirmed for build `38615`:
 
 ```text
 GameContext + 0x3c -> GuildContext
 ```
 
-Desktop references:
+Current JSPI evidence:
 
-- `gwca/Include/GWCA/Context/GuildContext.h`
-- `gwca/Include/GWCA/GameEntities/Guild.h`
-- corresponding implementations under `gwca/Source/`
+- `GuildClient::ContextCreate()` allocates `0x3bc`.
+- `GuildCliGetGuildId()` reads `+0x60`.
+- `GuildCliGetGuildGuid()` returns `+0x64`.
+- `GuildCliGetMotd()` and `GuildCliGetMotdAuthor()` use `+0x78` and `+0x278`.
+- `GuildCliGetClientRank()` reads `+0x2a0`.
+- `GuildCliGetGuildName/Tag()` use the pointer array at `+0x2f8`.
+- `GuildCliGetMember()` uses the roster table at `+0x358`.
+- `GuildCliGetMemberCount()` sums `+0x378/+0x37c/+0x380`.
 
-Useful desktop GuildContext candidates:
+Confirmed GuildContext fields:
 
 ```text
 +0x034 player name
@@ -592,18 +695,80 @@ Useful desktop GuildContext candidates:
 +0x358 guild roster
 ```
 
-Useful desktop structure sizes:
+Current JSPI structure sizes:
 
 ```text
-Guild          0xac
-GuildPlayer    0x174
-GuildHistory   0x208
+Guild          0xb0
+GuildPlayer    0x12c
+GuildHistory   0x90
 CapeDesign     0x1c
 TownAlliance   0x78
 ```
 
-Start GuildMgr read-only. Validate arrays, string pointers, guild keys, ranks,
-and cross-references before adding actions.
+The legacy desktop headers still describe `Guild` as `0xac`, `GuildPlayer` as
+`0x174`, and `GuildHistoryEvent` as `0x208`; do not use those sizes for the
+current JSPI pointer arrays. The current constructors/Add paths allocate the
+sizes above.
+
+The read-only implementation now lives in:
+
+- `Include/GWCA/Context/GuildContext.js`
+- `Include/GWCA/GameEntities/Guild.js`
+- `Source/GuildMgr.js`
+
+It validates the full context range, bounded array headers, entity pointers,
+guild slot/index agreement, player-guild cross-references, guild ranks, and
+roster status counts. `GWCAjs.Guild` exposes the native read surface plus
+roster/history/town-alliance diagnostics. Hall travel and leave remain
+explicitly unavailable until their UI message paths are verified.
+
+Live build `38615` probing found a populated guild entry with `faction = 4`
+(`Lg Hd Tv Q Plus` / `LGHD`), so the guild faction plausibility bound is
+`0..4`; do not reduce it to the old desktop Kurzick/Luxon-only assumption.
+
+The read-only GuildContext path was live-validated in an outpost and a guild
+hall on 2026-06-07. In the outpost, `GWCAjs.Guild.Describe()` returned
+`context.valid = true` with:
+
+- player guild index `1`, rank `4`, and a non-empty GHKey matching the guild
+  entry key
+- guild array size `2`, with populated slot `1`
+- roster size `3`, two non-null members, and status counts `[0, 1, 1]`
+- two guild-history entries
+- eighteen town-alliance entries
+
+The history text field can contain Guild Wars control-code prefixes. The
+current Guild-specific normalizer strips the observed control markers from
+history entries, exposes parsed `names`, and preserves the original text as
+`rawName`. It also decodes the low 16 bits of `time` as the displayed
+MM/DD/YYYY day serial and maps the two observed event codes:
+
+- `0x0345`: `Guild founded by <name>.`
+- `0x0346`: `New member <name> (invited by <name>).`
+- `0x0349`: `<name> kicked by <name>.`
+- `0x8101`: `<name> left the guild.`
+
+This is not a general TextParser replacement.
+
+After travelling to the guild hall, `GWCAjs.Guild.Describe()` again returned
+`context.valid = true` with the same player guild index, rank, GHKey, roster,
+history, and town-alliance counts. The `GuildContext` address stayed at
+`13747520`, while the guild array backing buffer moved from `273479912` to
+`37413360`, confirming that callers must re-read array headers and pointers
+instead of retaining entry addresses across map transitions.
+
+The derived guild-hall helpers were also live-validated in the guild hall:
+
+```text
+GWCAjs.Guild.Describe().isCurrentMapGuildHall -> true
+GWCAjs.Guild.Describe().currentGuildHall.name -> "Lg Hd Tv Q Plus"
+GWCAjs.Guild.Describe().currentGuildHall.tag -> "LGHD"
+GWCAjs.Guild.GetCurrentGH().name -> "Lg Hd Tv Q Plus"
+GWCAjs.Guild.GetCurrentGH().tag -> "LGHD"
+```
+
+Deterministic coverage is in `GWCAjs/Tests/Guild.test.mjs`. The next live step
+is to identify the UI message paths before enabling hall actions.
 
 ## Repeatable Workflow For A New Game Build
 
@@ -653,8 +818,8 @@ These checks do not replace an in-game test for memory layouts or calls.
   after an update if indexes are copied without semantic verification.
 - Raw pointers can become stale during map loads, character changes, or memory
   growth. Managers should revalidate their context before consequential use.
-- UTF-16 arguments and packet buffers need a shared temporary-allocation
-  strategy before adding many string-taking calls.
+- Temporary buffer addresses are lease-scoped and must not be retained by
+  callbacks or internal functions after the synchronous/awaited call returns.
 - Read APIs and write/action APIs should remain separate. A readable context
   does not prove that a related function is safe to invoke.
 
@@ -663,14 +828,43 @@ These checks do not replace an in-game test for memory layouts or calls.
 - We have copied over the symbols from old version to the current '38615' to help and reduce time in comparing between
   the two versions and sometimes duplicating efforts.
 
+## Guild Hall Action Wiring
+
+Ghidra verification for build `38615`:
+
+- `kGuildHall` (`0x10000180`) and `kLeaveGuildHall` (`0x10000182`) are
+  registered by `IUi::GameFrameProc`.
+- Both route through `IUi::MapSelect(unsigned int, IUi::CMission const&, int)`.
+- Guild-hall travel uses mode `0`, then
+  `PartyClient::MsgSendTravelGuildHall(Guid const&, int)`.
+  - current function index: `10631`
+  - export patch: `__gwca_msg_send_travel_guild_hall`
+  - packet opcode/size: `0xb0` / `0x18`
+- Leave-guild-hall uses mode `2`, then
+  `PartyClient::MsgSendTravelMissionLogin(int)`.
+  - current function index: `10633`
+  - export patch: `__gwca_msg_send_travel_mission_login`
+  - packet opcode/size: `0xb2` / `0x08`
+
+`GWCAjs.Guild.TravelGH()` writes the current `GHKey` through the temporary
+buffer pool before calling the travel export. `GWCAjs.Guild.LeaveGH()` sends the
+same `1` argument used by the verified UI path. Both fail closed unless their
+patched exports are present.
+
+Live validation commands after a browser reload:
+
+```js
+GWCAjs.Guild.GetActionStatuses()
+GWCAjs.Guild.GetPlayerGuildHallKey()
+GWCAjs.Guild.TravelGH()
+GWCAjs.Guild.LeaveGH()
+```
+
 ## Recommended Next Steps
 
-1. Implement a read-only `GuildMgr` from `root + 0x3c`, with strict context and
-   array validation.
-2. Add shared validated context accessors for Account, Gadget, Guild, Item,
-   Char, and Party rather than duplicating pointer logic in each manager.
-3. Reuse the new `Include/GWCA` array, memory, entity, and context readers in
-   the next manager instead of duplicating pointer validation.
-4. Add a safe shared UTF-16 temporary buffer API for message functions.
-5. Keep investigating a static root anchor in Ghidra, but retain the validated
+1. Reload the browser and confirm the two Guild action exports appear as
+   available in `GWCAjs.Guild.GetActionStatuses()`.
+2. Live-test `GWCAjs.Guild.TravelGH()` from a stable outpost.
+3. Live-test `GWCAjs.Guild.LeaveGH()` from the guild hall.
+4. Keep investigating a static root anchor in Ghidra, but retain the validated
    root scan as the default fallback.

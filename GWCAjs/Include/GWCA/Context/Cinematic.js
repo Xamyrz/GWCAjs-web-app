@@ -1,14 +1,10 @@
 import {
-  GAME_CONTEXT_OFFSETS,
-  getGameContextChildAddress,
+  getNamedGameContextChildAddress,
 } from "./GameContext.js";
 import { readValue } from "../Utilities/Memory.js";
 
 export function getCinematicContextAddress(state) {
-  return getGameContextChildAddress(
-    state,
-    GAME_CONTEXT_OFFSETS.cinematic
-  );
+  return getNamedGameContextChildAddress(state, "cinematic");
 }
 
 export function getIsInCinematic(state) {

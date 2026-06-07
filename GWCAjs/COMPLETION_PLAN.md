@@ -59,11 +59,11 @@ and record the compatibility difference in the parity ledger.
 | Shared `Context` and root promotion | Implemented and live validated |
 | `PlayerMgr` | Implemented, native API names represented 17/17 |
 | `MapMgr` | Implemented, native API names represented 33/33 |
-| `MemoryMgr` and `Scanner` | Functional bootstrap, not yet a complete shared toolkit |
+| `MemoryMgr` and `Scanner` | Growth-safe checked memory, bounded strings, scoped/reusable allocation, arrays, pointer arrays, and lists implemented |
 | `GameThreadMgr`, `RenderMgr`, `UIMgr` | Initialization placeholders only |
 | Other native managers | Empty placeholders |
-| Context/entity/container readers | Complete only for the Player/Map paths |
-| Deterministic tests | `InstanceInfo` and `MapTest` only |
+| Context/entity/container readers | On-demand GameContext child pointers are centralized; layouts remain complete only for Player/Map paths |
+| Deterministic tests | `Memory`, `Containers`, `TemporaryBuffer`, `ContextChildren`, `InstanceInfo`, and `MapTest` |
 | Manual testing | Strong coverage for current Player/Map paths |
 
 Native header declaration counts are useful for estimating scope, but they are
@@ -123,6 +123,11 @@ comparison sources, not proof for current JSPI addresses or function indexes.
 Run the current deterministic suite with:
 
 ```bash
+node GWCAjs/Tests/Memory.test.mjs
+node GWCAjs/Tests/Containers.test.mjs
+node GWCAjs/Tests/TemporaryBuffer.test.mjs
+node GWCAjs/Tests/ContextChildren.test.mjs
+node GWCAjs/Tests/Guild.test.mjs
 node GWCAjs/Tests/InstanceInfo.test.mjs
 node GWCAjs/Tests/MapTest.test.mjs
 ```

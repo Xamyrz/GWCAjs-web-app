@@ -1,8 +1,6 @@
 import {
-  getCharContextAddress,
-  getGameContextAddress,
-  getMapContextAddress,
-  getWorldContextAddress,
+  GAME_CONTEXT_CHILDREN,
+  getGameContextChildAddresses,
 } from "../Include/GWCA/Context/GameContext.js";
 import { asHex, createModule } from "./stdafx.js";
 
@@ -75,13 +73,22 @@ function readContextAddresses(state) {
     });
   }
 
-  const gameplayContextAddress = getGameContextAddress(state);
+  const children = getGameContextChildAddresses(state);
   const addresses = {
     ...resolved,
-    charContextAddress: getCharContextAddress(state),
-    gameplayContextAddress,
-    mapContextAddress: getMapContextAddress(state),
-    worldContextAddress: getWorldContextAddress(state),
+    accountContextAddress: children.account,
+    agentContextAddress: children.agent,
+    charContextAddress: children.character,
+    cinematicContextAddress: children.cinematic,
+    gadgetContextAddress: children.gadget,
+    gameplayContextAddress: children.gameContextAddress,
+    guildContextAddress: children.guild,
+    itemContextAddress: children.item,
+    mapContextAddress: children.map,
+    partyContextAddress: children.party,
+    textParserAddress: children.textParser,
+    tradeContextAddress: children.trade,
+    worldContextAddress: children.world,
   };
 
   state.anchors = Object.freeze({
@@ -138,6 +145,12 @@ function createContextApi(state, global = globalThis) {
         addresses: Object.fromEntries(
           Object.entries(addresses).map(([key, value]) => [key, asHex(value)])
         ),
+        childVerification: Object.fromEntries(
+          Object.entries(GAME_CONTEXT_CHILDREN).map(([name, child]) => [
+            name,
+            child.verification,
+          ])
+        ),
         rootDiscovery: state.context?.rootDiscovery || null,
       };
     },
@@ -147,11 +160,38 @@ function createContextApi(state, global = globalThis) {
     GetGameContextAddress() {
       return readContextAddresses(state).gameplayContextAddress || null;
     },
+    GetAccountContextAddress() {
+      return readContextAddresses(state).accountContextAddress || null;
+    },
+    GetAgentContextAddress() {
+      return readContextAddresses(state).agentContextAddress || null;
+    },
     GetCharContextAddress() {
       return readContextAddresses(state).charContextAddress || null;
     },
+    GetCinematicContextAddress() {
+      return readContextAddresses(state).cinematicContextAddress || null;
+    },
+    GetGadgetContextAddress() {
+      return readContextAddresses(state).gadgetContextAddress || null;
+    },
+    GetGuildContextAddress() {
+      return readContextAddresses(state).guildContextAddress || null;
+    },
+    GetItemContextAddress() {
+      return readContextAddresses(state).itemContextAddress || null;
+    },
     GetMapContextAddress() {
       return readContextAddresses(state).mapContextAddress || null;
+    },
+    GetPartyContextAddress() {
+      return readContextAddresses(state).partyContextAddress || null;
+    },
+    GetTextParserAddress() {
+      return readContextAddresses(state).textParserAddress || null;
+    },
+    GetTradeContextAddress() {
+      return readContextAddresses(state).tradeContextAddress || null;
     },
     GetWorldContextAddress() {
       return readContextAddresses(state).worldContextAddress || null;

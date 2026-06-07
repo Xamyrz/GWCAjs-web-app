@@ -17,9 +17,15 @@ export function createCaptureRuntime(global) {
     { name: "__gwca_msg_send_abort_cinematic", functionIndex: 7768 },
   ]);
 
+  const GUILD_ACTION_EXPORT_PATCHES = Object.freeze([
+    { name: "__gwca_msg_send_travel_guild_hall", functionIndex: 10631 },
+    { name: "__gwca_msg_send_travel_mission_login", functionIndex: 10633 },
+  ]);
+
   const GWCA_EXPORT_PATCHES = Object.freeze([
     ...PLAYER_ACTION_EXPORT_PATCHES,
     ...MAP_ACTION_EXPORT_PATCHES,
+    ...GUILD_ACTION_EXPORT_PATCHES,
   ]);
 
   const listeners = new Map();
