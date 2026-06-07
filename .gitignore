@@ -4,3 +4,7 @@ __pycache__/
 .agents/
 .codex/
 *.zip
+GWCAjs/SymbolMapping/*/Gw.jspi.named.wasm
+GWCAjs/SymbolMapping/*/function-map.csv
+GWCAjs/SymbolMapping/*/function-map.json
+GWCAjs/SymbolMapping/*/baseline-analysis/

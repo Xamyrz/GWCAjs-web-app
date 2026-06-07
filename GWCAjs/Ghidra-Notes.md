@@ -718,3 +718,97 @@ Live browser readback confirmed the same values after reload:
 - `GetRegion()` -> server territory `2`
 - outpost current map `644` returned the AreaInfo entry at `0x1df690`
 - explorable current map `548` returned the AreaInfo entry at `0x1dc810`
+
+## Whole-Program JSPI Symbol Mapping
+
+On 2026-06-07 a repeatable whole-program correlator was added at:
+
+```text
+GWCAjs/Tools/map-jspi-symbols.mjs
+```
+
+It compares the old named and current authoritative JSPI binaries using
+signatures, normalized instruction bodies, direct-call normalization,
+large-address normalization, instruction shape, function-order anchors, and
+mutual opcode similarity.
+
+Current build `38615` results:
+
+- old imports/functions considered: `17739`
+- exact/high-confidence one-to-one mappings: `17302`
+- review-only one-to-one candidates: `433`
+- old functions with no same-signature current candidate: `4`
+- duplicate auto-applied target indexes: `0`
+
+The four no-candidate old functions are:
+
+```text
+func[6634]  IFeatureFlag::FeatureFlagLocalOverridesSave()
+func[7717]  IAgentView::SoundArrowZip(float, Coord3f const&,
+                                      Coord3f const&, int)
+func[8672]  AvRender(float,
+                     TArray<HGrModel_tag*, TArrayCopyBits<HGrModel_tag*>>*,
+                     unsigned int*, unsigned int*)
+func[13325] IUi::Game::CameraAdvance(float, Coord3f*, Coord3f*, float*)
+```
+
+They should be treated as removed or ABI-reworked until independently found.
+
+The mapper creates:
+
+```text
+GWCAjs/SymbolMapping/38615/function-map.json
+GWCAjs/SymbolMapping/38615/function-map.csv
+GWCAjs/SymbolMapping/38615/Gw.jspi.named.wasm
+```
+
+The named WASM appends a synthesized name section to the unmodified current
+binary. It contains only accepted function names, plus compatible old
+module/global/data-segment name subsections. Code addresses are unchanged.
+Annotations stored only in the old Ghidra project, such as comments,
+bookmarks, extra labels, and manual renames, require a separate metadata
+transfer pass.
+
+Known-index validation passed for all previously proven GWCAjs calls:
+
+```text
+func[5557]  MapQueryAltitude(MapPoint const&, float, float*, Coord3f*)
+func[6893]  CharMsgSendOrderGuildAdjustFaction(...)
+func[6903]  CharMsgSendOrderSetProfessionSecondary(...)
+func[6924]  CharMsgSendSetTitle(unsigned int)
+func[6925]  CharMsgSendSetTitleNone()
+func[7768]  Cinematic::MsgSendAbortRequest()
+func[10574] PartyCliRedirectCancel()
+func[10577] PartyCliSelectMission(int)
+func[10632] PartyClient::MsgSendTravelMission(...)
+```
+
+`wasm-validate` passes for the synthesized binary. It was imported as
+`/38615-symbol-map/Gw.jspi.named.wasm`.
+
+The generic `merge_program_documentation` endpoint was not suitable for these
+programs. Its all-code-unit dry run exceeded 30 minutes and temporarily
+blocked Function-tree Swing updates. The target remained untouched because
+the operation was a dry run. Saving, closing, and reopening both JSPI
+programs cleared the stale `In progress` Function-tree nodes.
+
+The targeted application tools are:
+
+```text
+GWCAjs/Tools/apply-jspi-symbols-ghidra.mjs
+GWCAjs/Tools/annotate-jspi-review-candidates.mjs
+```
+
+Final current-program state:
+
+- `17044` default-named functions renamed
+- `42` accepted functions were already named
+- `3` existing non-default names preserved
+- `__stack_pointer`, `__stack_end`, and `__stack_base` applied
+- all `433` ambiguous candidates have explicit review plate comments
+- review candidates remain unrenamed
+- all `11167` old-program bookmarks are analyzer-generated Address Table
+  bookmarks; there are no user bookmarks to transfer
+- analysis is complete and idle with `17993` functions
+
+Both application tools are idempotent. Final dry runs reported `planned: 0`.

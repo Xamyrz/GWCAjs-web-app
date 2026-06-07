@@ -658,6 +658,11 @@ These checks do not replace an in-game test for memory layouts or calls.
 - Read APIs and write/action APIs should remain separate. A readable context
   does not prove that a related function is safe to invoke.
 
+## Ghidra JSPI 38615 wasm now contains symbols
+
+- We have copied over the symbols from old version to the current '38615' to help and reduce time in comparing between
+  the two versions and sometimes duplicating efforts.
+
 ## Recommended Next Steps
 
 1. Implement a read-only `GuildMgr` from `root + 0x3c`, with strict context and
