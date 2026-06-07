@@ -52,6 +52,7 @@ export function createGWHook(global) {
     readU32: memoryApi.readU32,
     readUtf8: memoryApi.readUtf8,
     readUtf16: memoryApi.readUtf16,
+    registerTableCallback: capture.registerTableCallback,
     ready: capture.ready,
     refreshMemoryViews: memoryApi.refreshMemoryViews,
     traceAllImports: capture.traceAllImports,

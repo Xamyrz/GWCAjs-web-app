@@ -966,6 +966,23 @@ array uses `0x1c`-byte `PetData` entries. Pet names may remain Guild Wars
 encoded strings. The reader returns readable ASCII names as `name`, preserves
 the source as `rawName`, and reports `nameEncoding`.
 
+Encoded display names now have Promise-based decoders:
+
+- `DecodePetName(ownerAgentId = 0)` decodes the pet's `nameAddress`
+- `DecodeHeroNameByIndex(index = 1)` obtains the coded name through
+  `CharCliAgentGetCodedName(agentId)` and decodes it
+- `TextResolveIssue(encoded, callback, param)` is exported as
+  `__gwca_text_resolve_issue` from current function index `5864`
+- `CharCliAgentGetCodedName` is exported as
+  `__gwca_char_get_coded_name` from current function index `9107`
+
+The hook creates a tiny typed WASM callback trampoline, adds it to the game
+function table, resolves the decoded UTF-16 string immediately in the
+callback, and releases the table entry. Decode results are cached by encoded
+source text. Build `38615` declares a fixed `4676/4676` function table, so the
+hook reserves 64 additional table slots while patching the module before
+instantiation. This requires a full page reload before decoding can work.
+
 Live validation commands after reload:
 
 ```js
@@ -993,6 +1010,9 @@ GWCAjs.Party.GetAgentHeroID(GWCAjs.Party.GetHeroAgentID(1))
 GWCAjs.Party.GetHeroPartyMember(1)
 GWCAjs.Party.GetHeroInfoByIndex(1)
 GWCAjs.Party.GetPetInfo()
+await GWCAjs.Party.DecodeHeroNameByIndex(1)
+await GWCAjs.Party.DecodePetName()
+GWCAjs.Party.GetTextDecoderStatus()
 ```
 
 ## Recommended Next Steps

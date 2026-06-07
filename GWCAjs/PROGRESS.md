@@ -180,8 +180,11 @@ Execution plan: [`COMPLETION_PLAN.md`](COMPLETION_PLAN.md)
 - [x] Implement `HeroInfo`, `PetInfo`, and `Attribute` readers.
 - [x] Live-validate `CharHeroData` and active hero attributes against the
   in-game Skills and Attributes panel.
-- [ ] Decode encoded pet names; numeric `CPetMgr::PetData` fields are
-  live-validated for build `38615`.
+- [x] Implement asynchronous hero/pet display-name decoding through the game
+  text resolver, including callback capacity for build `38615`'s fixed WASM
+  function table.
+- [ ] Live-test asynchronous hero/pet display-name decoding; numeric
+  `CPetMgr::PetData` fields are live-validated for build `38615`.
 - [x] Implement size, composition, leader, loaded, defeated, tick, and hard
   mode reads from PartyContext.
 - [x] Implement hard-mode-unlocked read from WorldContext.

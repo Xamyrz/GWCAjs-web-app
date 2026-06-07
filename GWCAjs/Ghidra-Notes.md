@@ -881,6 +881,19 @@ hero's inline `CharHeroData` name was empty, so standard hero and pet display
 names both require the asynchronous game text decoder rather than direct
 UTF-16 interpretation.
 
+The implemented decoder path is:
+
+```text
+func[5864] TextResolveIssue(wchar_t const*, callback, void*)
+func[9107] CharCliAgentGetCodedName(unsigned long)
+```
+
+`TextResolveIssue` validates the encoded string, resolves `EProp 6`, and calls
+`IText::CDecodeTable::New`. Browser JS cannot be inserted directly into an
+`anyfunc` table, so the hook instantiates a minimal auxiliary WASM module with
+an imported JS callback and places its exported `(i32, i32) -> void` function
+in the game table for the lifetime of each decode.
+
 `wasm-validate` passes for the synthesized binary. It was imported as
 `/38615-symbol-map/Gw.jspi.named.wasm`.
 

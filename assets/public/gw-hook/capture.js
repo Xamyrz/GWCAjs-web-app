@@ -28,11 +28,17 @@ export function createCaptureRuntime(global) {
     { name: "__gwca_msg_send_signal", functionIndex: 10630 },
   ]);
 
+  const TEXT_EXPORT_PATCHES = Object.freeze([
+    { name: "__gwca_text_resolve_issue", functionIndex: 5864 },
+    { name: "__gwca_char_get_coded_name", functionIndex: 9107 },
+  ]);
+
   const GWCA_EXPORT_PATCHES = Object.freeze([
     ...PLAYER_ACTION_EXPORT_PATCHES,
     ...MAP_ACTION_EXPORT_PATCHES,
     ...GUILD_ACTION_EXPORT_PATCHES,
     ...PARTY_ACTION_EXPORT_PATCHES,
+    ...TEXT_EXPORT_PATCHES,
   ]);
 
   const listeners = new Map();
@@ -364,6 +370,93 @@ export function createCaptureRuntime(global) {
     return source;
   }
 
+  function patchGuildWarsWasmTableCapacity(source) {
+    const bytes = toPatchableBytes(source);
+    if (!bytes || bytes.length < 8 || !isGuildWarsWasm(bytes)) {
+      return source;
+    }
+
+    let cursor = 8;
+    while (cursor < bytes.length) {
+      const sectionStart = cursor;
+      const sectionId = bytes[cursor];
+      cursor += 1;
+      const sizeInfo = readVarU32(bytes, cursor);
+      if (!sizeInfo) {
+        return source;
+      }
+      const payloadStart = sizeInfo.next;
+      const payloadEnd = payloadStart + sizeInfo.value;
+      if (payloadEnd > bytes.length) {
+        return source;
+      }
+      if (sectionId !== 4) {
+        cursor = payloadEnd;
+        continue;
+      }
+
+      const countInfo = readVarU32(bytes, payloadStart, payloadEnd);
+      if (!countInfo || countInfo.value !== 1) {
+        return source;
+      }
+      let entryCursor = countInfo.next;
+      if (bytes[entryCursor] !== 0x70) {
+        return source;
+      }
+      entryCursor += 1;
+      const flagsInfo = readVarU32(bytes, entryCursor, payloadEnd);
+      if (!flagsInfo || flagsInfo.value !== 1) {
+        return source;
+      }
+      const minInfo = readVarU32(bytes, flagsInfo.next, payloadEnd);
+      if (!minInfo) {
+        return source;
+      }
+      const maxInfo = readVarU32(bytes, minInfo.next, payloadEnd);
+      if (!maxInfo) {
+        return source;
+      }
+
+      const reservedMaximum = Math.max(
+        maxInfo.value + 64,
+        minInfo.value + 64
+      );
+      const newMaximum = writeVarU32(reservedMaximum);
+      const newPayloadLength =
+        sizeInfo.value - (maxInfo.next - minInfo.next) + newMaximum.length;
+      const encodedSize = writeVarU32(newPayloadLength);
+      const patched = new Uint8Array(
+        sectionStart +
+          1 +
+          encodedSize.length +
+          newPayloadLength +
+          (bytes.length - payloadEnd)
+      );
+      let writeOffset = 0;
+      patched.set(bytes.slice(0, sectionStart + 1), writeOffset);
+      writeOffset = sectionStart + 1;
+      patched.set(encodedSize, writeOffset);
+      writeOffset += encodedSize.length;
+      patched.set(bytes.slice(payloadStart, minInfo.next), writeOffset);
+      writeOffset += minInfo.next - payloadStart;
+      patched.set(newMaximum, writeOffset);
+      writeOffset += newMaximum.length;
+      patched.set(bytes.slice(maxInfo.next, payloadEnd), writeOffset);
+      writeOffset += payloadEnd - maxInfo.next;
+      patched.set(bytes.slice(payloadEnd), writeOffset);
+      debugLog("reserved wasm callback table capacity", {
+        maximum: reservedMaximum,
+        previousMaximum: maxInfo.value,
+      });
+      return patched;
+    }
+    return source;
+  }
+
+  function prepareWasmSource(source) {
+    return patchGuildWarsWasmTableCapacity(patchGuildWarsWasmExports(source));
+  }
+
   function getCallableSignature(value) {
     if (typeof value !== "function") {
       return null;
@@ -619,6 +712,59 @@ export function createCaptureRuntime(global) {
 
   function getTableFunction(index) {
     return state.table ? state.table.get(index) : null;
+  }
+
+  const TABLE_CALLBACK_MODULE_BYTES = new Uint8Array([
+    0x00, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00,
+    0x01, 0x06, 0x01, 0x60, 0x02, 0x7f, 0x7f, 0x00,
+    0x02, 0x10, 0x01, 0x03, 0x65, 0x6e, 0x76, 0x08,
+    0x63, 0x61, 0x6c, 0x6c, 0x62, 0x61, 0x63, 0x6b,
+    0x00, 0x00,
+    0x03, 0x02, 0x01, 0x00,
+    0x07, 0x0c, 0x01, 0x08, 0x63, 0x61, 0x6c, 0x6c,
+    0x62, 0x61, 0x63, 0x6b, 0x00, 0x01,
+    0x0a, 0x0a, 0x01, 0x08, 0x00, 0x20, 0x00, 0x20,
+    0x01, 0x10, 0x00, 0x0b,
+  ]);
+
+  function registerTableCallback(callback) {
+    if (!state.table || typeof callback !== "function") {
+      throw new Error("WASM function table is not available");
+    }
+    const callbackModule = new WebAssembly.Module(TABLE_CALLBACK_MODULE_BYTES);
+    const callbackInstance = new WebAssembly.Instance(callbackModule, {
+      env: { callback },
+    });
+    const callbackFunction = callbackInstance.exports.callback;
+    let index;
+    try {
+      index = state.table.grow(1);
+    } catch (error) {
+      for (
+        let candidate = state.table.length - 1;
+        candidate >= 0;
+        candidate -= 1
+      ) {
+        if (state.table.get(candidate) === null) {
+          index = candidate;
+          break;
+        }
+      }
+    }
+    if (!Number.isInteger(index)) {
+      throw new Error("No function-table slot is available for the callback");
+    }
+    state.table.set(index, callbackFunction);
+    let released = false;
+    return Object.freeze({
+      index,
+      release() {
+        if (!released && state.table?.get(index) === callbackFunction) {
+          state.table.set(index, null);
+        }
+        released = true;
+      },
+    });
   }
 
   function describeTableEntry(index) {
@@ -879,7 +1025,7 @@ export function createCaptureRuntime(global) {
   const originalInstantiate = WebAssembly.instantiate.bind(WebAssembly);
   WebAssembly.instantiate = function patchedInstantiate(source, imports) {
     const wrappedImports = buildWrappedImports(imports);
-    const patchedSource = patchGuildWarsWasmExports(source);
+    const patchedSource = prepareWasmSource(source);
     const result = originalInstantiate(patchedSource, wrappedImports);
     return Promise.resolve(result).then(function onInstantiated(value) {
       return captureInstantiation(
@@ -903,7 +1049,7 @@ export function createCaptureRuntime(global) {
       const result = Promise.resolve(source)
         .then((response) => response.arrayBuffer())
         .then((buffer) =>
-          originalInstantiate(patchGuildWarsWasmExports(buffer), wrappedImports)
+          originalInstantiate(prepareWasmSource(buffer), wrappedImports)
         );
       return Promise.resolve(result).then(function onInstantiated(value) {
         return captureInstantiation(
@@ -1138,8 +1284,10 @@ export function createCaptureRuntime(global) {
     getRawImports() {
       return state.rawImports;
     },
+    prepareWasmSource,
     getTable,
     getTableFunction,
+    registerTableCallback,
     listExports() {
       return state.rawExports ? Object.keys(state.rawExports) : [];
     },

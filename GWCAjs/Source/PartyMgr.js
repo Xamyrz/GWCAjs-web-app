@@ -3,6 +3,7 @@ import {
   readPartyContext,
 } from "../Include/GWCA/Context/PartyContext.js";
 import { createPartyInternals } from "./PartyMgrInternals.js";
+import { createTextDecoder } from "./TextDecoder.js";
 import { createModule } from "./stdafx.js";
 import {
   getPlayerControlledCharacter,
@@ -65,6 +66,7 @@ function getPlayerNumber(state) {
 
 export function createPartyApi(state) {
   const internals = createPartyInternals(state);
+  const textDecoder = createTextDecoder(state);
 
   function getContext() {
     return readPartyContext(state);
@@ -164,6 +166,22 @@ export function createPartyApi(state) {
       : null;
   }
 
+  function getPetInfo(ownerAgentId = 0) {
+    const normalizedOwnerAgentId = Number(ownerAgentId);
+    const effectiveOwnerAgentId =
+      Number.isInteger(normalizedOwnerAgentId) && normalizedOwnerAgentId > 0
+        ? normalizedOwnerAgentId
+        : getPlayerControlledCharacter(state)?.agentId || 0;
+    if (!effectiveOwnerAgentId) {
+      return null;
+    }
+    return (
+      getWorldPetArray(state)?.entries.find(
+        (entry) => entry.ownerAgentId === effectiveOwnerAgentId
+      ) || null
+    );
+  }
+
   function unsupported() {
     return false;
   }
@@ -184,6 +202,19 @@ export function createPartyApi(state) {
         },
       };
     },
+    DecodeHeroNameByIndex(heroIndex = 1) {
+      const hero = getHeroPartyMember(heroIndex);
+      return hero
+        ? textDecoder.decodeHeroAgentName(hero.agentId)
+        : Promise.resolve(null);
+    },
+    DecodePetName(ownerAgentId = 0) {
+      const pet = getPetInfo(ownerAgentId);
+      return pet
+        ? textDecoder.decodeAddress(pet.nameAddress)
+        : Promise.resolve(null);
+    },
+    GetTextDecoderStatus: textDecoder.getStatus,
     FlagAll: unsupported,
     FlagHero: unsupported,
     FlagHeroAgent: unsupported,
@@ -282,21 +313,7 @@ export function createPartyApi(state) {
     GetPartySize() {
       return getPartyInfo()?.partySize || 0;
     },
-    GetPetInfo(ownerAgentId = 0) {
-      const normalizedOwnerAgentId = Number(ownerAgentId);
-      const effectiveOwnerAgentId =
-        Number.isInteger(normalizedOwnerAgentId) && normalizedOwnerAgentId > 0
-          ? normalizedOwnerAgentId
-          : getPlayerControlledCharacter(state)?.agentId || 0;
-      if (!effectiveOwnerAgentId) {
-        return null;
-      }
-      return (
-        getWorldPetArray(state)?.entries.find(
-          (entry) => entry.ownerAgentId === effectiveOwnerAgentId
-        ) || null
-      );
-    },
+    GetPetInfo: getPetInfo,
     GetUnsupportedAction: getActionStatus,
     InvitePlayer: unsupported,
     KickAllHeroes: unsupported,
