@@ -821,6 +821,21 @@ func[10630] PartyClient::MsgSendSignal(int)
 packet opcode 0xaf, size 0x08
 export patch __gwca_msg_send_signal
 
+func[10579] PartyCliSelectOffer()
+wrapper: PropGet(0x13) + 4 -> CPartyTable::SelectOffer()
+export patch __gwca_party_select_offer
+used by ReturnToOutpost when PartyContext defeated bit is set
+
+func[6864] CharMsgSendCommandAiMode(unsigned long, ECharAiMode)
+packet opcode 0x15, size 0x0c
+fields: opcode, agentId, behavior
+export patch __gwca_msg_send_command_ai_mode
+
+func[6865] CharMsgSendCommandAiPriorityTarget(unsigned long, unsigned long)
+packet opcode 0x16, size 0x0c
+fields: opcode, agentId, targetAgentId
+export patch __gwca_msg_send_command_ai_priority_target
+
 func[10616] PartyClient::MsgSendLeave()
 packet opcode 0xa2, size 0x04
 
@@ -844,6 +859,7 @@ Party WorldContext readers use the build-38615 native layouts:
 
 ```text
 WorldContext + 0x0ac -> Array<PartyAttribute>, stride 0x43c
+WorldContext + 0x584 -> Array<HeroFlag>, stride 0x24
 WorldContext + 0x594 -> Array<CharHeroData>, stride 0x9c
 WorldContext + 0x6ac -> Array<PetInfo>, stride 0x1c
 ```

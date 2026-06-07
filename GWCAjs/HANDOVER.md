@@ -1068,6 +1068,29 @@ Numeric cancellation resolves exact `partyId` first, then outgoing-list index;
 with exactly one outgoing invite, any positive numeric argument resolves to
 that sole row to avoid stale transient party-id failures during live testing.
 
+Return-to-outpost and hero/pet behavior actions now have direct build `38615`
+candidates:
+
+- `ReturnToOutpost()`: `PartyCliSelectOffer()`, index `10579`, patched as
+  `__gwca_party_select_offer`; this is the same party redirect offer path used
+  by the first `DlgRedirect` button. The JS wrapper only calls it when the
+  readable PartyContext defeated bit is set.
+- `SetHeroBehavior(agentId, behavior)`: `CharMsgSendCommandAiMode(unsigned long,
+  ECharAiMode)`, index `6864`, opcode `0x15`, packet size `0x0c`.
+- `SetPetBehavior(behavior, lockTargetId)`: uses
+  `CharMsgSendCommandAiPriorityTarget(unsigned long, unsigned long)`, index
+  `6865`, opcode `0x16`, packet size `0x0c`, before sending the same
+  `CharMsgSendCommandAiMode` behavior packet when needed.
+
+Build `38615` hero behavior state is read from `WorldContext + 0x584`, an
+`Array<HeroFlag>` with `0x24`-byte entries. `SetHeroBehavior` validates the
+agent against that array and returns `true` without sending when the requested
+mode is already set. `SetPetBehavior` reads the active pet from
+`WorldContext + 0x6ac`; fight mode currently requires an explicit
+`lockTargetId` or a future `AgentMgr` target provider, while guard/avoid mode
+clears the lock target to zero. These actions have deterministic export and
+argument tests but still require live validation.
+
 ## Recommended Next Steps
 
 1. Reload the browser and live-validate `GWCAjs.Party.Describe()` while solo in

@@ -6,8 +6,10 @@ import {
 } from "../GameEntities/Player.js";
 import { TITLE_SIZE } from "../GameEntities/Title.js";
 import {
+  HERO_FLAG_SIZE,
   HERO_INFO_SIZE,
   PET_INFO_SIZE,
+  readHeroFlag,
   readHeroInfo,
   readPetInfo,
 } from "../GameEntities/Hero.js";
@@ -31,6 +33,7 @@ export const WORLD_CONTEXT_OFFSETS = Object.freeze({
   attributes: 0x0ac,
   foesKilled: 0x84c,
   foesToKill: 0x850,
+  heroFlags: 0x584,
   heroInfo: 0x594,
   isHardModeUnlocked: 0x684,
   missionMapIcons: 0x7ec,
@@ -257,6 +260,16 @@ export function getWorldHeroInfoArray(state) {
     HERO_INFO_SIZE,
     readHeroInfo,
     256
+  );
+}
+
+export function getWorldHeroFlagArray(state) {
+  return readWorldEntityArray(
+    state,
+    WORLD_CONTEXT_OFFSETS.heroFlags,
+    HERO_FLAG_SIZE,
+    readHeroFlag,
+    16
   );
 }
 

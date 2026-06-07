@@ -1,7 +1,26 @@
 import { isValidPointer, readUtf16, readValue } from "../Utilities/Memory.js";
 
+export const HERO_BEHAVIOR = Object.freeze({
+  AvoidCombat: 2,
+  Fight: 0,
+  Guard: 1,
+});
+
+export const HERO_FLAG_SIZE = 0x24;
 export const HERO_INFO_SIZE = 0x9c;
 export const PET_INFO_SIZE = 0x1c;
+
+export const HERO_FLAG_OFFSETS = Object.freeze({
+  agentId: 0x04,
+  behavior: 0x0c,
+  flagX: 0x10,
+  flagY: 0x14,
+  heroId: 0x00,
+  level: 0x08,
+  lockedTargetId: 0x1c,
+  unknown18: 0x18,
+  unknown20: 0x20,
+});
 
 export const HERO_INFO_OFFSETS = Object.freeze({
   agentId: 0x04,
@@ -47,6 +66,31 @@ function isPlainDisplayName(value) {
       );
     })
   );
+}
+
+export function readHeroFlag(state, address, index = 0) {
+  if (!hasRange(state, address, HERO_FLAG_SIZE)) {
+    return null;
+  }
+  return {
+    address: address >>> 0,
+    agentId: readValue(state, "u32", address + HERO_FLAG_OFFSETS.agentId),
+    behavior: readValue(state, "u32", address + HERO_FLAG_OFFSETS.behavior),
+    flag: {
+      x: readValue(state, "f32", address + HERO_FLAG_OFFSETS.flagX),
+      y: readValue(state, "f32", address + HERO_FLAG_OFFSETS.flagY),
+    },
+    heroId: readValue(state, "u32", address + HERO_FLAG_OFFSETS.heroId),
+    index,
+    level: readValue(state, "u32", address + HERO_FLAG_OFFSETS.level),
+    lockedTargetId: readValue(
+      state,
+      "u32",
+      address + HERO_FLAG_OFFSETS.lockedTargetId
+    ),
+    unknown18: readValue(state, "u32", address + HERO_FLAG_OFFSETS.unknown18),
+    unknown20: readValue(state, "u32", address + HERO_FLAG_OFFSETS.unknown20),
+  };
 }
 
 export function readHeroInfo(state, address, index = 0) {

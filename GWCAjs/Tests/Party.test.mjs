@@ -12,6 +12,8 @@ import {
   PARTY_ATTRIBUTE_ACTIVE_IDS_OFFSET,
 } from "../Include/GWCA/GameEntities/Attribute.js";
 import {
+  HERO_BEHAVIOR,
+  HERO_FLAG_OFFSETS,
   HERO_INFO_OFFSETS,
   PET_INFO_OFFSETS,
 } from "../Include/GWCA/GameEntities/Hero.js";
@@ -51,6 +53,7 @@ const heroInfoBuffer = 0x24000;
 const partyAttributeBuffer = 0x25000;
 const activeAttributeIdsBuffer = 0x25800;
 const petBuffer = 0x26000;
+const heroFlagBuffer = 0x26800;
 const petNameAddress = 0x27000;
 const requestPartyAddress = 0x28000;
 const sendingPartyAddress = 0x29000;
@@ -108,6 +111,9 @@ const state = {
       if (type === "u32" || type === "ptr") {
         return view.getUint32(address, true);
       }
+      if (type === "f32") {
+        return view.getFloat32(address, true);
+      }
       throw new Error("Unsupported test read type: " + type);
     },
   },
@@ -132,6 +138,10 @@ const state = {
 
 function writeU32(address, value) {
   view.setUint32(address, value >>> 0, true);
+}
+
+function writeF32(address, value) {
+  view.setFloat32(address, value, true);
 }
 
 function writeUtf16(address, value, maxUnits) {
@@ -214,6 +224,19 @@ writeU32(heroInfoBuffer + HERO_INFO_OFFSETS.secondary, 5);
 writeU32(heroInfoBuffer + HERO_INFO_OFFSETS.heroFileId, 10005);
 writeU32(heroInfoBuffer + HERO_INFO_OFFSETS.modelFileId, 20005);
 writeUtf16(heroInfoBuffer + HERO_INFO_OFFSETS.name, "Hero Five", 20);
+writeArray(
+  worldAddress + WORLD_CONTEXT_OFFSETS.heroFlags,
+  heroFlagBuffer,
+  1,
+  1
+);
+writeU32(heroFlagBuffer + HERO_FLAG_OFFSETS.heroId, 5);
+writeU32(heroFlagBuffer + HERO_FLAG_OFFSETS.agentId, 3001);
+writeU32(heroFlagBuffer + HERO_FLAG_OFFSETS.level, 20);
+writeU32(heroFlagBuffer + HERO_FLAG_OFFSETS.behavior, HERO_BEHAVIOR.Guard);
+writeF32(heroFlagBuffer + HERO_FLAG_OFFSETS.flagX, 100);
+writeF32(heroFlagBuffer + HERO_FLAG_OFFSETS.flagY, 200);
+writeU32(heroFlagBuffer + HERO_FLAG_OFFSETS.lockedTargetId, 0);
 writeArray(
   worldAddress + WORLD_CONTEXT_OFFSETS.attributes,
   partyAttributeBuffer,
@@ -447,6 +470,8 @@ assert.equal(api.GetIsPartyInHardMode(), false);
 assert.equal(api.SetHardMode(true), false);
 const internalCalls = [];
 state.hook.getRawExports = () => ({
+  __gwca_msg_send_command_ai_mode() {},
+  __gwca_msg_send_command_ai_priority_target() {},
   __gwca_msg_send_hero_activate() {},
   __gwca_msg_send_hero_deactivate() {},
   __gwca_msg_send_invite_henchman() {},
@@ -459,6 +484,7 @@ state.hook.getRawExports = () => ({
   __gwca_msg_send_remove_member() {},
   __gwca_msg_send_hard_mode_set() {},
   __gwca_party_button_on_click() {},
+  __gwca_party_select_offer() {},
   __gwca_msg_send_signal() {},
 });
 state.hook.callExport = (name, ...args) => {
@@ -467,9 +493,12 @@ state.hook.callExport = (name, ...args) => {
 assert.equal(api.GetActionStatus("SetHardMode").available, true);
 assert.equal(api.GetActionStatus("Tick").available, true);
 assert.equal(api.GetActionStatus("LeaveParty").available, true);
+assert.equal(api.GetActionStatus("ReturnToOutpost").available, true);
 assert.equal(api.GetActionStatus("AddHero").available, true);
 assert.equal(api.GetActionStatus("KickHero").available, true);
 assert.equal(api.GetActionStatus("KickAllHeroes").available, true);
+assert.equal(api.GetActionStatus("SetHeroBehavior").available, true);
+assert.equal(api.GetActionStatus("SetPetBehavior").available, true);
 assert.equal(api.GetActionStatus("AddHenchman").available, true);
 assert.equal(api.GetActionStatus("KickHenchman").available, true);
 assert.equal(api.GetActionStatus("InvitePlayer").available, true);
@@ -499,6 +528,17 @@ assert.equal(api.CancelPartyInvite(0), true);
 assert.equal(api.CancelPartyInvite("Carol"), true);
 assert.equal(api.CancelPartyInvite("carol"), true);
 assert.equal(api.CancelPartyInvite(2), true);
+assert.equal(api.ReturnToOutpost(), false);
+writeU32(contextAddress + PARTY_CONTEXT_OFFSETS.flag, 0x20 | 0x80);
+assert.equal(api.ReturnToOutpost(), true);
+writeU32(contextAddress + PARTY_CONTEXT_OFFSETS.flag, 0x80);
+assert.equal(api.SetHeroBehavior(3001, HERO_BEHAVIOR.Fight), true);
+writeU32(heroFlagBuffer + HERO_FLAG_OFFSETS.behavior, HERO_BEHAVIOR.Fight);
+assert.equal(api.SetHeroBehavior(3001, "fight"), true);
+assert.equal(api.SetHeroBehavior(3002, HERO_BEHAVIOR.Guard), false);
+assert.equal(api.SetHeroBehavior(3001, 3), false);
+assert.equal(api.SetPetBehavior(HERO_BEHAVIOR.Fight), false);
+assert.equal(api.SetPetBehavior(HERO_BEHAVIOR.Fight, 9300), true);
 assert.equal(api.AddHero(0), false);
 assert.equal(api.AddHero(0x28), false);
 assert.equal(api.KickHero(0x29), false);
@@ -507,6 +547,7 @@ assert.equal(api.InvitePlayer(""), false);
 assert.equal(api.InvitePlayer("12345678901234567890"), false);
 assert.equal(api.KickPlayer(0), false);
 assert.equal(api.RespondToPartyRequest(0), false);
+assert.equal(api.SetPetBehavior(3), false);
 assert.deepEqual(internalCalls, [
   {
     args: [1],
@@ -584,16 +625,32 @@ assert.deepEqual(internalCalls, [
     args: [88],
     name: "__gwca_party_cancel_invitation",
   },
+  {
+    args: [],
+    name: "__gwca_party_select_offer",
+  },
+  {
+    args: [3001, HERO_BEHAVIOR.Fight],
+    name: "__gwca_msg_send_command_ai_mode",
+  },
+  {
+    args: [9100, 9300],
+    name: "__gwca_msg_send_command_ai_priority_target",
+  },
+  {
+    args: [9100, HERO_BEHAVIOR.Fight],
+    name: "__gwca_msg_send_command_ai_mode",
+  },
 ]);
 assert.equal(state.hook.readUtf16(temporaryAddress, 20), "Player Name");
 assert.equal(view.getUint32(temporaryAddress + 0x34, true), 1);
 assert.equal(propContextSlot, 0);
 writeU32(contextAddress + PARTY_CONTEXT_OFFSETS.flag, 0x10 | 0x80);
 assert.equal(api.SetHardMode(true), true);
-assert.equal(internalCalls.length, 19);
+assert.equal(internalCalls.length, 23);
 writeU32(playersBuffer + PLAYER_PARTY_MEMBER_OFFSETS.state, 1);
 assert.equal(api.Tick(false), true);
-assert.equal(internalCalls.length, 19);
+assert.equal(internalCalls.length, 23);
 writeArray(partyAddress + PARTY_INFO_OFFSETS.heroes, 0, 0, 0);
 writeArray(partyAddress + PARTY_INFO_OFFSETS.henchmen, 0, 0, 0);
 assert.equal(api.GetPartySize(), 2);
@@ -605,7 +662,7 @@ writeArray(
 );
 assert.equal(api.GetPartySize(), 1);
 assert.equal(api.LeaveParty(), true);
-assert.equal(internalCalls.length, 19);
+assert.equal(internalCalls.length, 23);
 writeArray(
   partyAddress + PARTY_INFO_OFFSETS.players,
   playersBuffer,

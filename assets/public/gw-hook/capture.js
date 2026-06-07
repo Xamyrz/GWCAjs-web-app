@@ -24,6 +24,9 @@ export function createCaptureRuntime(global) {
 
   const PARTY_ACTION_EXPORT_PATCHES = Object.freeze([
     { name: "__gwca_party_button_on_click", functionIndex: 16298 },
+    { name: "__gwca_party_select_offer", functionIndex: 10579 },
+    { name: "__gwca_msg_send_command_ai_mode", functionIndex: 6864 },
+    { name: "__gwca_msg_send_command_ai_priority_target", functionIndex: 6865 },
     { name: "__gwca_msg_send_hero_activate", functionIndex: 6872 },
     { name: "__gwca_msg_send_hero_deactivate", functionIndex: 6873 },
     { name: "__gwca_msg_send_invite_henchman", functionIndex: 10610 },

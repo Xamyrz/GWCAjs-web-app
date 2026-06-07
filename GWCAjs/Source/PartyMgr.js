@@ -7,30 +7,35 @@ import { createTextDecoder } from "./TextDecoder.js";
 import { createModule } from "./stdafx.js";
 import {
   getPlayerControlledCharacter,
+  getWorldHeroFlagArray,
   getWorldHeroInfoArray,
   getWorldIsHardModeUnlocked,
   getWorldPartyAttributeArray,
   getWorldPetArray,
 } from "../Include/GWCA/Context/WorldContext.js";
+import { HERO_BEHAVIOR } from "../Include/GWCA/GameEntities/Hero.js";
 
 const UNSUPPORTED_ACTIONS = Object.freeze({
   FlagAll: "Hero flagging packet path has not been verified in JSPI.",
   FlagHero: "Hero flagging packet path has not been verified in JSPI.",
   FlagHeroAgent: "Hero flagging packet path has not been verified in JSPI.",
-  ReturnToOutpost:
-    "Return-to-outpost UI/button path has not been verified in JSPI.",
   SearchParty: "Party-search packet path has not been verified in JSPI.",
   SearchPartyCancel:
     "Party-search cancel packet path has not been verified in JSPI.",
   SearchPartyReply:
     "Party-search reply packet path has not been verified in JSPI.",
-  SetHeroBehavior:
-    "Hero-behavior packet path has not been verified in JSPI.",
-  SetPetBehavior:
-    "Pet-behavior packet path has not been verified in JSPI.",
   UnflagAll: "Hero flagging packet path has not been verified in JSPI.",
   UnflagHero: "Hero flagging packet path has not been verified in JSPI.",
 });
+
+const HERO_BEHAVIOR_BY_NAME = Object.freeze({
+  avoid: HERO_BEHAVIOR.AvoidCombat,
+  avoidcombat: HERO_BEHAVIOR.AvoidCombat,
+  fight: HERO_BEHAVIOR.Fight,
+  guard: HERO_BEHAVIOR.Guard,
+});
+
+const HERO_BEHAVIOR_VALUES = new Set(Object.values(HERO_BEHAVIOR));
 
 function getUnsupportedActionStatus(name) {
   const reason = UNSUPPORTED_ACTIONS[name];
@@ -83,6 +88,23 @@ export function createPartyApi(state) {
           accept.available && decline.available
             ? "Accept and decline exports are patched into the runtime."
             : "One or both party-request exports are unavailable.",
+      };
+    }
+    if (name === "SetPetBehavior") {
+      const behavior = internals.getActionStatus("SetHeroBehavior");
+      const lockTarget = internals.getActionStatus("LockPetTarget");
+      return {
+        available: behavior.available && lockTarget.available,
+        behavior,
+        lockTarget,
+        mode:
+          behavior.available && lockTarget.available
+            ? "messageFunction"
+            : "unavailable",
+        reason:
+          behavior.available && lockTarget.available
+            ? "Behavior and target-lock exports are patched into the runtime."
+            : "One or both pet behavior exports are unavailable.",
       };
     }
     return internals.getInternalFunction(name)
@@ -138,6 +160,7 @@ export function createPartyApi(state) {
       ...getActionStatuses(),
       ...internals.getActionStatuses(),
       RespondToPartyRequest: getActionStatus("RespondToPartyRequest"),
+      SetPetBehavior: getActionStatus("SetPetBehavior"),
     };
   }
 
@@ -211,6 +234,18 @@ export function createPartyApi(state) {
     );
   }
 
+  function getHeroFlagByAgentId(agentId) {
+    const normalizedAgentId = Number(agentId);
+    if (!Number.isInteger(normalizedAgentId) || normalizedAgentId <= 0) {
+      return null;
+    }
+    return (
+      getWorldHeroFlagArray(state)?.entries.find(
+        (entry) => entry.agentId === normalizedAgentId
+      ) || null
+    );
+  }
+
   function getHeroPartyMember(heroIndex = 1) {
     const normalizedHeroIndex = Number(heroIndex);
     const heroes = getPartyInfo()?.heroes.entries;
@@ -242,11 +277,35 @@ export function createPartyApi(state) {
     return false;
   }
 
+  function getCurrentTargetAgentId() {
+    const directTargetId = state?.agent?.api?.GetTargetId?.();
+    if (Number.isInteger(directTargetId) && directTargetId > 0) {
+      return directTargetId;
+    }
+    const target = state?.agent?.api?.GetTarget?.();
+    return Number.isInteger(target?.agentId) && target.agentId > 0
+      ? target.agentId
+      : 0;
+  }
+
   function normalizePositiveInteger(value) {
     const normalized = Number(value);
     return Number.isInteger(normalized) && normalized > 0
       ? normalized
       : 0;
+  }
+
+  function normalizeHeroBehavior(value) {
+    if (typeof value === "string") {
+      const key = value.trim().toLowerCase().replace(/[^a-z0-9]/g, "");
+      return Object.hasOwn(HERO_BEHAVIOR_BY_NAME, key)
+        ? HERO_BEHAVIOR_BY_NAME[key]
+        : null;
+    }
+    const normalized = Number(value);
+    return Number.isInteger(normalized) && HERO_BEHAVIOR_VALUES.has(normalized)
+      ? normalized
+      : null;
   }
 
   return Object.freeze({
@@ -291,6 +350,7 @@ export function createPartyApi(state) {
     FlagAll: unsupported,
     FlagHero: unsupported,
     FlagHeroAgent: unsupported,
+    HeroBehavior: HERO_BEHAVIOR,
     GetActionStatus: getActionStatus,
     GetActionStatuses: getAllActionStatuses,
     GetAgentAttributes(agentId) {
@@ -462,7 +522,10 @@ export function createPartyApi(state) {
         ? internals.respondToPartyRequest(normalizedPartyId, !!accept)
         : false;
     },
-    ReturnToOutpost: unsupported,
+    ReturnToOutpost() {
+      const context = getContext();
+      return context?.isDefeated ? internals.returnToOutpost() : false;
+    },
     SearchParty: unsupported,
     SearchPartyCancel: unsupported,
     SearchPartyReply: unsupported,
@@ -477,8 +540,57 @@ export function createPartyApi(state) {
       }
       return internals.setHardMode(shouldEnable);
     },
-    SetHeroBehavior: unsupported,
-    SetPetBehavior: unsupported,
+    SetHeroBehavior(agentId, behavior) {
+      const normalizedAgentId = normalizePositiveInteger(agentId);
+      const normalizedBehavior = normalizeHeroBehavior(behavior);
+      if (!normalizedAgentId || normalizedBehavior === null) {
+        return false;
+      }
+      const heroFlag = getHeroFlagByAgentId(normalizedAgentId);
+      if (!heroFlag) {
+        return false;
+      }
+      if (heroFlag.behavior === normalizedBehavior) {
+        return true;
+      }
+      return internals.setHeroBehavior(normalizedAgentId, normalizedBehavior);
+    },
+    SetPetBehavior(behavior, lockTargetId = 0) {
+      const normalizedBehavior = normalizeHeroBehavior(behavior);
+      if (normalizedBehavior === null) {
+        return false;
+      }
+      const pet = getPetInfo();
+      if (!pet?.agentId) {
+        return false;
+      }
+      const targetAgentId =
+        normalizedBehavior === HERO_BEHAVIOR.Fight
+          ? normalizePositiveInteger(lockTargetId) || getCurrentTargetAgentId()
+          : 0;
+      if (normalizedBehavior === HERO_BEHAVIOR.Fight && !targetAgentId) {
+        return false;
+      }
+      if (
+        pet.lockedTargetId === targetAgentId &&
+        pet.behavior === normalizedBehavior
+      ) {
+        return true;
+      }
+      if (
+        pet.lockedTargetId !== targetAgentId &&
+        !internals.lockPetTarget(pet.agentId, targetAgentId)
+      ) {
+        return false;
+      }
+      if (
+        pet.behavior !== normalizedBehavior &&
+        !internals.setHeroBehavior(pet.agentId, normalizedBehavior)
+      ) {
+        return false;
+      }
+      return true;
+    },
     SetTickToggle() {
       return false;
     },

@@ -207,7 +207,9 @@ Execution plan: [`COMPLETION_PLAN.md`](COMPLETION_PLAN.md)
 - [x] Implement cancel sent party invite by party id or leader name.
 - [ ] Live-test sent-invite cancellation through the party-client cancel
   wrapper path.
-- [ ] Implement return, hero/pet behavior, flag, and search actions.
+- [x] Implement return-to-outpost and hero/pet behavior action candidates.
+- [ ] Live-test return-to-outpost and hero/pet behavior actions.
+- [ ] Implement flag and search actions.
 - [x] Add deterministic read-only layout tests.
 - [x] Add deterministic hard-mode, ready/tick, and leave-party UI callback
   action/export tests.

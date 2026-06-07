@@ -31,6 +31,39 @@ const INTERNAL_FUNCTIONS = Object.freeze({
     rawWasmSignature: "(i32) -> nil",
     signature: "void(heroId)",
   }),
+  LockPetTarget: Object.freeze({
+    address: "ram:802bf4c0",
+    callable: false,
+    exportName: "__gwca_msg_send_command_ai_priority_target",
+    functionName:
+      "CharMsgSendCommandAiPriorityTarget(unsigned long, unsigned long)",
+    functionIndex: 6865,
+    message: Object.freeze({
+      opcode: 0x16,
+      size: 0x0c,
+      fields: Object.freeze(["opcode", "agentId", "targetAgentId"]),
+    }),
+    reason:
+      "Experimental: lower-level hero/pet priority-target sender patched into the runtime exports.",
+    rawWasmSignature: "(i32, i32) -> nil",
+    signature: "void(agentId, targetAgentId)",
+  }),
+  SetHeroBehavior: Object.freeze({
+    address: "ram:802bf477",
+    callable: false,
+    exportName: "__gwca_msg_send_command_ai_mode",
+    functionName: "CharMsgSendCommandAiMode(unsigned long, ECharAiMode)",
+    functionIndex: 6864,
+    message: Object.freeze({
+      opcode: 0x15,
+      size: 0x0c,
+      fields: Object.freeze(["opcode", "agentId", "behavior"]),
+    }),
+    reason:
+      "Experimental: lower-level hero/pet behavior sender patched into the runtime exports.",
+    rawWasmSignature: "(i32, i32) -> nil",
+    signature: "void(agentId, behavior)",
+  }),
   KickHenchman: Object.freeze({
     address: "ram:80388f2d",
     callable: false,
@@ -152,6 +185,19 @@ const INTERNAL_FUNCTIONS = Object.freeze({
     requiresPropContext: true,
     rawWasmSignature: "(i32, i32) -> nil",
     signature: "void(buttonContext, notifyParent)",
+  }),
+  ReturnToOutpost: Object.freeze({
+    address: "ram:80388914",
+    callable: false,
+    exportName: "__gwca_party_select_offer",
+    functionName: "PartyCliSelectOffer()",
+    functionIndex: 10579,
+    mode: "partyClientWrapper",
+    reason:
+      "Experimental: party-client redirect offer wrapper patched into the runtime exports.",
+    requiresPropContext: true,
+    rawWasmSignature: "() -> nil",
+    signature: "void()",
   }),
   RespondToPartyRequestAccept: Object.freeze({
     address: "ram:80388dec",
@@ -383,6 +429,9 @@ export function createPartyInternals(state) {
     addHero(heroId) {
       return call("AddHero", [heroId]).called === true;
     },
+    lockPetTarget(agentId, targetAgentId) {
+      return call("LockPetTarget", [agentId, targetAgentId]).called === true;
+    },
     kickHenchman(agentId) {
       return call("KickHenchman", [agentId]).called === true;
     },
@@ -441,6 +490,12 @@ export function createPartyInternals(state) {
       } catch (error) {
         return false;
       }
+    },
+    returnToOutpost() {
+      return call("ReturnToOutpost", []).called === true;
+    },
+    setHeroBehavior(agentId, behavior) {
+      return call("SetHeroBehavior", [agentId, behavior]).called === true;
     },
     tick(enabled) {
       return call("Tick", [enabled ? 1 : 0]).called === true;
