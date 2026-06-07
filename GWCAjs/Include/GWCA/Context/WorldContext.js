@@ -6,6 +6,16 @@ import {
 } from "../GameEntities/Player.js";
 import { TITLE_SIZE } from "../GameEntities/Title.js";
 import {
+  HERO_INFO_SIZE,
+  PET_INFO_SIZE,
+  readHeroInfo,
+  readPetInfo,
+} from "../GameEntities/Hero.js";
+import {
+  PARTY_ATTRIBUTE_SIZE,
+  readPartyAttribute,
+} from "../GameEntities/Attribute.js";
+import {
   getMemoryLimit,
   isValidPointer,
   readValue,
@@ -18,12 +28,16 @@ import {
 } from "./GameContext.js";
 
 export const WORLD_CONTEXT_OFFSETS = Object.freeze({
+  attributes: 0x0ac,
   foesKilled: 0x84c,
   foesToKill: 0x850,
+  heroInfo: 0x594,
+  isHardModeUnlocked: 0x684,
   missionMapIcons: 0x7ec,
   playerControlledChar: 0x680,
   playerNumber: 0x67c,
   players: 0x80c,
+  pets: 0x6ac,
   titles: 0x81c,
   unlockedMap: 0x60c,
 });
@@ -203,6 +217,78 @@ export function getWorldTitleArray(state) {
         worldContextAddress: resolved.worldContextAddress,
       }
     : null;
+}
+
+function readWorldEntityArray(state, offset, stride, readEntry, maxSize = 4096) {
+  const resolved = resolveWorldContext(state);
+  if (!resolved?.worldContextAddress) {
+    return null;
+  }
+  const array = readArray(
+    state,
+    resolved.worldContextAddress + offset,
+    stride,
+    {
+      allowEmpty: true,
+      maxCapacity: maxSize,
+      maxSize,
+    }
+  );
+  if (!array) {
+    return null;
+  }
+  const entries = Array.from({ length: array.size }, (_, index) =>
+    readEntry(state, array.buffer + index * stride, index)
+  );
+  return entries.some((entry) => !entry)
+    ? null
+    : {
+        ...array,
+        entries,
+        source: "worldContext",
+        worldContextAddress: resolved.worldContextAddress,
+      };
+}
+
+export function getWorldHeroInfoArray(state) {
+  return readWorldEntityArray(
+    state,
+    WORLD_CONTEXT_OFFSETS.heroInfo,
+    HERO_INFO_SIZE,
+    readHeroInfo,
+    256
+  );
+}
+
+export function getWorldPetArray(state) {
+  return readWorldEntityArray(
+    state,
+    WORLD_CONTEXT_OFFSETS.pets,
+    PET_INFO_SIZE,
+    readPetInfo,
+    256
+  );
+}
+
+export function getWorldPartyAttributeArray(state) {
+  return readWorldEntityArray(
+    state,
+    WORLD_CONTEXT_OFFSETS.attributes,
+    PARTY_ATTRIBUTE_SIZE,
+    readPartyAttribute,
+    64
+  );
+}
+
+export function getWorldIsHardModeUnlocked(state) {
+  const resolved = resolveWorldContext(state);
+  return resolved?.worldContextAddress
+    ? readValue(
+        state,
+        "u32",
+        resolved.worldContextAddress + WORLD_CONTEXT_OFFSETS.isHardModeUnlocked
+      ) !== 0
+    : false;
 }
 
 export function getWorldMissionMapIconArray(state) {

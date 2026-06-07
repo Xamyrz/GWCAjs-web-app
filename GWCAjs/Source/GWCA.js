@@ -5,6 +5,7 @@ import { GuildModule } from "./GuildMgr.js";
 import { disableHooks as disableHookBase, enableHooks as enableHookBase, HookBaseModule } from "./Hooker.js";
 import { MapModule } from "./MapMgr.js";
 import { MemoryModule } from "./MemoryMgr.js";
+import { PartyModule } from "./PartyMgr.js";
 import { PlayerModule } from "./PlayerMgr.js";
 import { RenderModule } from "./RenderMgr.js";
 import { ScannerModule } from "./Scanner.js";
@@ -21,6 +22,7 @@ const modules = [
   UIModule,
   MapModule,
   GuildModule,
+  PartyModule,
   PlayerModule,
 ];
 
@@ -40,6 +42,7 @@ function createState() {
     map: null,
     memory: null,
     modules: {},
+    party: null,
     player: null,
     scanner: null,
     signatures: null,
@@ -116,6 +119,7 @@ function buildResult(reused = false) {
     initialized: state.initialized,
     map: state.map?.api?.Describe ? state.map.api.Describe() : null,
     modules: describeModuleResults(),
+    party: state.party?.api?.Describe ? state.party.api.Describe() : null,
     player: state.player || null,
     reused,
   };
@@ -205,6 +209,10 @@ export function getMapManager() {
 
 export function getGuildManager() {
   return state.guild?.api || null;
+}
+
+export function getPartyManager() {
+  return state.party?.api || null;
 }
 
 export function getContextManager() {

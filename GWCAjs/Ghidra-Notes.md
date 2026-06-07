@@ -796,6 +796,91 @@ func[10633] PartyClient::MsgSendTravelMissionLogin(int)
 `PartyClient::MsgSendTravelGuildHall`, while mode `2` reaches
 `PartyClient::MsgSendTravelMissionLogin`.
 
+PartyContext build `38615` baseline:
+
+```text
+PartyClient::ContextCreate() allocates 0xd0 bytes
+GameContext + 0x4c -> PartyContext*
+PartyContext + 0x14 -> flag
+PartyContext + 0x40 -> Array<PartyInfo*>
+PartyContext + 0x54 -> player_party
+PartyContext + 0x9c -> CSearchTable
+PartyContext + 0xc0 -> Array<PartySearch*>
+```
+
+`PartyCliHardModeGet()` reads `flag >> 4 & 1`, and `PartyCliIsLeader()` reads
+`flag >> 7 & 1`. `PartyClient::CPartyTable::HardModeSet(int)` updates the same
+flag bit and sends `PartyClient::MsgSendHardModeSet(int)`.
+
+```text
+func[10629] PartyClient::MsgSendHardModeSet(int)
+packet opcode 0x9b, size 0x08
+export patch __gwca_msg_send_hard_mode_set
+
+func[10630] PartyClient::MsgSendSignal(int)
+packet opcode 0xaf, size 0x08
+export patch __gwca_msg_send_signal
+
+func[10616] PartyClient::MsgSendLeave()
+packet opcode 0xa2, size 0x04
+
+func[16298] IUi::Game::Party::CPartyButtonFrame::OnClick(int)
+export patch __gwca_party_button_on_click
+leave mode: synthetic 0x38-byte context with *(context + 0x34) = 1
+```
+
+Live testing showed that directly exporting and invoking
+`PartyClient::MsgSendLeave()` returned normally but did not leave a
+three-member party. The in-game Leave button instead calls `PartyCliLeave()`
+and then `CharCliHeroDeactivate(0x28)`. GWCA's desktop implementation reaches
+that complete sequence through `CPartyButtonFrame::OnClick`, so the JSPI
+implementation now exports that callback and temporarily installs the
+validated Prop context around it.
+
+Live result: the replacement party-window callback successfully left the
+party.
+
+Party WorldContext readers use the build-38615 native layouts:
+
+```text
+WorldContext + 0x0ac -> Array<PartyAttribute>, stride 0x43c
+WorldContext + 0x594 -> Array<CharHeroData>, stride 0x9c
+WorldContext + 0x6ac -> Array<PetInfo>, stride 0x1c
+```
+
+More precisely, current build `38615` embeds `CharClient::CPetMgr` at
+`WorldContext + 0x6ac`. Its first four fields are the array header, and
+`CPetMgr::EnumAll` copies seven `u32` fields per `0x1c`-byte entry:
+
+```text
++0x00 agent id
++0x04 owner agent id
++0x08 allocated wchar_t name pointer
++0x0c model file id 1
++0x10 model file id 2
++0x14 AI mode
++0x18 priority/locked target id
+```
+
+Live output validated the numeric fields. The name buffer can contain an
+encoded Guild Wars string and still needs a general text-parser decoder.
+
+`CHeroMgr::GetData(EHero)` validates `0x9c`-byte records. Build `38615`
+`CharHeroData` starts with hero ID, active agent ID, level, professions,
+hero/model file IDs, and stores the 20-unit name buffer at `+0x74`.
+
+`CAttribMgr::AttribEnum(agentId, cursor)` reads active attribute IDs from the
+array header at `PartyAttribute + 0x424`. The backing record contains 51
+`0x14`-byte slots from `+0x04`; inactive slots are stale storage and must not
+be presented as current attributes.
+
+Live validation with Ogden Stonehealer confirmed hero ID `27`, professions
+Monk/Mesmer (`3/5`), and active attributes `1,2,3,13,14,15,16` with levels
+`0,0,6,12,0,2,11`. These values matched the in-game panel. The standard
+hero's inline `CharHeroData` name was empty, so standard hero and pet display
+names both require the asynchronous game text decoder rather than direct
+UTF-16 interpretation.
+
 `wasm-validate` passes for the synthesized binary. It was imported as
 `/38615-symbol-map/Gw.jspi.named.wasm`.
 

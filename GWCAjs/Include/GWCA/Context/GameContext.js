@@ -50,7 +50,7 @@ export const GAME_CONTEXT_CHILDREN = Object.freeze({
   }),
   party: Object.freeze({
     offset: GAME_CONTEXT_OFFSETS.party,
-    verification: "pointer-only",
+    verification: "static-readonly",
   }),
   textParser: Object.freeze({
     offset: GAME_CONTEXT_OFFSETS.textParser,

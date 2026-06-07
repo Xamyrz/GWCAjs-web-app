@@ -24,6 +24,12 @@ function install(global = globalThis) {
     get guild() {
       return GWCA.getGuildManager();
     },
+    get Party() {
+      return GWCA.getPartyManager();
+    },
+    get party() {
+      return GWCA.getPartyManager();
+    },
     get Player() {
       return GWCA.getPlayerManager();
     },

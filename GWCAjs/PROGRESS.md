@@ -25,6 +25,7 @@ Execution plan: [`COMPLETION_PLAN.md`](COMPLETION_PLAN.md)
 - [x] Array, pointer-array, and list deterministic test passes.
 - [x] Temporary-buffer lifecycle and altitude deterministic test passes.
 - [x] GameContext child refresh and validation test passes.
+- [x] PartyContext and manager deterministic test passes.
 - [x] Live memory range, pointer, and scoped-allocation smoke test passes.
 - [ ] Full cross-manager regression suite exists.
 - [ ] Method-level native-to-JS API parity ledger exists.
@@ -70,7 +71,7 @@ Execution plan: [`COMPLETION_PLAN.md`](COMPLETION_PLAN.md)
 - [ ] GadgetContext.
 - [ ] GuildContext.
 - [ ] ItemContext.
-- [ ] PartyContext.
+- [x] PartyContext live validation.
 - [ ] PreGameContext.
 - [ ] TextParser.
 - [ ] TradeContext.
@@ -157,7 +158,7 @@ Execution plan: [`COMPLETION_PLAN.md`](COMPLETION_PLAN.md)
 - [x] Live test read-only guild state in an outpost.
 - [x] Live test read-only guild state in a guild hall.
 - [x] Live test `GetCurrentGH()` and `Describe().currentGuildHall`.
-- [ ] Live test guild hall lifecycle/actions.
+- [x] Live test guild hall lifecycle/actions.
 - [x] Register and expose `GWCAjs.Guild`.
 
 ### AgentMgr
@@ -173,17 +174,34 @@ Execution plan: [`COMPLETION_PLAN.md`](COMPLETION_PLAN.md)
 
 ### PartyMgr
 
-- [ ] Validate PartyContext and relevant WorldContext arrays.
-- [ ] Implement `PartyInfo`, `PartySearch`, `HeroInfo`, `PetInfo`, and
-  `Attribute` readers.
-- [ ] Implement size, composition, leader, loaded, defeated, tick, and hard
-  mode reads.
-- [ ] Implement hero/henchman/player lookup helpers.
-- [ ] Implement party request, leave, invite, kick, tick, hard mode, return,
-  hero/pet, flag, and search actions.
-- [ ] Add deterministic layout/action tests.
-- [ ] Live test solo, player party, and hero/henchman party.
-- [ ] Register and expose `GWCAjs.Party`.
+- [x] Statically validate PartyContext for build `38615`.
+- [x] Live-validate PartyContext with solo and populated party invariants.
+- [x] Implement `PartyInfo` and `PartySearch` readers.
+- [x] Implement `HeroInfo`, `PetInfo`, and `Attribute` readers.
+- [x] Live-validate `CharHeroData` and active hero attributes against the
+  in-game Skills and Attributes panel.
+- [ ] Decode encoded pet names; numeric `CPetMgr::PetData` fields are
+  live-validated for build `38615`.
+- [x] Implement size, composition, leader, loaded, defeated, tick, and hard
+  mode reads from PartyContext.
+- [x] Implement hard-mode-unlocked read from WorldContext.
+- [x] Implement party-local player, hero-index, and agent-to-hero lookup
+  helpers.
+- [x] Implement hard-mode action.
+- [x] Live-test hard-mode action.
+- [x] Implement ready/tick action.
+- [x] Live-test ready/tick action.
+- [x] Implement leave-party action through the party-window callback.
+- [x] Live-test the replacement leave-party callback path. Direct
+  `PartyClient::MsgSendLeave()` export invocation returned successfully but
+  did not leave a live three-member party; the party-window callback did.
+- [ ] Implement party request, invite, kick, return, hero/pet, flag, and
+  search actions.
+- [x] Add deterministic read-only layout tests.
+- [x] Add deterministic hard-mode, ready/tick, and leave-party UI callback
+  action/export tests.
+- [x] Live test solo, player party, and hero/henchman party.
+- [x] Register and expose `GWCAjs.Party`.
 
 ### EffectMgr
 

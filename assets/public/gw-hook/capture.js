@@ -22,10 +22,17 @@ export function createCaptureRuntime(global) {
     { name: "__gwca_msg_send_travel_mission_login", functionIndex: 10633 },
   ]);
 
+  const PARTY_ACTION_EXPORT_PATCHES = Object.freeze([
+    { name: "__gwca_party_button_on_click", functionIndex: 16298 },
+    { name: "__gwca_msg_send_hard_mode_set", functionIndex: 10629 },
+    { name: "__gwca_msg_send_signal", functionIndex: 10630 },
+  ]);
+
   const GWCA_EXPORT_PATCHES = Object.freeze([
     ...PLAYER_ACTION_EXPORT_PATCHES,
     ...MAP_ACTION_EXPORT_PATCHES,
     ...GUILD_ACTION_EXPORT_PATCHES,
+    ...PARTY_ACTION_EXPORT_PATCHES,
   ]);
 
   const listeners = new Map();

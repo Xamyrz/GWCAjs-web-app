@@ -860,11 +860,149 @@ GWCAjs.Guild.TravelGH()
 GWCAjs.Guild.LeaveGH()
 ```
 
+Live result: user reported the Guild Hall action path works.
+
+## Party Read-Only Baseline
+
+Ghidra verification for build `38615`:
+
+- `PartyClient::ContextCreate()` allocates `0xd0` bytes.
+- The Party context is `GameContext + 0x4c`.
+- `PartyClient::CPartyTable` starts at `PartyContext + 0x04`.
+- `flag` is at `PartyContext + 0x14`.
+  - hard mode: `0x10`
+  - defeated: `0x20`
+  - leader: `0x80`
+- `parties` is a `PartyInfo*` array at `PartyContext + 0x40`.
+- `player_party` is at `PartyContext + 0x54`.
+- `PartyClient::CSearchTable` starts at `PartyContext + 0x9c`.
+- party-search pointer array is at `PartyContext + 0xc0`.
+
+Implemented read-only JS surface:
+
+- `GWCAjs.Party.Describe()`
+- `GetPartyInfo()`, `GetPartySearch()`, `GetPartySearchArray()`
+- party size, player count, hero count, henchman count
+- hard mode, defeated, leader, loaded, and ticked reads
+- basic hero-agent lookup from the current `PartyInfo`
+
+Party actions currently fail closed with explicit diagnostics until their JSPI
+packet senders are independently verified.
+
+`SetHardMode()` is the first wired Party action:
+
+- `PartyClient::MsgSendHardModeSet(int)`
+- current function index: `10629`
+- export patch: `__gwca_msg_send_hard_mode_set`
+- packet opcode/size: `0x9b` / `0x08`
+- public behavior: returns `true` without sending when the requested state is
+  already active; otherwise sends `1` or `0` through the patched export
+
+Live result: user reported `SetHardMode(true)` and `SetHardMode(false)` work,
+and `GetIsPartyInHardMode()` reflects both JS and manual UI changes.
+
+`Tick()` is wired as the next Party action:
+
+- `PartyClient::MsgSendSignal(int)`
+- current function index: `10630`
+- export patch: `__gwca_msg_send_signal`
+- packet opcode/size: `0xaf` / `0x08`
+- public behavior: returns `true` without sending when the current player's
+  ticked state already matches the requested flag; otherwise sends `1` or `0`
+  through the patched export
+
+Live result: user reported `Tick(true)` and `Tick(false)` work, and
+`GetIsPlayerTicked()` reflects both states.
+
+`LeaveParty()` is wired through the same callback used by the party window:
+
+- `IUi::Game::Party::CPartyButtonFrame::OnClick(int)`
+- current function index: `16298`
+- export patch: `__gwca_party_button_on_click`
+- synthetic context size: `0x38`, with leave mode `1` at offset `0x34`
+- the callback calls `PartyCliLeave()` followed by
+  `CharCliHeroDeactivate(0x28)`
+- public behavior: requires a readable player party; returns `true` without
+  calling when party size is `1` or less; otherwise invokes the callback with
+  the validated gameplay context installed in Prop slot `0x28b680`
+
+Rejected path: direct invocation of `PartyClient::MsgSendLeave()` at current
+function index `10616` returned successfully but did not leave a live
+three-member party. Its export patch was removed.
+
+Live result: user reported the replacement callback returned `true` and
+successfully left the party.
+
+Party read helpers now also cover:
+
+- `GetHeroAgentID(0)` for the controlled character and one-based hero indexes
+- `GetAgentHeroID(agentId)` from the current party hero array
+- `GetHeroPartyMember(index)` for the party entry and its actual `heroId`
+- `GetHeroInfo(heroId)` from `WorldContext + 0x594`
+- `GetHeroInfoByIndex(index)` as the unambiguous party-index convenience path
+- `GetPetInfo(ownerAgentId)` from `WorldContext + 0x6ac`
+- `GetAgentAttributes(agentId)` from `WorldContext + 0x0ac`
+- `GetIsHardModeUnlocked()` from `WorldContext + 0x684`
+
+The validated entity sizes are `CharHeroData = 0x9c`, `PetInfo = 0x1c`,
+`Attribute = 0x14`, and `PartyAttribute = 0x43c`.
+
+`PartyAttribute` contains 51 fixed attribute slots at `+0x04`, followed by
+the active attribute-ID array header at `+0x424`. Public `attributes` contains
+only those active IDs; `allAttributes` preserves the backing slots for
+diagnostics.
+
+Live result with Ogden Stonehealer:
+
+- `GetHeroInfoByIndex(1)` returned hero ID `27`, agent ID `19`, level `20`,
+  primary profession `3` (Monk), and secondary profession `5` (Mesmer)
+- the standard hero record's inline name buffer was empty
+- active attribute IDs were `1, 2, 3, 13, 14, 15, 16`
+- base/current levels were `0/0, 0/0, 6/6, 12/12, 0/0, 2/2, 11/11`,
+  matching the in-game Skills and Attributes panel
+
+Build `38615` stores pets in `CPetMgr` at `WorldContext + 0x6ac`; its leading
+array uses `0x1c`-byte `PetData` entries. Pet names may remain Guild Wars
+encoded strings. The reader returns readable ASCII names as `name`, preserves
+the source as `rawName`, and reports `nameEncoding`.
+
+Live validation commands after reload:
+
+```js
+GWCAjs.Party.Describe()
+GWCAjs.Party.GetPartyInfo()
+GWCAjs.Party.GetPartySize()
+GWCAjs.Party.GetPartyPlayerCount()
+GWCAjs.Party.GetPartyHeroCount()
+GWCAjs.Party.GetPartyHenchmanCount()
+GWCAjs.Party.GetIsLeader()
+GWCAjs.Party.GetIsPartyLoaded()
+GWCAjs.Party.GetIsPartyTicked()
+GWCAjs.Party.GetIsPartyInHardMode()
+GWCAjs.Party.GetActionStatuses()
+GWCAjs.Party.SetHardMode(true)
+GWCAjs.Party.SetHardMode(false)
+GWCAjs.Party.Tick(true)
+GWCAjs.Party.GetIsPlayerTicked()
+GWCAjs.Party.Tick(false)
+GWCAjs.Party.GetIsPlayerTicked()
+GWCAjs.Party.LeaveParty()
+GWCAjs.Party.GetHeroAgentID(0)
+GWCAjs.Party.GetHeroAgentID(1)
+GWCAjs.Party.GetAgentHeroID(GWCAjs.Party.GetHeroAgentID(1))
+GWCAjs.Party.GetHeroPartyMember(1)
+GWCAjs.Party.GetHeroInfoByIndex(1)
+GWCAjs.Party.GetPetInfo()
+```
+
 ## Recommended Next Steps
 
-1. Reload the browser and confirm the two Guild action exports appear as
-   available in `GWCAjs.Guild.GetActionStatuses()`.
-2. Live-test `GWCAjs.Guild.TravelGH()` from a stable outpost.
-3. Live-test `GWCAjs.Guild.LeaveGH()` from the guild hall.
-4. Keep investigating a static root anchor in Ghidra, but retain the validated
+1. Reload the browser and live-validate `GWCAjs.Party.Describe()` while solo in
+   an outpost.
+2. Repeat Party validation with heroes/henchmen added.
+3. Live-test the new hero, pet, and attribute readers with matching entities
+   present.
+4. Verify the next Party action sender, likely add/remove henchman or hero,
+   using packet opcode and current function index evidence.
+5. Keep investigating a static root anchor in Ghidra, but retain the validated
    root scan as the default fallback.

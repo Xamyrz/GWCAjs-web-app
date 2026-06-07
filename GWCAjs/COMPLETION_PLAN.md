@@ -63,7 +63,7 @@ and record the compatibility difference in the parity ledger.
 | `GameThreadMgr`, `RenderMgr`, `UIMgr` | Initialization placeholders only |
 | Other native managers | Empty placeholders |
 | Context/entity/container readers | On-demand GameContext child pointers are centralized; layouts remain complete only for Player/Map paths |
-| Deterministic tests | `Memory`, `Containers`, `TemporaryBuffer`, `ContextChildren`, `InstanceInfo`, and `MapTest` |
+| Deterministic tests | `Memory`, `Containers`, `TemporaryBuffer`, `ContextChildren`, `Guild`, `Party`, `InstanceInfo`, and `MapTest` |
 | Manual testing | Strong coverage for current Player/Map paths |
 
 Native header declaration counts are useful for estimating scope, but they are
@@ -128,6 +128,7 @@ node GWCAjs/Tests/Containers.test.mjs
 node GWCAjs/Tests/TemporaryBuffer.test.mjs
 node GWCAjs/Tests/ContextChildren.test.mjs
 node GWCAjs/Tests/Guild.test.mjs
+node GWCAjs/Tests/Party.test.mjs
 node GWCAjs/Tests/InstanceInfo.test.mjs
 node GWCAjs/Tests/MapTest.test.mjs
 ```
