@@ -52,6 +52,10 @@ const partyAttributeBuffer = 0x25000;
 const activeAttributeIdsBuffer = 0x25800;
 const petBuffer = 0x26000;
 const petNameAddress = 0x27000;
+const requestPartyAddress = 0x28000;
+const sendingPartyAddress = 0x29000;
+const requestPlayersBuffer = 0x2a000;
+const sendingPlayersBuffer = 0x2b000;
 const temporaryAddress = 0x30000;
 const propContextSlotAddress = 0x28b680;
 let propContextSlot = 0;
@@ -86,6 +90,10 @@ const state = {
       assert.ok(size <= 0x100);
       return callback(temporaryAddress);
     },
+    withUtf16(value, callback) {
+      writeUtf16(temporaryAddress, value, 20);
+      return callback(temporaryAddress);
+    },
     writeU32(address, value) {
       if (address === propContextSlotAddress) {
         propContextSlot = value >>> 0;
@@ -107,6 +115,16 @@ const state = {
     api: {
       GetPlayerNumber() {
         return 1001;
+      },
+      GetPlayerByID(playerId) {
+        return (
+          {
+            501: { name: "Alice", partyLeaderPlayerNumber: 501 },
+            502: { name: "Bob", partyLeaderPlayerNumber: 501 },
+            601: { name: "Carol", partyLeaderPlayerNumber: 601 },
+            602: { name: "Dave", partyLeaderPlayerNumber: 601 },
+          }[playerId] || null
+        );
       },
     },
   },
@@ -132,6 +150,37 @@ function writeArray(address, dataAddress, capacity, size, param = 0) {
   writeU32(address + 4, capacity);
   writeU32(address + 8, size);
   writeU32(address + 12, param);
+}
+
+function writeLink(address, previousLinkAddress, nextNodeRaw) {
+  writeU32(address, previousLinkAddress);
+  writeU32(address + 4, nextNodeRaw);
+}
+
+function writePartyInfoList(listAddress, nodes) {
+  const offset = PARTY_INFO_OFFSETS.inviteLink;
+  const sentinelAddress = listAddress + 4;
+  writeU32(listAddress, offset);
+  if (nodes.length === 0) {
+    writeLink(sentinelAddress, sentinelAddress, sentinelAddress - offset);
+    return;
+  }
+  writeLink(
+    sentinelAddress,
+    nodes[nodes.length - 1] + offset,
+    nodes[0]
+  );
+  nodes.forEach((nodeAddress, index) => {
+    const previousLinkAddress =
+      index === 0
+        ? sentinelAddress
+        : nodes[index - 1] + offset;
+    const nextNodeRaw =
+      index === nodes.length - 1
+        ? sentinelAddress - offset
+        : nodes[index + 1];
+    writeLink(nodeAddress + offset, previousLinkAddress, nextNodeRaw);
+  });
 }
 
 writeU32(rootAddress + GAME_CONTEXT_OFFSETS.party, contextAddress);
@@ -201,6 +250,14 @@ writeU32(
   contextAddress + PARTY_CONTEXT_OFFSETS.searchClientId,
   7
 );
+writePartyInfoList(contextAddress + PARTY_CONTEXT_OFFSETS.requests, [
+  requestPartyAddress,
+]);
+writeU32(contextAddress + PARTY_CONTEXT_OFFSETS.requestsCount, 1);
+writePartyInfoList(contextAddress + PARTY_CONTEXT_OFFSETS.sending, [
+  sendingPartyAddress,
+]);
+writeU32(contextAddress + PARTY_CONTEXT_OFFSETS.sendingCount, 1);
 writeArray(contextAddress + PARTY_CONTEXT_OFFSETS.parties, partiesBuffer, 2, 2);
 writeU32(partiesBuffer, 0);
 writeU32(partiesBuffer + 4, partyAddress);
@@ -223,6 +280,44 @@ writeArray(
 );
 writeArray(partyAddress + PARTY_INFO_OFFSETS.heroes, heroesBuffer, 1, 1);
 writeArray(partyAddress + PARTY_INFO_OFFSETS.others, 0, 0, 0);
+writeU32(requestPartyAddress + PARTY_INFO_OFFSETS.partyId, 77);
+writeArray(
+  requestPartyAddress + PARTY_INFO_OFFSETS.players,
+  requestPlayersBuffer,
+  2,
+  2
+);
+writeArray(requestPartyAddress + PARTY_INFO_OFFSETS.henchmen, 0, 0, 0);
+writeArray(requestPartyAddress + PARTY_INFO_OFFSETS.heroes, 0, 0, 0);
+writeArray(requestPartyAddress + PARTY_INFO_OFFSETS.others, 0, 0, 0);
+writeU32(
+  requestPlayersBuffer + PLAYER_PARTY_MEMBER_OFFSETS.loginNumber,
+  501
+);
+writeU32(
+  requestPlayersBuffer + PLAYER_PARTY_MEMBER_SIZE +
+    PLAYER_PARTY_MEMBER_OFFSETS.loginNumber,
+  502
+);
+writeU32(sendingPartyAddress + PARTY_INFO_OFFSETS.partyId, 88);
+writeArray(
+  sendingPartyAddress + PARTY_INFO_OFFSETS.players,
+  sendingPlayersBuffer,
+  2,
+  2
+);
+writeArray(sendingPartyAddress + PARTY_INFO_OFFSETS.henchmen, 0, 0, 0);
+writeArray(sendingPartyAddress + PARTY_INFO_OFFSETS.heroes, 0, 0, 0);
+writeArray(sendingPartyAddress + PARTY_INFO_OFFSETS.others, 0, 0, 0);
+writeU32(
+  sendingPlayersBuffer + PLAYER_PARTY_MEMBER_OFFSETS.loginNumber,
+  601
+);
+writeU32(
+  sendingPlayersBuffer + PLAYER_PARTY_MEMBER_SIZE +
+    PLAYER_PARTY_MEMBER_OFFSETS.loginNumber,
+  602
+);
 
 writeU32(playersBuffer + PLAYER_PARTY_MEMBER_OFFSETS.loginNumber, 1001);
 writeU32(playersBuffer + PLAYER_PARTY_MEMBER_OFFSETS.calledTargetId, 2001);
@@ -269,6 +364,10 @@ assert.equal(context.isHardMode, true);
 assert.equal(context.isLeader, true);
 assert.equal(context.isDefeated, false);
 assert.equal(context.playerParty.partyId, 1);
+assert.equal(context.requests.entries[0].partyId, 77);
+assert.equal(context.requests.entries[0].leaderName, "Alice");
+assert.equal(context.sending.entries[0].partyId, 88);
+assert.equal(context.sending.entries[0].leaderName, "Carol");
 assert.equal(context.playerParty.players.size, 2);
 assert.equal(context.playerParty.heroes.entries[0].heroId, 5);
 assert.equal(context.playerParty.henchmen.entries[0].name, "Hench One");
@@ -329,6 +428,14 @@ assert.deepEqual(api.GetAgentAttributes(3001).attributes[0], {
 assert.equal(api.GetAgentAttributes(3001).allAttributes.length, 51);
 assert.equal(api.GetAgentAttributes(3002), null);
 assert.equal(api.GetPartyInfo(1).partyId, 1);
+assert.equal(api.GetPartyRequests().entries[0].partyId, 77);
+assert.deepEqual(
+  api.GetPendingPartyRequests().map((entry) => entry.partyId),
+  [77]
+);
+assert.equal(api.GetSendingPartyRequests().entries[0].partyId, 88);
+assert.equal(api.GetPartyRequests().entries[0].leaderName, "Alice");
+assert.equal(api.GetSendingPartyRequests().entries[0].leaderName, "Carol");
 assert.equal(api.GetPartySearch(7).partyLeader, "Leader Name");
 assert.equal(api.GetActionStatus("LeaveParty").available, false);
 assert.equal(api.GetActionStatus("SetHardMode").available, false);
@@ -340,6 +447,16 @@ assert.equal(api.GetIsPartyInHardMode(), false);
 assert.equal(api.SetHardMode(true), false);
 const internalCalls = [];
 state.hook.getRawExports = () => ({
+  __gwca_msg_send_hero_activate() {},
+  __gwca_msg_send_hero_deactivate() {},
+  __gwca_msg_send_invite_henchman() {},
+  __gwca_msg_send_invite_member() {},
+  __gwca_msg_send_invite_member_by_name() {},
+  __gwca_msg_send_invite_accept() {},
+  __gwca_msg_send_invite_decline() {},
+  __gwca_party_cancel_invitation() {},
+  __gwca_msg_send_remove_henchman() {},
+  __gwca_msg_send_remove_member() {},
   __gwca_msg_send_hard_mode_set() {},
   __gwca_party_button_on_click() {},
   __gwca_msg_send_signal() {},
@@ -350,9 +467,46 @@ state.hook.callExport = (name, ...args) => {
 assert.equal(api.GetActionStatus("SetHardMode").available, true);
 assert.equal(api.GetActionStatus("Tick").available, true);
 assert.equal(api.GetActionStatus("LeaveParty").available, true);
+assert.equal(api.GetActionStatus("AddHero").available, true);
+assert.equal(api.GetActionStatus("KickHero").available, true);
+assert.equal(api.GetActionStatus("KickAllHeroes").available, true);
+assert.equal(api.GetActionStatus("AddHenchman").available, true);
+assert.equal(api.GetActionStatus("KickHenchman").available, true);
+assert.equal(api.GetActionStatus("InvitePlayer").available, true);
+assert.equal(api.GetActionStatus("KickPlayer").available, true);
+assert.equal(api.GetActionStatus("CancelPartyInvite").available, true);
+assert.equal(
+  api.GetActionStatus("RespondToPartyRequestAccept").available,
+  true
+);
+assert.equal(api.GetActionStatus("RespondToPartyRequest").available, true);
 assert.equal(api.SetHardMode(true), true);
 assert.equal(api.Tick(false), true);
 assert.equal(api.LeaveParty(), true);
+assert.equal(api.AddHero(5), true);
+assert.equal(api.KickHero(5), true);
+assert.equal(api.KickAllHeroes(), true);
+assert.equal(api.AddHenchman(4001), true);
+assert.equal(api.KickHenchman(4001), true);
+assert.equal(api.InvitePlayer(1002), true);
+assert.equal(api.InvitePlayer("Player Name"), true);
+assert.equal(api.KickPlayer(1002), true);
+assert.equal(api.RespondToPartyRequest(7, true), true);
+assert.equal(api.RespondToPartyRequest(7, false), true);
+assert.equal(api.RespondToPartyRequest("Alice", true), true);
+assert.equal(api.CancelPartyInvite(88), true);
+assert.equal(api.CancelPartyInvite(0), true);
+assert.equal(api.CancelPartyInvite("Carol"), true);
+assert.equal(api.CancelPartyInvite("carol"), true);
+assert.equal(api.CancelPartyInvite(2), true);
+assert.equal(api.AddHero(0), false);
+assert.equal(api.AddHero(0x28), false);
+assert.equal(api.KickHero(0x29), false);
+assert.equal(api.AddHenchman(0), false);
+assert.equal(api.InvitePlayer(""), false);
+assert.equal(api.InvitePlayer("12345678901234567890"), false);
+assert.equal(api.KickPlayer(0), false);
+assert.equal(api.RespondToPartyRequest(0), false);
 assert.deepEqual(internalCalls, [
   {
     args: [1],
@@ -366,15 +520,80 @@ assert.deepEqual(internalCalls, [
     args: [temporaryAddress, 0],
     name: "__gwca_party_button_on_click",
   },
+  {
+    args: [5],
+    name: "__gwca_msg_send_hero_activate",
+  },
+  {
+    args: [5],
+    name: "__gwca_msg_send_hero_deactivate",
+  },
+  {
+    args: [0x26],
+    name: "__gwca_msg_send_hero_deactivate",
+  },
+  {
+    args: [4001],
+    name: "__gwca_msg_send_invite_henchman",
+  },
+  {
+    args: [4001],
+    name: "__gwca_msg_send_remove_henchman",
+  },
+  {
+    args: [1002],
+    name: "__gwca_msg_send_invite_member",
+  },
+  {
+    args: [temporaryAddress],
+    name: "__gwca_msg_send_invite_member_by_name",
+  },
+  {
+    args: [1002],
+    name: "__gwca_msg_send_remove_member",
+  },
+  {
+    args: [7],
+    name: "__gwca_msg_send_invite_accept",
+  },
+  {
+    args: [7],
+    name: "__gwca_msg_send_invite_decline",
+  },
+  {
+    args: [77],
+    name: "__gwca_msg_send_invite_accept",
+  },
+  {
+    args: [88],
+    name: "__gwca_party_cancel_invitation",
+  },
+  {
+    args: [88],
+    name: "__gwca_party_cancel_invitation",
+  },
+  {
+    args: [88],
+    name: "__gwca_party_cancel_invitation",
+  },
+  {
+    args: [88],
+    name: "__gwca_party_cancel_invitation",
+  },
+  {
+    args: [88],
+    name: "__gwca_party_cancel_invitation",
+  },
 ]);
+assert.equal(state.hook.readUtf16(temporaryAddress, 20), "Player Name");
 assert.equal(view.getUint32(temporaryAddress + 0x34, true), 1);
 assert.equal(propContextSlot, 0);
 writeU32(contextAddress + PARTY_CONTEXT_OFFSETS.flag, 0x10 | 0x80);
 assert.equal(api.SetHardMode(true), true);
-assert.equal(internalCalls.length, 3);
+assert.equal(internalCalls.length, 19);
 writeU32(playersBuffer + PLAYER_PARTY_MEMBER_OFFSETS.state, 1);
 assert.equal(api.Tick(false), true);
-assert.equal(internalCalls.length, 3);
+assert.equal(internalCalls.length, 19);
 writeArray(partyAddress + PARTY_INFO_OFFSETS.heroes, 0, 0, 0);
 writeArray(partyAddress + PARTY_INFO_OFFSETS.henchmen, 0, 0, 0);
 assert.equal(api.GetPartySize(), 2);
@@ -386,7 +605,7 @@ writeArray(
 );
 assert.equal(api.GetPartySize(), 1);
 assert.equal(api.LeaveParty(), true);
-assert.equal(internalCalls.length, 3);
+assert.equal(internalCalls.length, 19);
 writeArray(
   partyAddress + PARTY_INFO_OFFSETS.players,
   playersBuffer,

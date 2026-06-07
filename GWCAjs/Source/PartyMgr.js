@@ -14,18 +14,9 @@ import {
 } from "../Include/GWCA/Context/WorldContext.js";
 
 const UNSUPPORTED_ACTIONS = Object.freeze({
-  AddHenchman: "Party action packet path has not been verified in JSPI.",
-  AddHero: "Party action packet path has not been verified in JSPI.",
   FlagAll: "Hero flagging packet path has not been verified in JSPI.",
   FlagHero: "Hero flagging packet path has not been verified in JSPI.",
   FlagHeroAgent: "Hero flagging packet path has not been verified in JSPI.",
-  InvitePlayer: "Party invitation packet path has not been verified in JSPI.",
-  KickAllHeroes: "Party action packet path has not been verified in JSPI.",
-  KickHenchman: "Party action packet path has not been verified in JSPI.",
-  KickHero: "Party action packet path has not been verified in JSPI.",
-  KickPlayer: "Party kick packet path has not been verified in JSPI.",
-  RespondToPartyRequest:
-    "Party request accept/decline packet path has not been verified in JSPI.",
   ReturnToOutpost:
     "Return-to-outpost UI/button path has not been verified in JSPI.",
   SearchParty: "Party-search packet path has not been verified in JSPI.",
@@ -73,15 +64,80 @@ export function createPartyApi(state) {
   }
 
   function getActionStatus(name) {
+    if (name === "RespondToPartyRequest") {
+      const accept = internals.getActionStatus(
+        "RespondToPartyRequestAccept"
+      );
+      const decline = internals.getActionStatus(
+        "RespondToPartyRequestDecline"
+      );
+      return {
+        available: accept.available && decline.available,
+        accept,
+        decline,
+        mode:
+          accept.available && decline.available
+            ? "messageFunction"
+            : "unavailable",
+        reason:
+          accept.available && decline.available
+            ? "Accept and decline exports are patched into the runtime."
+            : "One or both party-request exports are unavailable.",
+      };
+    }
     return internals.getInternalFunction(name)
       ? internals.getActionStatus(name)
       : getUnsupportedActionStatus(name);
+  }
+
+  function findInviteByLeaderName(list, name) {
+    const normalizedName = String(name || "").trim().toLowerCase();
+    if (!normalizedName) {
+      return null;
+    }
+    return (
+      list?.entries?.find(
+        (entry) =>
+          entry &&
+          typeof entry.leaderName === "string" &&
+          entry.leaderName.trim().toLowerCase() === normalizedName
+      ) || null
+    );
+  }
+
+  function findInviteByIdOrIndex(list, value) {
+    const normalized = Number(value);
+    if (!Number.isInteger(normalized) || normalized < 0) {
+      return null;
+    }
+    const entries = list?.entries?.filter(Boolean) || [];
+    const byPartyId =
+      entries.find((entry) => entry.partyId === normalized) || null;
+    if (byPartyId) {
+      return byPartyId;
+    }
+    const byIndex =
+      entries.find((entry) => entry.index === normalized) || null;
+    if (byIndex) {
+      return byIndex;
+    }
+    if (normalized > 0 && entries.length === 1) {
+      return entries[0];
+    }
+    return (
+      entries.find((entry) =>
+        entry.players?.entries?.some(
+          (player) => player?.loginNumber === normalized
+        )
+      ) || null
+    );
   }
 
   function getAllActionStatuses() {
     return {
       ...getActionStatuses(),
       ...internals.getActionStatuses(),
+      RespondToPartyRequest: getActionStatus("RespondToPartyRequest"),
     };
   }
 
@@ -186,9 +242,26 @@ export function createPartyApi(state) {
     return false;
   }
 
+  function normalizePositiveInteger(value) {
+    const normalized = Number(value);
+    return Number.isInteger(normalized) && normalized > 0
+      ? normalized
+      : 0;
+  }
+
   return Object.freeze({
-    AddHenchman: unsupported,
-    AddHero: unsupported,
+    AddHenchman(agentId) {
+      const normalizedAgentId = normalizePositiveInteger(agentId);
+      return normalizedAgentId
+        ? internals.addHenchman(normalizedAgentId)
+        : false;
+    },
+    AddHero(heroId) {
+      const normalizedHeroId = normalizePositiveInteger(heroId);
+      return normalizedHeroId && normalizedHeroId < 0x28
+        ? internals.addHero(normalizedHeroId)
+        : false;
+    },
     Describe() {
       return {
         actionStatuses: getAllActionStatuses(),
@@ -303,6 +376,9 @@ export function createPartyApi(state) {
       return getPartyInfo()?.heroes.size || 0;
     },
     GetPartyInfo: getPartyInfo,
+    GetPartyRequests() {
+      return getContext()?.requests || null;
+    },
     GetPartyPlayerCount() {
       return getPartyInfo()?.players.size || 0;
     },
@@ -310,16 +386,60 @@ export function createPartyApi(state) {
     GetPartySearchArray() {
       return getContext()?.partySearch || null;
     },
+    GetPendingPartyRequests() {
+      return getContext()?.requests?.entries || [];
+    },
     GetPartySize() {
       return getPartyInfo()?.partySize || 0;
     },
+    GetSendingPartyRequests() {
+      return getContext()?.sending || null;
+    },
     GetPetInfo: getPetInfo,
     GetUnsupportedAction: getActionStatus,
-    InvitePlayer: unsupported,
-    KickAllHeroes: unsupported,
-    KickHenchman: unsupported,
-    KickHero: unsupported,
-    KickPlayer: unsupported,
+    InvitePlayer(player) {
+      if (typeof player === "string") {
+        const name = player.trim();
+        return name && name.length < 20
+          ? internals.invitePlayerByName(name)
+          : false;
+      }
+      const normalizedPlayerId = normalizePositiveInteger(player);
+      return normalizedPlayerId
+        ? internals.invitePlayer(normalizedPlayerId)
+        : false;
+    },
+    KickAllHeroes() {
+      return internals.kickAllHeroes();
+    },
+    KickHenchman(agentId) {
+      const normalizedAgentId = normalizePositiveInteger(agentId);
+      return normalizedAgentId
+        ? internals.kickHenchman(normalizedAgentId)
+        : false;
+    },
+    KickHero(heroId) {
+      const normalizedHeroId = normalizePositiveInteger(heroId);
+      return normalizedHeroId && normalizedHeroId < 0x29
+        ? internals.kickHero(normalizedHeroId)
+        : false;
+    },
+    KickPlayer(playerId) {
+      const normalizedPlayerId = normalizePositiveInteger(playerId);
+      return normalizedPlayerId
+        ? internals.kickPlayer(normalizedPlayerId)
+        : false;
+    },
+    CancelPartyInvite(partyId) {
+      if (typeof partyId === "string") {
+        const request = findInviteByLeaderName(getContext()?.sending, partyId);
+        return request
+          ? internals.cancelPartyInvite(request.partyId)
+          : false;
+      }
+      const request = findInviteByIdOrIndex(getContext()?.sending, partyId);
+      return request ? internals.cancelPartyInvite(request.partyId) : false;
+    },
     LeaveParty() {
       const party = getPartyInfo();
       if (!party) {
@@ -330,7 +450,18 @@ export function createPartyApi(state) {
       }
       return internals.leaveParty();
     },
-    RespondToPartyRequest: unsupported,
+    RespondToPartyRequest(partyId, accept = true) {
+      if (typeof partyId === "string") {
+        const request = findInviteByLeaderName(getContext()?.requests, partyId);
+        return request
+          ? internals.respondToPartyRequest(request.partyId, !!accept)
+          : false;
+      }
+      const normalizedPartyId = normalizePositiveInteger(partyId);
+      return normalizedPartyId
+        ? internals.respondToPartyRequest(normalizedPartyId, !!accept)
+        : false;
+    },
     ReturnToOutpost: unsupported,
     SearchParty: unsupported,
     SearchPartyCancel: unsupported,

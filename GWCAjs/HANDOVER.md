@@ -1015,6 +1015,59 @@ await GWCAjs.Party.DecodePetName()
 GWCAjs.Party.GetTextDecoderStatus()
 ```
 
+Hero and henchman party composition actions now have direct build `38615`
+message candidates:
+
+- `AddHero(heroId)`: `CharMsgSendHeroActivate(EHero)`, index `6872`,
+  opcode `0x1e`
+- `KickHero(heroId)` and `KickAllHeroes()`: `CharMsgSendHeroDeactivate(EHero)`,
+  index `6873`, opcode `0x1f`
+- `AddHenchman(agentId)`: `PartyClient::MsgSendInviteHenchman`, index `10610`,
+  opcode `0x9f`
+- `KickHenchman(agentId)`: `PartyClient::MsgSendRemoveHenchman`, index `10618`,
+  opcode `0xa8`
+
+All four messages are eight bytes and contain only the opcode and one integer
+argument. Their exports and deterministic call tests are implemented; live
+action verification succeeded for hero and henchman add/remove operations.
+
+Player-party actions now also expose current build `38615` message candidates:
+
+- `InvitePlayer(playerId)`: opcode `0xa0`, index `10611`
+- `InvitePlayer(name)`: opcode `0xa1`, index `10612`; the game copies a
+  maximum of 19 UTF-16 characters into its packet synchronously
+- `KickPlayer(playerId)`: opcode `0xa9`, index `10619`
+- `RespondToPartyRequest(partyId, true)`: opcode `0x9c`, index `10613`
+- `RespondToPartyRequest(partyId, false)`: opcode `0x9e`, index `10615`
+
+These actions have deterministic export and argument tests but still require
+live validation.
+
+Incoming/outgoing regular party invitations are not stored in
+`partySearch.entries`; that array tracks party-search advertisements. Regular
+party invites use intrusive `TList<PartyInfo>` lists in `PartyContext`:
+
+- incoming requests: `PartyContext + 0x1c`, count at `+0x28`
+- outgoing requests: `PartyContext + 0x2c`, count at `+0x38`
+- the `PartyInfo` list link is at `PartyInfo + 0x7c`
+
+Use `GetPendingPartyRequests()` or `GetPartyRequests()` for incoming invite
+party IDs suitable for `RespondToPartyRequest(partyId, accept)`.
+Invite rows now also include `leaderPlayerNumber` and `leaderName` when the
+player roster can resolve them, and `CancelPartyInvite(partyIdOrLeaderName)`
+resolves regular outgoing invites by party id, list index, or leader name.
+Live UI behavior shows sent invites are cancelled by selecting the outgoing
+invite and pressing the party window `Kick` button. That path reaches the
+current build `38615` party-client wrapper at index `10561`, which resolves
+`PropGet(0x13)` and calls `CPartyTable::CancelInvitation(partyId)`.
+`CancelPartyInvite` patches and calls that wrapper with the resolved `partyId`.
+The raw `PartyClient::MsgSendInviteCancel(unsigned int)` packet sender and the
+search-table `CSearchTable::InviteCancel(searchTable, index)` path can return
+from JS without visibly cancelling a regular outgoing invite.
+Numeric cancellation resolves exact `partyId` first, then outgoing-list index;
+with exactly one outgoing invite, any positive numeric argument resolves to
+that sole row to avoid stale transient party-id failures during live testing.
+
 ## Recommended Next Steps
 
 1. Reload the browser and live-validate `GWCAjs.Party.Describe()` while solo in

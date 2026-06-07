@@ -1,4 +1,145 @@
 const INTERNAL_FUNCTIONS = Object.freeze({
+  AddHenchman: Object.freeze({
+    address: "ram:80388d1b",
+    callable: false,
+    exportName: "__gwca_msg_send_invite_henchman",
+    functionName: "PartyClient::MsgSendInviteHenchman(unsigned int)",
+    functionIndex: 10610,
+    message: Object.freeze({
+      opcode: 0x9f,
+      size: 0x08,
+      fields: Object.freeze(["opcode", "agentId"]),
+    }),
+    reason:
+      "Experimental: lower-level henchman invitation sender patched into the runtime exports.",
+    rawWasmSignature: "(i32) -> nil",
+    signature: "void(agentId)",
+  }),
+  AddHero: Object.freeze({
+    address: "ram:802bf6da",
+    callable: false,
+    exportName: "__gwca_msg_send_hero_activate",
+    functionName: "CharMsgSendHeroActivate(EHero)",
+    functionIndex: 6872,
+    message: Object.freeze({
+      opcode: 0x1e,
+      size: 0x08,
+      fields: Object.freeze(["opcode", "heroId"]),
+    }),
+    reason:
+      "Experimental: lower-level hero activation sender patched into the runtime exports.",
+    rawWasmSignature: "(i32) -> nil",
+    signature: "void(heroId)",
+  }),
+  KickHenchman: Object.freeze({
+    address: "ram:80388f2d",
+    callable: false,
+    exportName: "__gwca_msg_send_remove_henchman",
+    functionName: "PartyClient::MsgSendRemoveHenchman(unsigned int)",
+    functionIndex: 10618,
+    message: Object.freeze({
+      opcode: 0xa8,
+      size: 0x08,
+      fields: Object.freeze(["opcode", "agentId"]),
+    }),
+    reason:
+      "Experimental: lower-level henchman removal sender patched into the runtime exports.",
+    rawWasmSignature: "(i32) -> nil",
+    signature: "void(agentId)",
+  }),
+  KickAllHeroes: Object.freeze({
+    address: "ram:802bf71c",
+    callable: false,
+    exportName: "__gwca_msg_send_hero_deactivate",
+    functionName: "CharMsgSendHeroDeactivate(EHero)",
+    functionIndex: 6873,
+    message: Object.freeze({
+      opcode: 0x1f,
+      size: 0x08,
+      fields: Object.freeze(["opcode", "heroId"]),
+    }),
+    reason:
+      "Experimental: hero deactivation sender using GWCA's all-heroes sentinel.",
+    rawWasmSignature: "(i32) -> nil",
+    signature: "void(0x26)",
+  }),
+  KickHero: Object.freeze({
+    address: "ram:802bf71c",
+    callable: false,
+    exportName: "__gwca_msg_send_hero_deactivate",
+    functionName: "CharMsgSendHeroDeactivate(EHero)",
+    functionIndex: 6873,
+    message: Object.freeze({
+      opcode: 0x1f,
+      size: 0x08,
+      fields: Object.freeze(["opcode", "heroId"]),
+    }),
+    reason:
+      "Experimental: lower-level hero deactivation sender patched into the runtime exports.",
+    rawWasmSignature: "(i32) -> nil",
+    signature: "void(heroId)",
+  }),
+  InvitePlayer: Object.freeze({
+    address: "ram:80388d5e",
+    callable: false,
+    exportName: "__gwca_msg_send_invite_member",
+    functionName: "PartyClient::MsgSendInviteMember(unsigned int)",
+    functionIndex: 10611,
+    message: Object.freeze({
+      opcode: 0xa0,
+      size: 0x08,
+      fields: Object.freeze(["opcode", "playerId"]),
+    }),
+    reason:
+      "Experimental: lower-level numeric party invitation sender patched into the runtime exports.",
+    rawWasmSignature: "(i32) -> nil",
+    signature: "void(playerId)",
+  }),
+  InvitePlayerByName: Object.freeze({
+    address: "ram:80388da1",
+    callable: false,
+    exportName: "__gwca_msg_send_invite_member_by_name",
+    functionName: "PartyClient::MsgSendInviteMemberByName(wchar_t const*)",
+    functionIndex: 10612,
+    message: Object.freeze({
+      opcode: 0xa1,
+      size: 0x2c,
+      fields: Object.freeze(["opcode", "name[20]"]),
+    }),
+    reason:
+      "Experimental: lower-level named party invitation sender patched into the runtime exports.",
+    rawWasmSignature: "(i32) -> nil",
+    signature: "void(nameAddress)",
+  }),
+  CancelPartyInvite: Object.freeze({
+    address: "ram:80388786",
+    callable: false,
+    exportName: "__gwca_party_cancel_invitation",
+    functionName: "PartyCliCancelInvitation(unsigned int)",
+    functionIndex: 10561,
+    mode: "partyClientWrapper",
+    reason:
+      "Experimental: party-client sent-invite cancellation wrapper patched into the runtime exports.",
+    requiresPropContext: true,
+    rawWasmSignature: "(i32) -> nil",
+    signature: "void(partyId)",
+  }),
+  KickPlayer: Object.freeze({
+    address: "ram:80388f70",
+    callable: false,
+    exportName: "__gwca_msg_send_remove_member",
+    functionName: "PartyClient::MsgSendRemoveMember(unsigned int)",
+    functionIndex: 10619,
+    message: Object.freeze({
+      opcode: 0xa9,
+      size: 0x08,
+      fields: Object.freeze(["opcode", "playerId"]),
+    }),
+    reason:
+      "Experimental: lower-level party-member removal sender patched into the runtime exports.",
+    rawWasmSignature: "(i32) -> nil",
+    signature: "void(playerId)",
+  }),
   LeaveParty: Object.freeze({
     address: "ram:805c138c",
     callable: false,
@@ -11,6 +152,38 @@ const INTERNAL_FUNCTIONS = Object.freeze({
     requiresPropContext: true,
     rawWasmSignature: "(i32, i32) -> nil",
     signature: "void(buttonContext, notifyParent)",
+  }),
+  RespondToPartyRequestAccept: Object.freeze({
+    address: "ram:80388dec",
+    callable: false,
+    exportName: "__gwca_msg_send_invite_accept",
+    functionName: "PartyClient::MsgSendInviteAccept(unsigned int)",
+    functionIndex: 10613,
+    message: Object.freeze({
+      opcode: 0x9c,
+      size: 0x08,
+      fields: Object.freeze(["opcode", "partyId"]),
+    }),
+    reason:
+      "Experimental: lower-level party invitation acceptance sender patched into the runtime exports.",
+    rawWasmSignature: "(i32) -> nil",
+    signature: "void(partyId)",
+  }),
+  RespondToPartyRequestDecline: Object.freeze({
+    address: "ram:80388e72",
+    callable: false,
+    exportName: "__gwca_msg_send_invite_decline",
+    functionName: "PartyClient::MsgSendInviteDecline(unsigned int)",
+    functionIndex: 10615,
+    message: Object.freeze({
+      opcode: 0x9e,
+      size: 0x08,
+      fields: Object.freeze(["opcode", "partyId"]),
+    }),
+    reason:
+      "Experimental: lower-level party invitation decline sender patched into the runtime exports.",
+    rawWasmSignature: "(i32) -> nil",
+    signature: "void(partyId)",
   }),
   SetHardMode: Object.freeze({
     address: "ram:80389237",
@@ -204,6 +377,42 @@ export function createPartyInternals(state) {
     setHardMode(enabled) {
       return call("SetHardMode", [enabled ? 1 : 0]).called === true;
     },
+    addHenchman(agentId) {
+      return call("AddHenchman", [agentId]).called === true;
+    },
+    addHero(heroId) {
+      return call("AddHero", [heroId]).called === true;
+    },
+    kickHenchman(agentId) {
+      return call("KickHenchman", [agentId]).called === true;
+    },
+    kickAllHeroes() {
+      return call("KickAllHeroes", [0x26]).called === true;
+    },
+    kickHero(heroId) {
+      return call("KickHero", [heroId]).called === true;
+    },
+    invitePlayer(playerId) {
+      return call("InvitePlayer", [playerId]).called === true;
+    },
+    invitePlayerByName(name) {
+      if (typeof state?.hook?.withUtf16 !== "function") {
+        return false;
+      }
+      try {
+        return state.hook.withUtf16(name, (nameAddress) =>
+          call("InvitePlayerByName", [nameAddress]).called === true
+        );
+      } catch (error) {
+        return false;
+      }
+    },
+    cancelPartyInvite(partyId) {
+      return call("CancelPartyInvite", [partyId]).called === true;
+    },
+    kickPlayer(playerId) {
+      return call("KickPlayer", [playerId]).called === true;
+    },
     leaveParty() {
       if (
         typeof state?.hook?.withAllocation !== "function" ||
@@ -235,6 +444,12 @@ export function createPartyInternals(state) {
     },
     tick(enabled) {
       return call("Tick", [enabled ? 1 : 0]).called === true;
+    },
+    respondToPartyRequest(partyId, accept) {
+      const name = accept
+        ? "RespondToPartyRequestAccept"
+        : "RespondToPartyRequestDecline";
+      return call(name, [partyId]).called === true;
     },
   });
 }

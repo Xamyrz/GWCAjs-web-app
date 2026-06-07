@@ -1,7 +1,9 @@
 import { getNamedGameContextChildAddress } from "./GameContext.js";
 import { readPointerArray } from "../GameContainers/Array.js";
+import { readList } from "../GameContainers/List.js";
 import {
   PARTY_INFO_SIZE,
+  PARTY_INFO_OFFSETS,
   readPartyInfo,
   readPartySearchArray,
 } from "../GameEntities/Party.js";
@@ -14,6 +16,10 @@ export const PARTY_CONTEXT_OFFSETS = Object.freeze({
   parties: 0x40,
   partySearch: 0xc0,
   playerParty: 0x54,
+  requests: 0x1c,
+  requestsCount: 0x28,
+  sending: 0x2c,
+  sendingCount: 0x38,
   searchClientId: 0x9c,
 });
 
@@ -60,6 +66,68 @@ function readPartyPointerArray(state, address) {
   };
 }
 
+function readPartyInfoList(state, address, countAddress) {
+  const list = readList(state, address, {
+    expectedOffset: PARTY_INFO_OFFSETS.inviteLink,
+    maxNodes: 256,
+    nodeSize: PARTY_INFO_SIZE,
+  });
+  if (!list) {
+    return null;
+  }
+  const expectedCount = readValue(state, "u32", countAddress) || 0;
+  if (expectedCount !== list.count) {
+    return null;
+  }
+  return {
+    ...list,
+    expectedCount,
+    entries: list.nodeAddresses.map((nodeAddress, index) =>
+      enrichPartyInfo(state, readPartyInfo(state, nodeAddress), index)
+    ),
+  };
+}
+
+function resolvePlayerByNumber(state, playerNumber) {
+  if (!Number.isInteger(playerNumber) || playerNumber <= 0) {
+    return null;
+  }
+  return (
+    state?.player?.api?.GetPlayerByID?.(playerNumber) ||
+    state?.player?.api?.GetPlayer?.(playerNumber) ||
+    null
+  );
+}
+
+function enrichPartyInfo(state, partyInfo, index = 0) {
+  if (!partyInfo) {
+    return null;
+  }
+  const playerEntries = partyInfo.players?.entries || [];
+  let leaderPlayerNumber = 0;
+  for (const entry of playerEntries) {
+    const player = resolvePlayerByNumber(state, entry.loginNumber);
+    const candidate = Number(player?.partyLeaderPlayerNumber || 0);
+    if (candidate > 0) {
+      leaderPlayerNumber = candidate;
+      break;
+    }
+    if (!leaderPlayerNumber && Number.isInteger(entry.loginNumber)) {
+      leaderPlayerNumber = entry.loginNumber;
+    }
+  }
+  const leaderPlayer =
+    resolvePlayerByNumber(state, leaderPlayerNumber) ||
+    resolvePlayerByNumber(state, playerEntries[0]?.loginNumber || 0);
+  return {
+    ...partyInfo,
+    index,
+    leaderName: leaderPlayer?.name || null,
+    leaderPlayer: leaderPlayer || null,
+    leaderPlayerNumber,
+  };
+}
+
 export function inspectPartyContext(state) {
   const address = getPartyContextAddress(state);
   if (!address) {
@@ -102,6 +170,24 @@ export function inspectPartyContext(state) {
     });
   }
 
+  const requests = readPartyInfoList(
+    state,
+    address + PARTY_CONTEXT_OFFSETS.requests,
+    address + PARTY_CONTEXT_OFFSETS.requestsCount
+  );
+  if (!requests || requests.entries.some((entry) => !entry)) {
+    return invalidInspection(address, "Party request list is invalid.");
+  }
+
+  const sending = readPartyInfoList(
+    state,
+    address + PARTY_CONTEXT_OFFSETS.sending,
+    address + PARTY_CONTEXT_OFFSETS.sendingCount
+  );
+  if (!sending || sending.entries.some((entry) => !entry)) {
+    return invalidInspection(address, "Outgoing party request list is invalid.");
+  }
+
   const partySearch = readPartySearchArray(
     state,
     address + PARTY_CONTEXT_OFFSETS.partySearch
@@ -124,6 +210,14 @@ export function inspectPartyContext(state) {
     partySearch,
     playerParty,
     playerPartyPointer: playerPartyPointer >>> 0,
+    requests,
+    requestsCount:
+      readValue(state, "u32", address + PARTY_CONTEXT_OFFSETS.requestsCount) ||
+      0,
+    sending,
+    sendingCount:
+      readValue(state, "u32", address + PARTY_CONTEXT_OFFSETS.sendingCount) ||
+      0,
     searchClientId:
       readValue(state, "u32", address + PARTY_CONTEXT_OFFSETS.searchClientId) ||
       0,

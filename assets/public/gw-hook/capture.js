@@ -24,6 +24,17 @@ export function createCaptureRuntime(global) {
 
   const PARTY_ACTION_EXPORT_PATCHES = Object.freeze([
     { name: "__gwca_party_button_on_click", functionIndex: 16298 },
+    { name: "__gwca_msg_send_hero_activate", functionIndex: 6872 },
+    { name: "__gwca_msg_send_hero_deactivate", functionIndex: 6873 },
+    { name: "__gwca_msg_send_invite_henchman", functionIndex: 10610 },
+    { name: "__gwca_msg_send_invite_member", functionIndex: 10611 },
+    { name: "__gwca_msg_send_invite_member_by_name", functionIndex: 10612 },
+    { name: "__gwca_msg_send_invite_accept", functionIndex: 10613 },
+    { name: "__gwca_msg_send_invite_decline", functionIndex: 10615 },
+    { name: "__gwca_party_cancel_invitation", functionIndex: 10561 },
+    { name: "__gwca_msg_send_remove_henchman", functionIndex: 10618 },
+    { name: "__gwca_msg_send_remove_member", functionIndex: 10619 },
+    { name: "__gwca_party_search_invite_cancel", functionIndex: 10733 },
     { name: "__gwca_msg_send_hard_mode_set", functionIndex: 10629 },
     { name: "__gwca_msg_send_signal", functionIndex: 10630 },
   ]);
