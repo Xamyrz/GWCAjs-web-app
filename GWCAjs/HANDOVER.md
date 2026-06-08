@@ -1,6 +1,6 @@
 # GWCAjs Browser/WASM Handover
 
-Last updated: 2026-06-07
+Last updated: 2026-06-08
 
 Target game build: `38615`
 
@@ -50,6 +50,73 @@ Location: `assets/public/gw-hook/`
 
 Do not automatically launch the game, Chromium, or a probe. The game download
 is slow and live testing should be deliberate.
+
+### Chromium live testing
+
+Use the root page only:
+
+```text
+http://127.0.0.1:8000/
+```
+
+Do not use `GWCAjs/probe.html` for end-to-end login/init testing. The current
+reliable path is the non-headless Chromium flow backed by the injected
+`window.__GWInputBridge` helper from `serve_local_webapp.py`.
+
+Launch Chromium deliberately:
+
+```bash
+chromium --no-sandbox --remote-debugging-port=9223 http://127.0.0.1:8000/
+```
+
+Then drive login plus `GWCAjs.initialize()` with:
+
+```bash
+node GWCAjs/Tools/login-and-initialize-gwca.mjs
+```
+
+The tool attaches to the existing Chromium tab on port `9223`, clicks the
+remembered `Log In` button, sends the two validated Enter presses through CDP,
+waits five seconds, and runs `GWCAjs.initialize()`.
+
+Useful options:
+
+```bash
+node GWCAjs/Tools/login-and-initialize-gwca.mjs --help
+node GWCAjs/Tools/login-and-initialize-gwca.mjs --reload
+node GWCAjs/Tools/login-and-initialize-gwca.mjs --skip-login-click
+node GWCAjs/Tools/login-and-initialize-gwca.mjs --no-initialize
+```
+
+Use `--reload` after changing hook/runtime code that only takes effect during
+WASM instantiation. The script reloads the attached Chromium tab through CDP,
+waits for the page load event, then continues with the same login and
+`GWCAjs.initialize()` flow.
+
+Use `--skip-login-click` only when the game canvas is present but the helper
+cannot find an HTML `Log In` button; it focuses the preferred input target and
+sends the two validated Enter presses without waiting for the button.
+
+After initialization, run the sanitized Party smoke readback with:
+
+```bash
+node GWCAjs/Tools/smoke-party-live.mjs
+```
+
+It attaches to the same Chromium tab through CDP and reports PartyMgr counts,
+flags, action availability, request/search structure, and hero/pet numeric
+state without printing player, character, hero, pet, or leader names.
+
+Current limitation: headless Chromium can reach the login screen with the same
+bridge flow, but `GWCAjs.initialize()` currently fails there with:
+
+```text
+Required anchor missing: modules.gameplay.contextAddress
+```
+
+After finishing a live Chromium test run, close the Chromium process before
+starting another one so the remote-debugging port and browser state stay
+predictable.
 
 ### Runtime discovery
 
@@ -1067,6 +1134,12 @@ from JS without visibly cancelling a regular outgoing invite.
 Numeric cancellation resolves exact `partyId` first, then outgoing-list index;
 with exactly one outgoing invite, any positive numeric argument resolves to
 that sole row to avoid stale transient party-id failures during live testing.
+
+Search actions now have direct build `38615` packet senders:
+
+- `SearchParty(searchType, advertisement)`: `PartyClient::MsgSendSearchBeginRequest(EPartySearchMode, wchar_t const*, unsigned int)`, index `10620`, opcode `0xaa`, packet size `0x4c`.
+- `SearchPartyCancel()`: `PartyClient::MsgSendSearchEndRequest()`, index `10621`, opcode `0xab`, packet size `0x04`.
+- `SetTickToggle()`: convenience wrapper over the ready-state packet sender; it flips the current player tick state by reusing the validated `PartyClient::MsgSendSignal(int)` path at index `10630`.
 
 Return-to-outpost and hero/pet behavior actions now have direct build `38615`
 candidates:

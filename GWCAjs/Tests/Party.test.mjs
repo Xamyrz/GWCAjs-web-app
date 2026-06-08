@@ -480,6 +480,8 @@ state.hook.getRawExports = () => ({
   __gwca_msg_send_invite_accept() {},
   __gwca_msg_send_invite_decline() {},
   __gwca_party_cancel_invitation() {},
+  __gwca_msg_send_search_begin() {},
+  __gwca_msg_send_search_end() {},
   __gwca_msg_send_remove_henchman() {},
   __gwca_msg_send_remove_member() {},
   __gwca_msg_send_hard_mode_set() {},
@@ -504,6 +506,8 @@ assert.equal(api.GetActionStatus("KickHenchman").available, true);
 assert.equal(api.GetActionStatus("InvitePlayer").available, true);
 assert.equal(api.GetActionStatus("KickPlayer").available, true);
 assert.equal(api.GetActionStatus("CancelPartyInvite").available, true);
+assert.equal(api.GetActionStatus("SearchParty").available, true);
+assert.equal(api.GetActionStatus("SearchPartyCancel").available, true);
 assert.equal(
   api.GetActionStatus("RespondToPartyRequestAccept").available,
   true
@@ -520,6 +524,8 @@ assert.equal(api.KickHenchman(4001), true);
 assert.equal(api.InvitePlayer(1002), true);
 assert.equal(api.InvitePlayer("Player Name"), true);
 assert.equal(api.KickPlayer(1002), true);
+assert.equal(api.SearchParty(2, "Questing"), true);
+assert.equal(api.SearchPartyCancel(), true);
 assert.equal(api.RespondToPartyRequest(7, true), true);
 assert.equal(api.RespondToPartyRequest(7, false), true);
 assert.equal(api.RespondToPartyRequest("Alice", true), true);
@@ -546,6 +552,8 @@ assert.equal(api.AddHenchman(0), false);
 assert.equal(api.InvitePlayer(""), false);
 assert.equal(api.InvitePlayer("12345678901234567890"), false);
 assert.equal(api.KickPlayer(0), false);
+assert.equal(api.SearchParty(-1, "Questing"), false);
+assert.equal(api.SearchParty(2, "12345678901234567890123456789012"), false);
 assert.equal(api.RespondToPartyRequest(0), false);
 assert.equal(api.SetPetBehavior(3), false);
 assert.deepEqual(internalCalls, [
@@ -592,6 +600,14 @@ assert.deepEqual(internalCalls, [
   {
     args: [1002],
     name: "__gwca_msg_send_remove_member",
+  },
+  {
+    args: [2, temporaryAddress, 0],
+    name: "__gwca_msg_send_search_begin",
+  },
+  {
+    args: [],
+    name: "__gwca_msg_send_search_end",
   },
   {
     args: [7],
@@ -642,15 +658,26 @@ assert.deepEqual(internalCalls, [
     name: "__gwca_msg_send_command_ai_mode",
   },
 ]);
-assert.equal(state.hook.readUtf16(temporaryAddress, 20), "Player Name");
+assert.equal(state.hook.readUtf16(temporaryAddress, 20), "Questing");
 assert.equal(view.getUint32(temporaryAddress + 0x34, true), 1);
 assert.equal(propContextSlot, 0);
 writeU32(contextAddress + PARTY_CONTEXT_OFFSETS.flag, 0x10 | 0x80);
 assert.equal(api.SetHardMode(true), true);
-assert.equal(internalCalls.length, 23);
+assert.equal(internalCalls.length, 25);
 writeU32(playersBuffer + PLAYER_PARTY_MEMBER_OFFSETS.state, 1);
 assert.equal(api.Tick(false), true);
-assert.equal(internalCalls.length, 23);
+assert.equal(internalCalls.length, 25);
+assert.equal(api.SetTickToggle(), true);
+assert.deepEqual(internalCalls.at(-1), {
+  args: [1],
+  name: "__gwca_msg_send_signal",
+});
+writeU32(playersBuffer + PLAYER_PARTY_MEMBER_OFFSETS.state, 3);
+assert.equal(api.SetTickToggle(), true);
+assert.deepEqual(internalCalls.at(-1), {
+  args: [0],
+  name: "__gwca_msg_send_signal",
+});
 writeArray(partyAddress + PARTY_INFO_OFFSETS.heroes, 0, 0, 0);
 writeArray(partyAddress + PARTY_INFO_OFFSETS.henchmen, 0, 0, 0);
 assert.equal(api.GetPartySize(), 2);
@@ -662,7 +689,7 @@ writeArray(
 );
 assert.equal(api.GetPartySize(), 1);
 assert.equal(api.LeaveParty(), true);
-assert.equal(internalCalls.length, 23);
+assert.equal(internalCalls.length, 27);
 writeArray(
   partyAddress + PARTY_INFO_OFFSETS.players,
   playersBuffer,

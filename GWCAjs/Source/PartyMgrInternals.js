@@ -173,6 +173,39 @@ const INTERNAL_FUNCTIONS = Object.freeze({
     rawWasmSignature: "(i32) -> nil",
     signature: "void(playerId)",
   }),
+  SearchParty: Object.freeze({
+    address: "ram:80388fb3",
+    callable: false,
+    exportName: "__gwca_msg_send_search_begin",
+    functionName:
+      "PartyClient::MsgSendSearchBeginRequest(EPartySearchMode, wchar_t const*, unsigned int)",
+    functionIndex: 10620,
+    message: Object.freeze({
+      opcode: 0xaa,
+      size: 0x4c,
+      fields: Object.freeze(["opcode", "searchType", "advertisement[32]", "unknown0"]),
+    }),
+    reason:
+      "Experimental: lower-level party-search advertisement sender patched into the runtime exports.",
+    rawWasmSignature: "(i32, i32, i32) -> nil",
+    signature: "void(searchType, advertisementAddress, unknown0)",
+  }),
+  SearchPartyCancel: Object.freeze({
+    address: "ram:8038900f",
+    callable: false,
+    exportName: "__gwca_msg_send_search_end",
+    functionName: "PartyClient::MsgSendSearchEndRequest()",
+    functionIndex: 10621,
+    message: Object.freeze({
+      opcode: 0xab,
+      size: 0x04,
+      fields: Object.freeze(["opcode"]),
+    }),
+    reason:
+      "Experimental: lower-level party-search advertisement cancellation sender patched into the runtime exports.",
+    rawWasmSignature: "() -> nil",
+    signature: "void()",
+  }),
   LeaveParty: Object.freeze({
     address: "ram:805c138c",
     callable: false,
@@ -461,6 +494,22 @@ export function createPartyInternals(state) {
     },
     kickPlayer(playerId) {
       return call("KickPlayer", [playerId]).called === true;
+    },
+    searchParty(searchType, advertisement) {
+      if (typeof state?.hook?.withUtf16 !== "function") {
+        return false;
+      }
+      try {
+        return state.hook.withUtf16(advertisement, (advertisementAddress) =>
+          call("SearchParty", [searchType, advertisementAddress, 0]).called ===
+          true
+        );
+      } catch (error) {
+        return false;
+      }
+    },
+    searchPartyCancel() {
+      return call("SearchPartyCancel", []).called === true;
     },
     leaveParty() {
       if (

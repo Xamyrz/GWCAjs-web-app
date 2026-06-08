@@ -37,6 +37,8 @@ export function createCaptureRuntime(global) {
     { name: "__gwca_party_cancel_invitation", functionIndex: 10561 },
     { name: "__gwca_msg_send_remove_henchman", functionIndex: 10618 },
     { name: "__gwca_msg_send_remove_member", functionIndex: 10619 },
+    { name: "__gwca_msg_send_search_begin", functionIndex: 10620 },
+    { name: "__gwca_msg_send_search_end", functionIndex: 10621 },
     { name: "__gwca_party_search_invite_cancel", functionIndex: 10733 },
     { name: "__gwca_msg_send_hard_mode_set", functionIndex: 10629 },
     { name: "__gwca_msg_send_signal", functionIndex: 10630 },

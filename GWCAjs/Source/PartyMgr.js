@@ -19,9 +19,6 @@ const UNSUPPORTED_ACTIONS = Object.freeze({
   FlagAll: "Hero flagging packet path has not been verified in JSPI.",
   FlagHero: "Hero flagging packet path has not been verified in JSPI.",
   FlagHeroAgent: "Hero flagging packet path has not been verified in JSPI.",
-  SearchParty: "Party-search packet path has not been verified in JSPI.",
-  SearchPartyCancel:
-    "Party-search cancel packet path has not been verified in JSPI.",
   SearchPartyReply:
     "Party-search reply packet path has not been verified in JSPI.",
   UnflagAll: "Hero flagging packet path has not been verified in JSPI.",
@@ -308,6 +305,18 @@ export function createPartyApi(state) {
       : null;
   }
 
+  function tick(flag = true) {
+    const party = getPartyInfo();
+    if (!party) {
+      return false;
+    }
+    const shouldTick = !!flag;
+    if ((getPlayerMember()?.ticked || false) === shouldTick) {
+      return true;
+    }
+    return internals.tick(shouldTick);
+  }
+
   return Object.freeze({
     AddHenchman(agentId) {
       const normalizedAgentId = normalizePositiveInteger(agentId);
@@ -526,8 +535,22 @@ export function createPartyApi(state) {
       const context = getContext();
       return context?.isDefeated ? internals.returnToOutpost() : false;
     },
-    SearchParty: unsupported,
-    SearchPartyCancel: unsupported,
+    SearchParty(searchType, advertisement = "") {
+      const normalizedSearchType = Number(searchType);
+      if (
+        !Number.isInteger(normalizedSearchType) ||
+        normalizedSearchType < 0
+      ) {
+        return false;
+      }
+      const text = String(advertisement || "");
+      return text.length < 32
+        ? internals.searchParty(normalizedSearchType, text)
+        : false;
+    },
+    SearchPartyCancel() {
+      return internals.searchPartyCancel();
+    },
     SearchPartyReply: unsupported,
     SetHardMode(enabled = true) {
       const context = getContext();
@@ -592,19 +615,9 @@ export function createPartyApi(state) {
       return true;
     },
     SetTickToggle() {
-      return false;
+      return tick(!getPlayerMember()?.ticked);
     },
-    Tick(flag = true) {
-      const party = getPartyInfo();
-      if (!party) {
-        return false;
-      }
-      const shouldTick = !!flag;
-      if ((getPlayerMember()?.ticked || false) === shouldTick) {
-        return true;
-      }
-      return internals.tick(shouldTick);
-    },
+    Tick: tick,
     UnflagAll: unsupported,
     UnflagHero: unsupported,
   });

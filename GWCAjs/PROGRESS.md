@@ -193,6 +193,7 @@ Execution plan: [`COMPLETION_PLAN.md`](COMPLETION_PLAN.md)
 - [x] Implement hard-mode action.
 - [x] Live-test hard-mode action.
 - [x] Implement ready/tick action.
+- [x] Implement ready/tick toggle convenience action.
 - [x] Live-test ready/tick action.
 - [x] Implement leave-party action through the party-window callback.
 - [x] Live-test the replacement leave-party callback path. Direct
@@ -209,7 +210,8 @@ Execution plan: [`COMPLETION_PLAN.md`](COMPLETION_PLAN.md)
   wrapper path.
 - [x] Implement return-to-outpost and hero/pet behavior action candidates.
 - [ ] Live-test return-to-outpost and hero/pet behavior actions.
-- [ ] Implement flag and search actions.
+- [x] Implement search actions.
+- [ ] Implement flag actions.
 - [x] Add deterministic read-only layout tests.
 - [x] Add deterministic hard-mode, ready/tick, and leave-party UI callback
   action/export tests.
