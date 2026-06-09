@@ -790,7 +790,7 @@ roster/history/town-alliance diagnostics. Hall travel and leave remain
 explicitly unavailable until their UI message paths are verified.
 
 Live build `38615` probing found a populated guild entry with `faction = 4`
-(`Lg Hd Tv Q Plus` / `LGHD`), so the guild faction plausibility bound is
+(`THIS IS MY GUILD` / `TIMG`), so the guild faction plausibility bound is
 `0..4`; do not reduce it to the old desktop Kurzick/Luxon-only assumption.
 
 The read-only GuildContext path was live-validated in an outpost and a guild
@@ -828,10 +828,10 @@ The derived guild-hall helpers were also live-validated in the guild hall:
 
 ```text
 GWCAjs.Guild.Describe().isCurrentMapGuildHall -> true
-GWCAjs.Guild.Describe().currentGuildHall.name -> "Lg Hd Tv Q Plus"
-GWCAjs.Guild.Describe().currentGuildHall.tag -> "LGHD"
-GWCAjs.Guild.GetCurrentGH().name -> "Lg Hd Tv Q Plus"
-GWCAjs.Guild.GetCurrentGH().tag -> "LGHD"
+GWCAjs.Guild.Describe().currentGuildHall.name -> "THIS IS MY GUILD"
+GWCAjs.Guild.Describe().currentGuildHall.tag -> "TIMG"
+GWCAjs.Guild.GetCurrentGH().name -> "THIS IS MY GUILD"
+GWCAjs.Guild.GetCurrentGH().tag -> "TIMG"
 ```
 
 Deterministic coverage is in `GWCAjs/Tests/Guild.test.mjs`. The next live step

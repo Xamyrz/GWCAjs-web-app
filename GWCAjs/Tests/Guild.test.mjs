@@ -380,41 +380,41 @@ writeU32(rootAddress + GAME_CONTEXT_OFFSETS.guild, 0);
 assert.equal(api.IsAvailable(), false);
 assert.match(api.Describe().context.reason, /unavailable/i);
 
-assert.deepEqual(decodeGuildHistoryText("\u0345\u0107Damo Dalton\u0001"), {
-  display: "Damo Dalton",
+assert.deepEqual(decodeGuildHistoryText("\u0345\u0107Bravo Johny\u0001"), {
+  display: "Bravo Johny",
   eventCode: 0x0345,
-  names: ["Damo Dalton"],
-  raw: "\u0345\u0107Damo Dalton\u0001",
+  names: ["Bravo Johny"],
+  raw: "\u0345\u0107Bravo Johny\u0001",
 });
 assert.deepEqual(
   decodeGuildHistoryText(
-    "\u0346\u0107Persona Sai\u0001\u0108Damo Dalton\u0001"
+    "\u0346\u0107John Doe\u0001\u0108Bravo Johny\u0001"
   ),
   {
-    display: "Persona Sai / Damo Dalton",
+    display: "John Doe / Bravo Johny",
     eventCode: 0x0346,
-    names: ["Persona Sai", "Damo Dalton"],
-    raw: "\u0346\u0107Persona Sai\u0001\u0108Damo Dalton\u0001",
+    names: ["John Doe", "Bravo Johny"],
+    raw: "\u0346\u0107John Doe\u0001\u0108Bravo Johny\u0001",
   }
 );
 assert.deepEqual(
   decodeGuildHistoryText(
-    "\u0349\u0107Antonia Ulton\u0001\u0108Persona Sai\u0001"
+    "\u0349\u0107Jessica Simpson\u0001\u0108John Doe\u0001"
   ),
   {
-    display: "Antonia Ulton / Persona Sai",
+    display: "Jessica Simpson / John Doe",
     eventCode: 0x0349,
-    names: ["Antonia Ulton", "Persona Sai"],
-    raw: "\u0349\u0107Antonia Ulton\u0001\u0108Persona Sai\u0001",
+    names: ["Jessica Simpson", "John Doe"],
+    raw: "\u0349\u0107Jessica Simpson\u0001\u0108John Doe\u0001",
   }
 );
 assert.deepEqual(
-  decodeGuildHistoryText("\u8101\u2e7a\u0107Antonia Ulton\u0001"),
+  decodeGuildHistoryText("\u8101\u2e7a\u0107Jessica Simpson\u0001"),
   {
-    display: "Antonia Ulton",
+    display: "Jessica Simpson",
     eventCode: 0x8101,
-    names: ["Antonia Ulton"],
-    raw: "\u8101\u2e7a\u0107Antonia Ulton\u0001",
+    names: ["Jessica Simpson"],
+    raw: "\u8101\u2e7a\u0107Jessica Simpson\u0001",
   }
 );
 assert.deepEqual(decodeGuildHistoryDate(0x00a4b39f), {
@@ -424,35 +424,35 @@ assert.deepEqual(decodeGuildHistoryDate(0x00a4b39f), {
 });
 assert.equal(
   describeGuildHistoryEvent(
-    decodeGuildHistoryText("\u0345\u0107Damo Dalton\u0001"),
+    decodeGuildHistoryText("\u0345\u0107Bravo Johny\u0001"),
     decodeGuildHistoryDate(0x00a4b39f)
   ),
-  "11/24/2025 Guild founded by Damo Dalton."
+  "11/24/2025 Guild founded by Bravo Johny."
 );
 assert.equal(
   describeGuildHistoryEvent(
     decodeGuildHistoryText(
-      "\u0346\u0107Persona Sai\u0001\u0108Damo Dalton\u0001"
+      "\u0346\u0107John Doe\u0001\u0108Bravo Johny\u0001"
     ),
     decodeGuildHistoryDate(0x00b9b39f)
   ),
-  "11/24/2025 New member Persona Sai (invited by Damo Dalton)."
+  "11/24/2025 New member John Doe (invited by Bravo Johny)."
 );
 assert.equal(
   describeGuildHistoryEvent(
     decodeGuildHistoryText(
-      "\u0349\u0107Antonia Ulton\u0001\u0108Persona Sai\u0001"
+      "\u0349\u0107Jessica Simpson\u0001\u0108John Doe\u0001"
     ),
     decodeGuildHistoryDate(0x02e8b462)
   ),
-  "6/7/2026 Antonia Ulton kicked by Persona Sai."
+  "6/7/2026 Jessica Simpson kicked by John Doe."
 );
 assert.equal(
   describeGuildHistoryEvent(
-    decodeGuildHistoryText("\u8101\u2e7a\u0107Antonia Ulton\u0001"),
+    decodeGuildHistoryText("\u8101\u2e7a\u0107Jessica Simpson\u0001"),
     decodeGuildHistoryDate(0x02e9b462)
   ),
-  "6/7/2026 Antonia Ulton left the guild."
+  "6/7/2026 Jessica Simpson left the guild."
 );
 
 console.log("GuildContext, entity, and manager checks passed");
