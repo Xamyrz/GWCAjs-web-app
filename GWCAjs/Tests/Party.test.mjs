@@ -489,6 +489,10 @@ state.hook.getRawExports = () => ({
   __gwca_party_select_offer() {},
   __gwca_msg_send_signal() {},
 });
+state.hook.getPatchStatus = () => ({
+  actionPatchesEnabled: true,
+  reason: "known-build",
+});
 state.hook.callExport = (name, ...args) => {
   internalCalls.push({ args, name });
 };
@@ -699,6 +703,7 @@ writeArray(
 writeArray(partyAddress + PARTY_INFO_OFFSETS.henchmen, henchmenBuffer, 1, 1);
 writeArray(partyAddress + PARTY_INFO_OFFSETS.heroes, heroesBuffer, 1, 1);
 delete state.hook.getRawExports;
+delete state.hook.getPatchStatus;
 delete state.hook.callExport;
 
 writeU32(contextAddress + PARTY_CONTEXT_OFFSETS.playerParty, buffer.byteLength - 4);

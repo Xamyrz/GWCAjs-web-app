@@ -58,6 +58,12 @@ const state = {
         __gwca_text_resolve_issue() {},
       };
     },
+    getPatchStatus() {
+      return {
+        actionPatchesEnabled: true,
+        reason: "known-build",
+      };
+    },
     readU32(address) {
       assert.equal(address, propContextSlotAddress);
       return propContextSlot;

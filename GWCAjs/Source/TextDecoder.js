@@ -1,38 +1,8 @@
-const PROP_CONTEXT_SLOT_ADDRESS = 0x28b680;
-const TEXT_RESOLVE_EXPORT = "__gwca_text_resolve_issue";
-const HERO_CODED_NAME_EXPORT = "__gwca_char_get_coded_name";
-
-function getActivePropContextAddress(state) {
-  const anchoredAddress = state?.anchors?.gameplayContextAddress || 0;
-  if (anchoredAddress) {
-    return anchoredAddress >>> 0;
-  }
-  return (
-    state?.scanner?.tryResolveAddress?.("modules.gameplay.contextAddress") || 0
-  ) >>> 0;
-}
-
-function withPropContext(state, callback) {
-  if (
-    typeof state?.hook?.readU32 !== "function" ||
-    typeof state?.hook?.writeU32 !== "function"
-  ) {
-    return callback();
-  }
-  const contextAddress = getActivePropContextAddress(state);
-  if (!contextAddress) {
-    return callback();
-  }
-  const previous = state.hook.readU32(PROP_CONTEXT_SLOT_ADDRESS) || 0;
-  state.hook.writeU32(PROP_CONTEXT_SLOT_ADDRESS, contextAddress);
-  try {
-    return callback();
-  } finally {
-    state.hook.writeU32(PROP_CONTEXT_SLOT_ADDRESS, previous);
-  }
-}
+import { TEXT_INTERNAL_CALLS } from "../Evidence/InternalCalls.js";
+import { createInternalCallRuntime } from "./InternalCallRuntime.js";
 
 export function createTextDecoder(state, options = {}) {
+  const internalCalls = createInternalCallRuntime(state, TEXT_INTERNAL_CALLS);
   const timeoutMs = options.timeoutMs ?? 5000;
   const cache = new Map();
   const status = {
@@ -43,11 +13,8 @@ export function createTextDecoder(state, options = {}) {
   };
 
   function isAvailable() {
-    const exportsObject = state?.hook?.getRawExports?.();
     return !!(
-      exportsObject &&
-      typeof exportsObject[TEXT_RESOLVE_EXPORT] === "function" &&
-      typeof state?.hook?.callExport === "function" &&
+      internalCalls.getActionStatus("Decode").available &&
       typeof state?.hook?.registerTableCallback === "function"
     );
   }
@@ -107,14 +74,14 @@ export function createTextDecoder(state, options = {}) {
             );
           }
         );
-        withPropContext(state, () =>
-          state.hook.callExport(
-            TEXT_RESOLVE_EXPORT,
-            address,
-            callbackLease.index,
-            0
-          )
-        );
+        const callResult = internalCalls.call("Decode", [
+          address,
+          callbackLease.index,
+          0,
+        ]);
+        if (!callResult.called) {
+          throw new Error(callResult.reason);
+        }
       } catch (error) {
         status.lastError =
           error instanceof Error ? error.message : String(error);
@@ -128,15 +95,13 @@ export function createTextDecoder(state, options = {}) {
     if (
       !Number.isInteger(normalizedAgentId) ||
       normalizedAgentId <= 0 ||
-      typeof state?.hook?.callExport !== "function"
+      !internalCalls.getActionStatus("GetHeroCodedName").available
     ) {
       return 0;
     }
     try {
       return (
-        withPropContext(state, () =>
-          state.hook.callExport(HERO_CODED_NAME_EXPORT, normalizedAgentId)
-        ) || 0
+        internalCalls.call("GetHeroCodedName", [normalizedAgentId]).result || 0
       ) >>> 0;
     } catch (error) {
       return 0;

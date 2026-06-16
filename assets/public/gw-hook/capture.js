@@ -1,61 +1,8 @@
+import { getBuildManifest } from "../gw-runtime/build-manifests.js";
+
 export function createCaptureRuntime(global) {
   let moduleObject =
     global.Module && typeof global.Module === "object" ? global.Module : null;
-
-  const PLAYER_ACTION_EXPORT_PATCHES = Object.freeze([
-    { name: "__gwca_msg_send_order_guild_adjust_faction", functionIndex: 6893 },
-    { name: "__gwca_msg_send_order_set_profession_secondary", functionIndex: 6903 },
-    { name: "__gwca_msg_send_set_title", functionIndex: 6924 },
-    { name: "__gwca_msg_send_set_title_none", functionIndex: 6925 },
-  ]);
-
-  const MAP_ACTION_EXPORT_PATCHES = Object.freeze([
-    { name: "__gwca_map_query_altitude", functionIndex: 5557 },
-    { name: "__gwca_party_select_challenge_mission", functionIndex: 10577 },
-    { name: "__gwca_party_cancel_enter_challenge", functionIndex: 10574 },
-    { name: "__gwca_msg_send_travel_mission", functionIndex: 10632 },
-    { name: "__gwca_msg_send_abort_cinematic", functionIndex: 7768 },
-  ]);
-
-  const GUILD_ACTION_EXPORT_PATCHES = Object.freeze([
-    { name: "__gwca_msg_send_travel_guild_hall", functionIndex: 10631 },
-    { name: "__gwca_msg_send_travel_mission_login", functionIndex: 10633 },
-  ]);
-
-  const PARTY_ACTION_EXPORT_PATCHES = Object.freeze([
-    { name: "__gwca_party_button_on_click", functionIndex: 16298 },
-    { name: "__gwca_party_select_offer", functionIndex: 10579 },
-    { name: "__gwca_msg_send_command_ai_mode", functionIndex: 6864 },
-    { name: "__gwca_msg_send_command_ai_priority_target", functionIndex: 6865 },
-    { name: "__gwca_msg_send_hero_activate", functionIndex: 6872 },
-    { name: "__gwca_msg_send_hero_deactivate", functionIndex: 6873 },
-    { name: "__gwca_msg_send_invite_henchman", functionIndex: 10610 },
-    { name: "__gwca_msg_send_invite_member", functionIndex: 10611 },
-    { name: "__gwca_msg_send_invite_member_by_name", functionIndex: 10612 },
-    { name: "__gwca_msg_send_invite_accept", functionIndex: 10613 },
-    { name: "__gwca_msg_send_invite_decline", functionIndex: 10615 },
-    { name: "__gwca_party_cancel_invitation", functionIndex: 10561 },
-    { name: "__gwca_msg_send_remove_henchman", functionIndex: 10618 },
-    { name: "__gwca_msg_send_remove_member", functionIndex: 10619 },
-    { name: "__gwca_msg_send_search_begin", functionIndex: 10620 },
-    { name: "__gwca_msg_send_search_end", functionIndex: 10621 },
-    { name: "__gwca_party_search_invite_cancel", functionIndex: 10733 },
-    { name: "__gwca_msg_send_hard_mode_set", functionIndex: 10629 },
-    { name: "__gwca_msg_send_signal", functionIndex: 10630 },
-  ]);
-
-  const TEXT_EXPORT_PATCHES = Object.freeze([
-    { name: "__gwca_text_resolve_issue", functionIndex: 5864 },
-    { name: "__gwca_char_get_coded_name", functionIndex: 9107 },
-  ]);
-
-  const GWCA_EXPORT_PATCHES = Object.freeze([
-    ...PLAYER_ACTION_EXPORT_PATCHES,
-    ...MAP_ACTION_EXPORT_PATCHES,
-    ...GUILD_ACTION_EXPORT_PATCHES,
-    ...PARTY_ACTION_EXPORT_PATCHES,
-    ...TEXT_EXPORT_PATCHES,
-  ]);
 
   const listeners = new Map();
   const importWrappers = new Map();
@@ -84,6 +31,7 @@ export function createCaptureRuntime(global) {
     loader: null,
     runtimeInitialized: false,
     views: null,
+    wasmPreparation: null,
   };
 
   let readyResolve;
@@ -249,6 +197,290 @@ export function createCaptureRuntime(global) {
     return writeVarU32(bytes.length).concat(bytes);
   }
 
+  function bytesToHex(bytes, start, end) {
+    let value = "";
+    for (let index = start; index < end; index += 1) {
+      value += bytes[index].toString(16).padStart(2, "0");
+    }
+    return value;
+  }
+
+  function readLimits(bytes, offset, end) {
+    const flags = readVarU32(bytes, offset, end);
+    if (!flags) {
+      return null;
+    }
+    const minimum = readVarU32(bytes, flags.next, end);
+    if (!minimum) {
+      return null;
+    }
+    let cursor = minimum.next;
+    let maximum = null;
+    if ((flags.value & 1) !== 0) {
+      const maximumInfo = readVarU32(bytes, cursor, end);
+      if (!maximumInfo) {
+        return null;
+      }
+      maximum = maximumInfo.value;
+      cursor = maximumInfo.next;
+    }
+    return {
+      flags: flags.value,
+      maximum,
+      minimum: minimum.value,
+      next: cursor,
+    };
+  }
+
+  function inspectWasmBytes(bytes) {
+    if (
+      !bytes ||
+      bytes.length < 8 ||
+      bytes[0] !== 0x00 ||
+      bytes[1] !== 0x61 ||
+      bytes[2] !== 0x73 ||
+      bytes[3] !== 0x6d
+    ) {
+      return null;
+    }
+
+    const metadata = {
+      buildId: null,
+      definedFunctionCount: 0,
+      exportCount: 0,
+      functionTypeIndexes: [],
+      importedFunctionCount: 0,
+      tables: [],
+      typeCount: 0,
+    };
+    const importedFunctionTypes = [];
+    const definedFunctionTypes = [];
+    let cursor = 8;
+
+    while (cursor < bytes.length) {
+      const sectionId = bytes[cursor];
+      cursor += 1;
+      const sizeInfo = readVarU32(bytes, cursor);
+      if (!sizeInfo) {
+        return null;
+      }
+      const payloadStart = sizeInfo.next;
+      const payloadEnd = payloadStart + sizeInfo.value;
+      if (payloadEnd > bytes.length) {
+        return null;
+      }
+
+      if (sectionId === 0) {
+        const name = readName(bytes, payloadStart, payloadEnd);
+        if (!name) {
+          return null;
+        }
+        if (name.value === "build_id") {
+          metadata.buildId = bytesToHex(bytes, name.next, payloadEnd);
+        }
+      } else if (sectionId === 1) {
+        const count = readVarU32(bytes, payloadStart, payloadEnd);
+        if (!count) {
+          return null;
+        }
+        metadata.typeCount = count.value;
+      } else if (sectionId === 2) {
+        const count = readVarU32(bytes, payloadStart, payloadEnd);
+        if (!count) {
+          return null;
+        }
+        let entryCursor = count.next;
+        for (let index = 0; index < count.value; index += 1) {
+          const moduleName = readName(bytes, entryCursor, payloadEnd);
+          if (!moduleName) {
+            return null;
+          }
+          const importName = readName(bytes, moduleName.next, payloadEnd);
+          if (!importName || importName.next >= payloadEnd) {
+            return null;
+          }
+          const kind = bytes[importName.next];
+          entryCursor = importName.next + 1;
+          if (kind === 0) {
+            const typeIndex = readVarU32(bytes, entryCursor, payloadEnd);
+            if (!typeIndex) {
+              return null;
+            }
+            importedFunctionTypes.push(typeIndex.value);
+            entryCursor = typeIndex.next;
+          } else if (kind === 1) {
+            if (entryCursor >= payloadEnd) {
+              return null;
+            }
+            entryCursor += 1;
+            const limits = readLimits(bytes, entryCursor, payloadEnd);
+            if (!limits) {
+              return null;
+            }
+            entryCursor = limits.next;
+          } else if (kind === 2) {
+            const limits = readLimits(bytes, entryCursor, payloadEnd);
+            if (!limits) {
+              return null;
+            }
+            entryCursor = limits.next;
+          } else if (kind === 3) {
+            if (entryCursor + 2 > payloadEnd) {
+              return null;
+            }
+            entryCursor += 2;
+          } else if (kind === 4) {
+            const attribute = readVarU32(bytes, entryCursor, payloadEnd);
+            if (!attribute) {
+              return null;
+            }
+            const typeIndex = readVarU32(
+              bytes,
+              attribute.next,
+              payloadEnd
+            );
+            if (!typeIndex) {
+              return null;
+            }
+            entryCursor = typeIndex.next;
+          } else {
+            return null;
+          }
+        }
+      } else if (sectionId === 3) {
+        const count = readVarU32(bytes, payloadStart, payloadEnd);
+        if (!count) {
+          return null;
+        }
+        let entryCursor = count.next;
+        for (let index = 0; index < count.value; index += 1) {
+          const typeIndex = readVarU32(bytes, entryCursor, payloadEnd);
+          if (!typeIndex) {
+            return null;
+          }
+          definedFunctionTypes.push(typeIndex.value);
+          entryCursor = typeIndex.next;
+        }
+      } else if (sectionId === 4) {
+        const count = readVarU32(bytes, payloadStart, payloadEnd);
+        if (!count) {
+          return null;
+        }
+        let entryCursor = count.next;
+        for (let index = 0; index < count.value; index += 1) {
+          if (entryCursor >= payloadEnd) {
+            return null;
+          }
+          const elementType = bytes[entryCursor];
+          const limits = readLimits(bytes, entryCursor + 1, payloadEnd);
+          if (!limits) {
+            return null;
+          }
+          metadata.tables.push({
+            elementType,
+            maximum: limits.maximum,
+            minimum: limits.minimum,
+          });
+          entryCursor = limits.next;
+        }
+      } else if (sectionId === 7) {
+        const count = readVarU32(bytes, payloadStart, payloadEnd);
+        if (!count) {
+          return null;
+        }
+        metadata.exportCount = count.value;
+      }
+      cursor = payloadEnd;
+    }
+
+    metadata.importedFunctionCount = importedFunctionTypes.length;
+    metadata.definedFunctionCount = definedFunctionTypes.length;
+    metadata.functionTypeIndexes =
+      importedFunctionTypes.concat(definedFunctionTypes);
+    return metadata;
+  }
+
+  function validateBuildManifest(metadata, manifest) {
+    const errors = [];
+    const expected = manifest.expected;
+    const table = metadata.tables[0] || null;
+    const expectedTable = expected.table;
+
+    for (const field of [
+      "definedFunctionCount",
+      "exportCount",
+      "importedFunctionCount",
+      "typeCount",
+    ]) {
+      if (metadata[field] !== expected[field]) {
+        errors.push(
+          field + ": expected " + expected[field] + ", got " + metadata[field]
+        );
+      }
+    }
+    if (metadata.tables.length !== expectedTable.count) {
+      errors.push(
+        "table.count: expected " +
+          expectedTable.count +
+          ", got " +
+          metadata.tables.length
+      );
+    }
+    if (!table) {
+      errors.push("table: expected one function table");
+    } else {
+      if (table.elementType !== expectedTable.elementType) {
+        errors.push(
+          "table.elementType: expected " +
+            expectedTable.elementType +
+            ", got " +
+            table.elementType
+        );
+      }
+      if (table.minimum !== expectedTable.initial) {
+        errors.push(
+          "table.initial: expected " +
+            expectedTable.initial +
+            ", got " +
+            table.minimum
+        );
+      }
+      if (table.maximum !== expectedTable.maximum) {
+        errors.push(
+          "table.maximum: expected " +
+            expectedTable.maximum +
+            ", got " +
+            table.maximum
+        );
+      }
+    }
+
+    const names = new Set();
+    for (const patch of manifest.exportPatches) {
+      if (names.has(patch.name)) {
+        errors.push("duplicate export patch: " + patch.name);
+        continue;
+      }
+      names.add(patch.name);
+      const actualTypeIndex =
+        metadata.functionTypeIndexes[patch.functionIndex];
+      if (actualTypeIndex === undefined) {
+        errors.push(
+          patch.name + ": function index " + patch.functionIndex + " is absent"
+        );
+      } else if (actualTypeIndex !== patch.typeIndex) {
+        errors.push(
+          patch.name +
+            ": expected type " +
+            patch.typeIndex +
+            ", got " +
+            actualTypeIndex
+        );
+      }
+    }
+    return errors;
+  }
+
   function bytesContainAscii(bytes, value) {
     if (!value || bytes.length < value.length) {
       return false;
@@ -280,9 +512,9 @@ export function createCaptureRuntime(global) {
     );
   }
 
-  function patchGuildWarsWasmExports(source) {
+  function patchGuildWarsWasmExports(source, exportPatches) {
     const bytes = toPatchableBytes(source);
-    if (!bytes || bytes.length < 8) {
+    if (!bytes || bytes.length < 8 || exportPatches.length === 0) {
       return source;
     }
     if (
@@ -338,7 +570,7 @@ export function createCaptureRuntime(global) {
         entryCursor = exportIndex.next;
       }
 
-      const missingPatches = GWCA_EXPORT_PATCHES.filter(
+      const missingPatches = exportPatches.filter(
         (patch) => !existingNames.has(patch.name)
       );
       if (missingPatches.length === 0) {
@@ -386,9 +618,15 @@ export function createCaptureRuntime(global) {
     return source;
   }
 
-  function patchGuildWarsWasmTableCapacity(source) {
+  function patchGuildWarsWasmTableCapacity(source, reserve) {
     const bytes = toPatchableBytes(source);
-    if (!bytes || bytes.length < 8 || !isGuildWarsWasm(bytes)) {
+    if (
+      !bytes ||
+      bytes.length < 8 ||
+      !isGuildWarsWasm(bytes) ||
+      !Number.isInteger(reserve) ||
+      reserve <= 0
+    ) {
       return source;
     }
 
@@ -434,8 +672,8 @@ export function createCaptureRuntime(global) {
       }
 
       const reservedMaximum = Math.max(
-        maxInfo.value + 64,
-        minInfo.value + 64
+        maxInfo.value + reserve,
+        minInfo.value + reserve
       );
       const newMaximum = writeVarU32(reservedMaximum);
       const newPayloadLength =
@@ -470,7 +708,66 @@ export function createCaptureRuntime(global) {
   }
 
   function prepareWasmSource(source) {
-    return patchGuildWarsWasmTableCapacity(patchGuildWarsWasmExports(source));
+    const bytes = toPatchableBytes(source);
+    const metadata = inspectWasmBytes(bytes);
+    if (!metadata || !isGuildWarsWasm(bytes)) {
+      state.wasmPreparation = Object.freeze({
+        actionPatchesEnabled: false,
+        buildId: metadata?.buildId || null,
+        reason: bytes ? "not-guild-wars-wasm" : "source-not-patchable",
+        status: "unchanged",
+      });
+      return source;
+    }
+
+    const manifest = getBuildManifest(metadata.buildId);
+    if (!manifest) {
+      state.wasmPreparation = Object.freeze({
+        actionPatchesEnabled: false,
+        buildId: metadata.buildId,
+        reason: "unsupported-build",
+        status: "unchanged",
+      });
+      debugLog("leaving unsupported Guild Wars WASM unmodified", {
+        buildId: metadata.buildId,
+      });
+      return source;
+    }
+
+    const validationErrors = validateBuildManifest(metadata, manifest);
+    if (validationErrors.length > 0) {
+      state.wasmPreparation = Object.freeze({
+        actionPatchesEnabled: false,
+        buildId: metadata.buildId,
+        errors: Object.freeze(validationErrors.slice()),
+        gameBuild: manifest.gameBuild,
+        reason: "manifest-mismatch",
+        status: "unchanged",
+        variant: manifest.variant,
+      });
+      debugLog("leaving mismatched Guild Wars WASM unmodified", {
+        buildId: metadata.buildId,
+        errors: validationErrors,
+      });
+      return source;
+    }
+
+    let patched = patchGuildWarsWasmExports(source, manifest.exportPatches);
+    patched = patchGuildWarsWasmTableCapacity(
+      patched,
+      manifest.callbackTableReserve
+    );
+    state.wasmPreparation = Object.freeze({
+      actionPatchesEnabled: manifest.exportPatches.length > 0,
+      buildId: metadata.buildId,
+      callbackTableReserve: manifest.callbackTableReserve,
+      exportPatchCount: manifest.exportPatches.length,
+      gameBuild: manifest.gameBuild,
+      reason: "known-build",
+      status: "patched",
+      variant: manifest.variant,
+    });
+    return patched;
   }
 
   function getCallableSignature(value) {
@@ -716,6 +1013,7 @@ export function createCaptureRuntime(global) {
       loader: state.loader,
       memoryByteLength: state.memory ? state.memory.buffer.byteLength : 0,
       memoryPageCount: state.memory ? state.memory.buffer.byteLength / 65536 : 0,
+      patchStatus: state.wasmPreparation,
       runtimeInitialized: state.runtimeInitialized,
       tableLength: state.table ? state.table.length : 0,
       wasmBuildId: moduleBuild ? moduleBuild.wasmBuildId : null,
@@ -979,6 +1277,7 @@ export function createCaptureRuntime(global) {
       module: state.wasmModule,
       imports: state.wrappedImports,
       memory: state.memory,
+      patchStatus: state.wasmPreparation,
       runtimeInitialized: state.runtimeInitialized,
       table: state.table,
     };
@@ -1299,6 +1598,9 @@ export function createCaptureRuntime(global) {
     },
     getRawImports() {
       return state.rawImports;
+    },
+    getPatchStatus() {
+      return state.wasmPreparation;
     },
     prepareWasmSource,
     getTable,

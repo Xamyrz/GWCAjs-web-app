@@ -1,0 +1,109 @@
+{
+  "name": "sanitized-lifecycle",
+  "schemaVersion": 1,
+  "steps": [
+    {
+      "name": "outpost",
+      "snapshot": {
+        "data": {
+          "build": {
+            "wasmBuildId": "known-build"
+          },
+          "gwca": {
+            "initialized": true
+          },
+          "managers": {
+            "map": {
+              "addresses": {
+                "mapContextAddress": "@p1"
+              },
+              "state": {
+                "mapId": 644
+              }
+            },
+            "party": {
+              "context": {
+                "valid": true
+              }
+            }
+          }
+        },
+        "sanitization": {
+          "nodeCount": 12,
+          "pointerCount": 1,
+          "redactedStringCount": 0,
+          "truncatedCount": 0
+        },
+        "schemaVersion": 1
+      },
+      "assertions": [
+        {
+          "expected": true,
+          "op": "equals",
+          "path": "gwca.initialized"
+        },
+        {
+          "op": "exists",
+          "path": "managers.map.addresses.mapContextAddress"
+        },
+        {
+          "expected": true,
+          "op": "equals",
+          "path": "managers.party.context.valid"
+        }
+      ]
+    },
+    {
+      "name": "explorable",
+      "snapshot": {
+        "data": {
+          "build": {
+            "wasmBuildId": "known-build"
+          },
+          "gwca": {
+            "initialized": true
+          },
+          "managers": {
+            "map": {
+              "addresses": {
+                "mapContextAddress": "@p2"
+              },
+              "state": {
+                "mapId": 548
+              }
+            },
+            "party": {
+              "context": {
+                "valid": true
+              }
+            }
+          }
+        },
+        "sanitization": {
+          "nodeCount": 12,
+          "pointerCount": 1,
+          "redactedStringCount": 0,
+          "truncatedCount": 0
+        },
+        "schemaVersion": 1
+      },
+      "assertions": [
+        {
+          "op": "changed-from",
+          "path": "managers.map.addresses.mapContextAddress",
+          "step": "outpost"
+        },
+        {
+          "op": "changed-from",
+          "path": "managers.map.state.mapId",
+          "step": "outpost"
+        },
+        {
+          "op": "same-as",
+          "path": "build.wasmBuildId",
+          "step": "outpost"
+        }
+      ]
+    }
+  ]
+}

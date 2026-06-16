@@ -144,7 +144,9 @@ assert.equal(
 );
 
 const altitudeState = {
-  anchors: {},
+  anchors: {
+    gameplayContextAddress: 0x12340000,
+  },
   hook: {
     callExport(name, pointAddress, radius, altitudeAddress, normalAddress) {
       assert.equal(name, "__gwca_map_query_altitude");
@@ -163,9 +165,23 @@ const altitudeState = {
         __gwca_map_query_altitude() {},
       };
     },
+    getPatchStatus() {
+      return {
+        actionPatchesEnabled: true,
+        reason: "known-build",
+      };
+    },
+    readU32(address) {
+      assert.equal(address, 0x28b680);
+      return 0x22220000;
+    },
     readF32: state.hook.readF32,
     writeBytes: state.hook.writeBytes,
     writeF32: state.hook.writeF32,
+    writeU32(address, value) {
+      assert.equal(address, 0x28b680);
+      assert.ok(value === 0x12340000 || value === 0x22220000);
+    },
   },
   memory: state.memory,
 };

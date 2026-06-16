@@ -1,6 +1,6 @@
 # GWCAjs Progress Checklist
 
-Last updated: 2026-06-07
+Last updated: 2026-06-11
 
 Execution plan: [`COMPLETION_PLAN.md`](COMPLETION_PLAN.md)
 
@@ -21,14 +21,18 @@ Execution plan: [`COMPLETION_PLAN.md`](COMPLETION_PLAN.md)
 - [x] `MapMgr` implementation is complete.
 - [x] Existing `InstanceInfo` deterministic test passes.
 - [x] Existing `MapTest` deterministic test passes.
+- [x] Exact-build manifest and fail-closed patch deterministic test passes.
 - [x] Memory safety, strings, scoped allocation, and growth test passes.
 - [x] Array, pointer-array, and list deterministic test passes.
 - [x] Temporary-buffer lifecycle and altitude deterministic test passes.
 - [x] GameContext child refresh and validation test passes.
 - [x] PartyContext and manager deterministic test passes.
+- [x] Shared internal-call runtime deterministic test passes.
+- [x] Sanitized snapshot/replay scenario test passes.
+- [x] Internal-call evidence audit passes.
 - [x] Live memory range, pointer, and scoped-allocation smoke test passes.
 - [ ] Full cross-manager regression suite exists.
-- [ ] Method-level native-to-JS API parity ledger exists.
+- [x] Method-level native-to-JS API parity ledger exists.
 
 ## Session Invariants
 
@@ -80,9 +84,9 @@ Execution plan: [`COMPLETION_PLAN.md`](COMPLETION_PLAN.md)
 
 ### Build And Calls
 
-- [ ] Central method-level API parity ledger.
-- [ ] Central build-aware internal-call registry.
-- [ ] Central export patch manifest consumed by `capture.js`.
+- [x] Central method-level API parity ledger.
+- [x] Central build-aware internal-call registry.
+- [x] Central export patch manifest consumed by `capture.js`.
 - [x] Whole-program old/current JSPI correlation tool.
 - [x] Build `38615` function mapping ledger generated.
 - [x] Build `38615` named analysis WASM generated and validated.
@@ -97,11 +101,11 @@ Execution plan: [`COMPLETION_PLAN.md`](COMPLETION_PLAN.md)
   in the old Ghidra project.
 - [ ] Promote review annotations only when independent evidence resolves them.
 - [ ] Resolve or confirm removal of four no-candidate old functions.
-- [ ] Shared scoped PropContext guard.
-- [ ] Shared internal-call argument validation.
-- [ ] Shared action status schema.
+- [x] Shared scoped PropContext guard.
+- [x] Shared internal-call argument validation.
+- [x] Shared action status schema.
 - [x] Export-presence tests.
-- [ ] Build mismatch fails closed.
+- [x] Build mismatch fails closed.
 - [ ] New-build snapshot/dump checklist automated or scripted.
 
 ### Lifecycle And Callbacks
@@ -193,7 +197,6 @@ Execution plan: [`COMPLETION_PLAN.md`](COMPLETION_PLAN.md)
 - [x] Implement hard-mode action.
 - [x] Live-test hard-mode action.
 - [x] Implement ready/tick action.
-- [x] Implement ready/tick toggle convenience action.
 - [x] Live-test ready/tick action.
 - [x] Implement leave-party action through the party-window callback.
 - [x] Live-test the replacement leave-party callback path. Direct
@@ -202,16 +205,15 @@ Execution plan: [`COMPLETION_PLAN.md`](COMPLETION_PLAN.md)
 - [x] Implement hero and henchman add/remove action candidates.
 - [x] Live-test hero and henchman add/remove actions.
 - [x] Implement party request and player invite/kick action candidates.
-- [ ] Live-test party request and player invite/kick actions.
+- [x] Live-test party request and player invite/kick actions.
 - [x] Implement incoming/outgoing party request list readers.
 - [x] Surface party leader names for pending incoming/outgoing requests.
 - [x] Implement cancel sent party invite by party id or leader name.
-- [ ] Live-test sent-invite cancellation through the party-client cancel
+- [x] Live-test sent-invite cancellation through the party-client cancel
   wrapper path.
 - [x] Implement return-to-outpost and hero/pet behavior action candidates.
 - [ ] Live-test return-to-outpost and hero/pet behavior actions.
-- [x] Implement search actions.
-- [ ] Implement flag actions.
+- [ ] Implement flag and search actions.
 - [x] Add deterministic read-only layout tests.
 - [x] Add deterministic hard-mode, ready/tick, and leave-party UI callback
   action/export tests.
@@ -408,7 +410,7 @@ Execution plan: [`COMPLETION_PLAN.md`](COMPLETION_PLAN.md)
 - [ ] Repeated `initialize()` is deterministic.
 - [ ] `terminate()` cleans every timer, callback, allocation owner, and cache.
 - [ ] Reinitialize after terminate works.
-- [ ] Full deterministic suite passes.
+- [x] Full deterministic suite passes.
 - [ ] Full manual end-to-end matrix passes.
 - [ ] Outpost-to-explorable transition passes with all managers initialized.
 - [ ] Character switch passes without stale pointers.

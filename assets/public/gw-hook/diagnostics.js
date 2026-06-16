@@ -554,6 +554,7 @@
         const recentEvents = dump ? dump.events.slice(-5) : [];
         const recentActions = dump ? dump.actions.slice(-4) : [];
         const buildInfo = dump && dump.hook ? dump.hook.buildInfo : null;
+        const patchStatus = buildInfo ? buildInfo.patchStatus : null;
         const context = readContextPeek();
         const lines = [
           "GW Debug",
@@ -562,6 +563,10 @@
           "flags: imageDb=" + (global.__GW_DISABLE_IMAGE_DB__ ? "off" : "on")
             + " jspi=" + (global.__GW_DISABLE_JSPI__ ? "off" : "on"),
           "build: " + (buildInfo ? buildInfo.wasmBuildId || buildInfo.buildId || "-" : "-"),
+          "patches: " + (patchStatus
+            ? patchStatus.reason
+              + " actions=" + (patchStatus.actionPatchesEnabled ? "on" : "off")
+            : "-"),
           "captures: " + (buildInfo ? buildInfo.captureCount : 0)
             + " fetches: " + (dump ? dump.fetches.length : 0)
             + " errors: " + (dump ? dump.windowErrors.length : 0),

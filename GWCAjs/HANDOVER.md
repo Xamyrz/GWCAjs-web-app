@@ -1,6 +1,6 @@
 # GWCAjs Browser/WASM Handover
 
-Last updated: 2026-06-08
+Last updated: 2026-06-11
 
 Target game build: `38615`
 
@@ -38,8 +38,8 @@ from memory dumps into documentation.
 
 Location: `assets/public/gw-hook/`
 
-- `capture.js`: intercepts WASM instantiation and patches selected exports by
-  function index.
+- `capture.js`: intercepts WASM instantiation and applies selected exports only
+  after exact build-manifest validation.
 - `memory.js`: memory access support.
 - `scanner.js`: browser-side scanning support.
 - `api.js` and `bootstrap.js`: hook initialization and API exposure.
@@ -50,6 +50,90 @@ Location: `assets/public/gw-hook/`
 
 Do not automatically launch the game, Chromium, or a probe. The game download
 is slow and live testing should be deliberate.
+
+### Build-gated WASM patching
+
+Build-specific export and callback-table patches are declared in
+`assets/public/gw-runtime/build-manifests.js`. Before modifying raw WASM,
+`capture.js` validates:
+
+- the exact raw `build_id`
+- type, imported-function, defined-function, and export counts
+- the function table count, element type, initial size, and maximum
+- every exported function index against its expected WASM type index
+
+The authoritative build `38615` JSPI module receives its declared action/text
+exports and callback-table reserve. The known sibling non-JSPI module receives
+only the callback-table reserve because its function indexes are not
+authoritative for live JSPI actions.
+
+Unknown builds and known IDs with a mismatched module shape are captured
+without modification. `GWHook.getPatchStatus()`,
+`GWHook.getBuildInfo().patchStatus`, the debug panel, and the inspector report
+the decision. Deterministic coverage is in
+`GWCAjs/Tests/BuildManifest.test.mjs`.
+
+### Common internal-call runtime and evidence
+
+`GWCAjs/Evidence/InternalCalls.js` is the source ledger for build-specific
+callable metadata. It records function and type indexes, export names, raw
+WASM signatures, addresses, PropContext requirements, verification state, and
+source evidence. Generated views live at:
+
+```text
+GWCAjs/Evidence/internal-calls.json
+GWCAjs/Evidence/INTERNAL_CALLS.md
+```
+
+`GWCAjs/Source/InternalCallRuntime.js` consumes those definitions for Player,
+Map, Guild, Party, and text-decoder internals. It fails closed when the build
+manifest is unsupported or mismatched, validates raw arguments, checks export
+availability, and restores the PropContext slot in `finally`, including nested
+calls.
+
+Use the RE workbench instead of manually joining indexes across files:
+
+```bash
+node GWCAjs/Tools/re.mjs list --manager Party
+node GWCAjs/Tools/re.mjs show Map.QueryAltitude
+node GWCAjs/Tools/re.mjs verify 10733
+node GWCAjs/Tools/re.mjs audit
+node GWCAjs/Tools/re.mjs check
+node GWCAjs/Tools/re.mjs generate
+```
+
+The current audit has no errors. One warning remains for
+`Party.CancelPartyInvite`: the old mapped symbol name differs from the
+live-validated current wrapper behavior.
+
+### Snapshot replay and API parity
+
+Sanitized offline scenarios live under `GWCAjs/Fixtures/Scenarios/`.
+`capture-snapshot-live.mjs` only attaches to an already-running Chromium CDP
+target; it never launches the browser or game. It redacts sensitive strings,
+rebases pointer-like values to stable labels, and bounds object traversal
+before writing a fixture.
+
+```bash
+node GWCAjs/Tools/capture-snapshot-live.mjs --help
+node GWCAjs/Tools/run-scenarios.mjs
+```
+
+Generated native-to-browser API parity lives at:
+
+```text
+GWCAjs/Generated/api-parity.json
+GWCAjs/Generated/API_PARITY.md
+```
+
+The build-independent baseline currently contains 480 unique native methods:
+95 implemented, 6 explicitly unavailable/adapted, and 379 not started.
+Browser-only diagnostics are listed separately. Regenerate or verify it with:
+
+```bash
+node GWCAjs/Tools/generate-api-parity.mjs
+node GWCAjs/Tools/generate-api-parity.mjs --check
+```
 
 ### Chromium live testing
 
@@ -145,8 +229,10 @@ The main implemented areas are:
 - `PlayerMgr.js`: exposes the GWCA-style player API and title operations.
 - `PlayerMgrState.js`: owns player address caching, fast-path resolution, and
   player diagnostics.
-- `PlayerMgrInternals.js`: owns current-build internal function metadata and
-  guarded message calls.
+- `PlayerMgrInternals.js`: delegates guarded message calls to the common
+  internal-call runtime.
+- `InternalCallRuntime.js`: owns build gating, ABI validation, PropContext
+  scoping, export checks, and shared call/status results.
 - `MemoryMgr.js`: memory primitives.
 - `GamePos.js`: positional type foundation; currently minimal.
 
@@ -154,8 +240,9 @@ Validated array, Player, Title, CharContext, GameContext, and WorldContext
 layouts now live under their mirrored `GWCAjs/Include/GWCA/` paths instead of
 being duplicated inside `PlayerMgr.js`.
 
-Many other manager files are placeholders or incomplete, including Guild,
-Party, Agent, Item, Skillbar, Chat, Quest, Merchant, Trade, Camera, Effect,
+Guild and Party are implemented manager surfaces with some remaining live
+action verification. Many other manager files are placeholders or incomplete,
+including Agent, Item, Skillbar, Chat, Quest, Merchant, Trade, Camera, Effect,
 Event, FriendList, and Storage managers.
 
 ### Shared memory foundation
@@ -294,6 +381,11 @@ Use Ghidra MCP to:
 - `wasm-objdump`: inspect imports, exports, function types, and code.
 - Node.js: syntax and module-import checks.
 - Git: inspect local changes without reverting unrelated work.
+- `node GWCAjs/Tools/re.mjs check`: audit callable evidence and verify the
+  generated views are current.
+- `node GWCAjs/Tools/run-scenarios.mjs`: replay sanitized lifecycle fixtures.
+- `node GWCAjs/Tools/generate-api-parity.mjs --check`: verify API parity
+  outputs are current.
 
 ### Browser tools
 
@@ -684,9 +776,10 @@ The preferred pattern is:
 
 1. Identify a safe lower-level message function.
 2. Verify its current-build index and raw WASM signature.
-3. Patch it into the export list in `assets/public/gw-hook/capture.js`.
-4. Wrap it with argument validation and useful status metadata.
-5. Test through the debug panel before exposing it as stable.
+3. Add its evidence definition and exact-build manifest patch.
+4. Call it through the common internal-call runtime.
+5. Add deterministic argument/status tests.
+6. Test through the debug panel before exposing it as stable.
 
 High-level `CharCli*` functions can enter unsuitable asyncify/prologue paths or
 assert on browser PropContext state. Public APIs therefore route to verified
@@ -1166,12 +1259,13 @@ argument tests but still require live validation.
 
 ## Recommended Next Steps
 
-1. Reload the browser and live-validate `GWCAjs.Party.Describe()` while solo in
-   an outpost.
-2. Repeat Party validation with heroes/henchmen added.
-3. Live-test the new hero, pet, and attribute readers with matching entities
-   present.
-4. Verify the next Party action sender, likely add/remove henchman or hero,
-   using packet opcode and current function index evidence.
-5. Keep investigating a static root anchor in Ghidra, but retain the validated
-   root scan as the default fallback.
+1. Start the next manager slice from the generated parity gaps, with
+   `AgentMgr` as the strongest dependency unlock.
+2. Capture sanitized outpost, explorable, and map-transition snapshots from an
+   existing Chromium session, then add cross-step replay assertions.
+3. Extend `re.mjs` evidence as each Agent callable or layout is verified;
+   avoid manager-local index tables.
+4. Script the remaining new-build extraction/hash/dump checklist around the
+   existing manifest and evidence audits.
+5. Keep investigating a static root anchor in Ghidra, while retaining the
+   validated root scan as the supported fallback.

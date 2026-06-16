@@ -1,6 +1,6 @@
 # GWCAjs Completion Plan
 
-Last updated: 2026-06-07
+Last updated: 2026-06-11
 
 Target game build: `38615`
 
@@ -59,11 +59,15 @@ and record the compatibility difference in the parity ledger.
 | Shared `Context` and root promotion | Implemented and live validated |
 | `PlayerMgr` | Implemented, native API names represented 17/17 |
 | `MapMgr` | Implemented, native API names represented 33/33 |
+| Common internal-call runtime | Implemented for Player, Map, Guild, Party, and text decoding |
+| Internal-call evidence ledger | Generated and audited from `Evidence/InternalCalls.js` |
+| API parity ledger | Generated baseline: 95 implemented, 6 adapted, 379 not started |
+| Snapshot/replay | Sanitized pointer-rebased fixtures and offline scenario assertions implemented |
 | `MemoryMgr` and `Scanner` | Growth-safe checked memory, bounded strings, scoped/reusable allocation, arrays, pointer arrays, and lists implemented |
 | `GameThreadMgr`, `RenderMgr`, `UIMgr` | Initialization placeholders only |
 | Other native managers | Empty placeholders |
 | Context/entity/container readers | On-demand GameContext child pointers are centralized; layouts remain complete only for Player/Map paths |
-| Deterministic tests | `Memory`, `Containers`, `TemporaryBuffer`, `ContextChildren`, `Guild`, `Party`, `InstanceInfo`, and `MapTest` |
+| Deterministic tests | Memory, containers, contexts, manifests, internal calls, implemented managers, text decoding, parity, and replay fixtures |
 | Manual testing | Strong coverage for current Player/Map paths |
 
 Native header declaration counts are useful for estimating scope, but they are
@@ -127,13 +131,27 @@ node GWCAjs/Tests/Memory.test.mjs
 node GWCAjs/Tests/Containers.test.mjs
 node GWCAjs/Tests/TemporaryBuffer.test.mjs
 node GWCAjs/Tests/ContextChildren.test.mjs
+node GWCAjs/Tests/BuildManifest.test.mjs
+node GWCAjs/Tests/CaptureTable.test.mjs
 node GWCAjs/Tests/Guild.test.mjs
 node GWCAjs/Tests/Party.test.mjs
 node GWCAjs/Tests/InstanceInfo.test.mjs
 node GWCAjs/Tests/MapTest.test.mjs
+node GWCAjs/Tests/TextDecoder.test.mjs
+node GWCAjs/Tests/InternalCallRuntime.test.mjs
+node GWCAjs/Tests/SnapshotReplay.test.mjs
+node GWCAjs/Tests/ApiParity.test.mjs
 ```
 
 Every new manager should add focused tests that can run without the game.
+
+Run the generated-ledger and replay checks with:
+
+```bash
+node GWCAjs/Tools/re.mjs check
+node GWCAjs/Tools/run-scenarios.mjs
+node GWCAjs/Tools/generate-api-parity.mjs --check
+```
 
 ### WASM extraction and dumps
 
@@ -222,18 +240,22 @@ Complete these shared facilities before multiplying manager-specific code.
 
 ### 1. API parity ledger
 
-Create a method-level ledger from every native manager header with:
+The generated method-level representation ledger is:
 
-- native signature
-- JS name and argument adaptation
-- `not-started`, `layout-verified`, `implemented`, `static-tested`,
-  `live-tested`, or `adapted` state
-- required context/layout
-- action export/status name
-- test scenario and evidence link
+```text
+GWCAjs/Generated/api-parity.json
+GWCAjs/Generated/API_PARITY.md
+```
 
-The ledger is the authoritative measurement of parity. Empty methods or silent
-`false`/`null` placeholders do not count as implemented.
+Regenerate it with `node GWCAjs/Tools/generate-api-parity.mjs`, and use
+`--check` in verification runs. It derives unique native method names and
+signatures from every manager header, collapses overloads, recognizes exact
+browser method names, records explicit unavailable adaptations, and lists
+browser-only diagnostics separately.
+
+This ledger measures API representation only. Layout, static, deterministic,
+and live verification remain separate evidence dimensions. Empty methods or
+silent `false`/`null` placeholders do not count as implemented.
 
 ### 2. Memory and allocation toolkit
 
@@ -288,7 +310,8 @@ Do not bulk-copy native offsets into JS without manager-specific invariants.
 
 ### 5. Internal-call registry
 
-Move callable metadata toward one build-aware registry containing:
+Build-aware callable metadata now lives in
+`GWCAjs/Evidence/InternalCalls.js`, containing:
 
 - public purpose
 - export name
@@ -299,15 +322,38 @@ Move callable metadata toward one build-aware registry containing:
 - PropContext/game-thread requirements
 - static and live verification state
 
-`capture.js` should consume a clear patch manifest. Managers should call only
-through guarded internals helpers and expose action status.
+`capture.js` consumes the exact-build patch manifest. Player, Map, Guild,
+Party, and text-decoder internals consume the evidence definitions through
+`Source/InternalCallRuntime.js`, which provides:
+
+- exact-build and patch-status gating
+- export availability checks
+- raw WASM ABI argument validation
+- reentrant scoped PropContext installation and restoration
+- a shared action-status and call-result shape
+
+Build `38615` now has an exact-build export patch manifest under
+`assets/public/gw-runtime/build-manifests.js`. Before modifying a module, the
+capture hook validates its raw `build_id`, function/import/export/type counts,
+function table shape, and every patched function's WASM type index. Unknown or
+structurally mismatched builds remain unmodified and expose read-only capture
+diagnostics.
+
+Audit or inspect the joined ledger, symbol mapping, manifest, and source
+evidence with:
+
+```bash
+node GWCAjs/Tools/re.mjs audit
+node GWCAjs/Tools/re.mjs show Map.QueryAltitude
+node GWCAjs/Tools/re.mjs verify 10733
+node GWCAjs/Tools/re.mjs check
+node GWCAjs/Tools/re.mjs generate
+```
 
 ### 6. Browser lifecycle and callbacks
 
 Implement shared equivalents for:
 
-- scoped PropContext installation/restoration
-- safe internal invocation
 - game-tick scheduling
 - callback registration/removal and altitude ordering
 - UI messages, frame callbacks, events, and StoC dispatch
@@ -316,6 +362,29 @@ Implement shared equivalents for:
 
 This foundation is required before callback-heavy GWCA APIs can be considered
 complete.
+
+Scoped PropContext handling and guarded internal invocation are complete in
+the shared internal-call runtime. Callback scheduling, dispatch, and lifecycle
+cleanup remain open.
+
+### 7. Snapshot and replay
+
+`Tools/capture-snapshot-live.mjs` attaches only to an existing Chromium CDP
+target. It sanitizes strings, rebases pointer-like values to stable labels,
+bounds traversal, and writes scenario JSON without raw live memory dumps.
+
+`Tools/run-scenarios.mjs` replays fixtures under
+`Fixtures/Scenarios/` offline. Assertions cover value, existence, type,
+length, pattern, and cross-step stability/change checks.
+
+Capture is deliberately separate from replay:
+
+```bash
+node GWCAjs/Tools/capture-snapshot-live.mjs \
+  --name map-transition \
+  --step before
+node GWCAjs/Tools/run-scenarios.mjs
+```
 
 ## Implementation Order
 

@@ -1,0 +1,5556 @@
+{
+  "managers": [
+    {
+      "browserOnly": [],
+      "counts": {
+        "adapted": 0,
+        "browserOnly": 0,
+        "implemented": 0,
+        "nativeMethods": 30,
+        "notStarted": 30
+      },
+      "headerPath": "gwca/Include/GWCA/Managers/AgentMgr.h",
+      "manager": "AgentMgr",
+      "methods": [
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "AsyncDecodeStr",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool AsyncDecodeStr(wchar_t* enc_str,std::wstring& res)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "AsyncGetAgentName",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool AsyncGetAgentName(const Agent *agent,std::wstring& name)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "CallTarget",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool CallTarget(uint32_t agent_id)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "ChangeTarget",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool ChangeTarget(const Agent *agent)",
+            "bool ChangeTarget(AgentID agent_id)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetAgentArray",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "AgentArray* GetAgentArray()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetAgentByID",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "Agent *GetAgentByID(uint32_t id)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetAgentEncName",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "wchar_t* GetAgentEncName(const Agent* agent)",
+            "wchar_t* GetAgentEncName(uint32_t agent_id)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetAgentIdByLoginNumber",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "uint32_t GetAgentIdByLoginNumber(uint32_t login_number)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetAmountOfPlayersInInstance",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "uint32_t GetAmountOfPlayersInInstance()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetControlledCharacter",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "AgentLiving* GetControlledCharacter()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetControlledCharacterId",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "uint32_t GetControlledCharacterId()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetHeroAgentID",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "AgentID GetHeroAgentID(uint32_t hero_index)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetIsAgentTargettable",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool GetIsAgentTargettable(const GW::Agent* agent)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetMapAgentArray",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "MapAgentArray* GetMapAgentArray()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetMapAgentByID",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "MapAgent* GetMapAgentByID(uint32_t agent_id)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetMouseoverId",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "uint32_t GetMouseoverId()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetNPCArray",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "NPCArray* GetNPCArray()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetNPCByID",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "NPC *GetNPCByID(uint32_t npc_id)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetObservingAgent",
+          "nativeExported": false,
+          "nativeSignatures": [
+            "inline Agent *GetObservingAgent()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetObservingId",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "uint32_t GetObservingId()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetPlayerArray",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "PlayerArray* GetPlayerArray()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetPlayerByID",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "Agent *GetPlayerByID(uint32_t player_id)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetPlayerNameByLoginNumber",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "wchar_t *GetPlayerNameByLoginNumber(uint32_t login_number)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetTarget",
+          "nativeExported": false,
+          "nativeSignatures": [
+            "inline Agent *GetTarget()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetTargetAsAgentLiving",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "AgentLiving *GetTargetAsAgentLiving()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetTargetId",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "uint32_t GetTargetId()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "InteractAgent",
+          "nativeExported": false,
+          "nativeSignatures": [
+            "bool InteractAgent(const Agent* agent,bool call_target = false)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "IsObserving",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool IsObserving()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "Move",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool Move(float x,float y,uint32_t zplane = 0)",
+            "bool Move(GamePos pos)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "SendDialog",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool SendDialog(uint32_t dialog_id)"
+          ],
+          "state": "not-started"
+        }
+      ],
+      "sourcePath": "GWCAjs/Source/AgentMgr.js"
+    },
+    {
+      "browserOnly": [],
+      "counts": {
+        "adapted": 0,
+        "browserOnly": 0,
+        "implemented": 0,
+        "nativeMethods": 14,
+        "notStarted": 14
+      },
+      "headerPath": "gwca/Include/GWCA/Managers/CameraMgr.h",
+      "manager": "CameraMgr",
+      "methods": [
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "ComputeCamPos",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "Vec3f ComputeCamPos(float dist = 0)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "ForwardMovement",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool ForwardMovement(float amount,bool true_forward)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetCamera",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "Camera *GetCamera()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetCameraUnlock",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool GetCameraUnlock()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetFieldOfView",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "float GetFieldOfView()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetYaw",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "float GetYaw()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "RotateMovement",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool RotateMovement(float angle)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "SetFieldOfView",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool SetFieldOfView(float fov)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "SetFog",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool SetFog(bool flag)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "SetMaxDist",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool SetMaxDist(float dist = 900.0f)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "SideMovement",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool SideMovement(float amount)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "UnlockCam",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool UnlockCam(bool flag)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "UpdateCameraPos",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool UpdateCameraPos()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "VerticalMovement",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool VerticalMovement(float amount)"
+          ],
+          "state": "not-started"
+        }
+      ],
+      "sourcePath": "GWCAjs/Source/CameraMgr.js"
+    },
+    {
+      "browserOnly": [],
+      "counts": {
+        "adapted": 0,
+        "browserOnly": 0,
+        "implemented": 0,
+        "nativeMethods": 20,
+        "notStarted": 20
+      },
+      "headerPath": "gwca/Include/GWCA/Managers/ChatMgr.h",
+      "manager": "ChatMgr",
+      "methods": [
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "AddToChatLog",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool AddToChatLog(wchar_t* message,uint32_t channel)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "CreateCommand",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "void CreateCommand(const wchar_t* cmd,ChatCommandCallback callback)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "DeleteCommand",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "void DeleteCommand(const wchar_t* cmd)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "FormatChatMessage",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "std::string FormatChatMessage(const std::string message,int r,int g,int b)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetChannel",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "Channel GetChannel(char opcode)",
+            "Channel GetChannel(wchar_t opcode)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetChannelColors",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "void GetChannelColors(Channel chan,Color* sender,Color* message)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetChatLog",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "Chat::ChatBuffer* GetChatLog()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetDefaultColors",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "void GetDefaultColors(Channel chan,Color* sender,Color* message)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetIsTyping",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool GetIsTyping()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "SendChat",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool SendChat(char channel,const wchar_t* msg)",
+            "bool SendChat(char channel,const char* msg)",
+            "bool SendChat(const wchar_t* from,const wchar_t* msg)",
+            "bool SendChat(const char* from,const char* msg)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "SendFakeChat",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "void SendFakeChat(int channel,std::string message)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "SendFakeChatColored",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "void SendFakeChatColored(int channel,std::string message,int r,int g,int b)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "SetMessageColor",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "Color SetMessageColor(Channel chan,Color col)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "SetSenderColor",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "Color SetSenderColor(Channel chan,Color col)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "SetTimestampsColor",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "void SetTimestampsColor(Color color)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "SetTimestampsFormat",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "void SetTimestampsFormat(bool use_24h,bool show_timestamp_seconds = false)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "ToggleTimestamps",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "void ToggleTimestamps(bool enable)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "WriteChat",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "void WriteChat(Channel channel,const wchar_t* message,const wchar_t* sender = nullptr,bool transient = false)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "WriteChatEnc",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "void WriteChatEnc(Channel channel,const wchar_t* message,const wchar_t* sender = nullptr,bool transient = false)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "WriteChatF",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "void WriteChatF(Channel channel,const wchar_t* format,...)"
+          ],
+          "state": "not-started"
+        }
+      ],
+      "sourcePath": "GWCAjs/Source/ChatMgr.js"
+    },
+    {
+      "browserOnly": [],
+      "counts": {
+        "adapted": 0,
+        "browserOnly": 0,
+        "implemented": 0,
+        "nativeMethods": 12,
+        "notStarted": 12
+      },
+      "headerPath": "gwca/Include/GWCA/Managers/EffectMgr.h",
+      "manager": "EffectMgr",
+      "methods": [
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "DropBuff",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool DropBuff(uint32_t buff_id)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetAgentBuffs",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "BuffArray* GetAgentBuffs(uint32_t agent_id)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetAgentEffects",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "EffectArray* GetAgentEffects(uint32_t agent_id)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetAgentEffectsArray",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "AgentEffects* GetAgentEffectsArray(uint32_t agent_id)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetAlcoholLevel",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "uint32_t GetAlcoholLevel()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetDrunkAf",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "void GetDrunkAf(uint32_t intensity,uint32_t tint)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetPartyEffectsArray",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "AgentEffectsArray* GetPartyEffectsArray()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetPlayerBuffBySkillId",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "Buff *GetPlayerBuffBySkillId(Constants::SkillID skill_id)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetPlayerBuffs",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "BuffArray* GetPlayerBuffs()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetPlayerEffectBySkillId",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "Effect * GetPlayerEffectBySkillId(Constants::SkillID skill_id)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetPlayerEffects",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "EffectArray* GetPlayerEffects()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetPlayerEffectsArray",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "AgentEffects* GetPlayerEffectsArray()"
+          ],
+          "state": "not-started"
+        }
+      ],
+      "sourcePath": "GWCAjs/Source/EffectMgr.js"
+    },
+    {
+      "browserOnly": [],
+      "counts": {
+        "adapted": 0,
+        "browserOnly": 0,
+        "implemented": 0,
+        "nativeMethods": 2,
+        "notStarted": 2
+      },
+      "headerPath": "gwca/Include/GWCA/Managers/EventMgr.h",
+      "manager": "EventMgr",
+      "methods": [
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "RegisterEventCallback",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "void RegisterEventCallback(HookEntry *entry,EventID event_id,const EventCallback& callback,int altitude = -0x8000)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "RemoveEventCallback",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "void RemoveEventCallback(HookEntry *entry)"
+          ],
+          "state": "not-started"
+        }
+      ],
+      "sourcePath": "GWCAjs/Source/EventMgr.js"
+    },
+    {
+      "browserOnly": [],
+      "counts": {
+        "adapted": 0,
+        "browserOnly": 0,
+        "implemented": 0,
+        "nativeMethods": 13,
+        "notStarted": 13
+      },
+      "headerPath": "gwca/Include/GWCA/Managers/FriendListMgr.h",
+      "manager": "FriendListMgr",
+      "methods": [
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "AddFriend",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool AddFriend(const wchar_t *name,const wchar_t *alias = nullptr)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "AddIgnore",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool AddIgnore(const wchar_t *name,const wchar_t *alias = nullptr)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetFriend",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "Friend *GetFriend(const wchar_t *alias,const wchar_t *charname,FriendType type = (FriendType)1)",
+            "Friend *GetFriend(uint32_t index)",
+            "Friend *GetFriend(const uint8_t *uuid)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetFriendList",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "FriendList *GetFriendList()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetMyStatus",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "FriendStatus GetMyStatus()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetNumberOfFriends",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "uint32_t GetNumberOfFriends(FriendType = (FriendType)1)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetNumberOfIgnores",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "uint32_t GetNumberOfIgnores()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetNumberOfPartners",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "uint32_t GetNumberOfPartners()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetNumberOfTraders",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "uint32_t GetNumberOfTraders()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "RegisterFriendStatusCallback",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "void RegisterFriendStatusCallback(HookEntry *entry,const FriendStatusCallback& callback)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "RemoveFriend",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool RemoveFriend(Friend *_friend)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "RemoveFriendStatusCallback",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "void RemoveFriendStatusCallback(HookEntry *entry)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "SetFriendListStatus",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool SetFriendListStatus(FriendStatus status)"
+          ],
+          "state": "not-started"
+        }
+      ],
+      "sourcePath": "GWCAjs/Source/FriendListMgr.js"
+    },
+    {
+      "browserOnly": [],
+      "counts": {
+        "adapted": 0,
+        "browserOnly": 0,
+        "implemented": 0,
+        "nativeMethods": 5,
+        "notStarted": 5
+      },
+      "headerPath": "gwca/Include/GWCA/Managers/GameThreadMgr.h",
+      "manager": "GameThreadMgr",
+      "methods": [
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "ClearCalls",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "void ClearCalls()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "Enqueue",
+          "nativeExported": false,
+          "nativeSignatures": [
+            "void Enqueue(std::function<void ()> f)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "IsInGameThread",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool IsInGameThread()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "RegisterGameThreadCallback",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "void RegisterGameThreadCallback(HookEntry *entry,const GameThreadCallback& callback,int altitude = 0x4000)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "RemoveGameThreadCallback",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "void RemoveGameThreadCallback(HookEntry *entry)"
+          ],
+          "state": "not-started"
+        }
+      ],
+      "sourcePath": "GWCAjs/Source/GameThreadMgr.js"
+    },
+    {
+      "browserOnly": [
+        {
+          "expression": "(name, ...args) {",
+          "name": "CallInternalFunction"
+        },
+        {
+          "expression": "() {",
+          "name": "Describe"
+        },
+        {
+          "expression": "(name) {",
+          "name": "GetActionStatus"
+        },
+        {
+          "expression": "() {",
+          "name": "GetActionStatuses"
+        },
+        {
+          "expression": ": getContext,",
+          "name": "GetContext"
+        },
+        {
+          "expression": "() {",
+          "name": "GetGuildHistory"
+        },
+        {
+          "expression": "() {",
+          "name": "GetGuildRoster"
+        },
+        {
+          "expression": "(name) {",
+          "name": "GetInternalFunction"
+        },
+        {
+          "expression": "() {",
+          "name": "GetInternalFunctions"
+        },
+        {
+          "expression": "() {",
+          "name": "GetPlayerGuildHallKey"
+        },
+        {
+          "expression": "() {",
+          "name": "GetPlayerGuildRank"
+        },
+        {
+          "expression": "() {",
+          "name": "GetTownAlliances"
+        },
+        {
+          "expression": "(name) {",
+          "name": "GetUnsupportedAction"
+        },
+        {
+          "expression": "() {",
+          "name": "IsAvailable"
+        }
+      ],
+      "counts": {
+        "adapted": 0,
+        "browserOnly": 14,
+        "implemented": 9,
+        "nativeMethods": 9,
+        "notStarted": 0
+      },
+      "headerPath": "gwca/Include/GWCA/Managers/GuildMgr.h",
+      "manager": "GuildMgr",
+      "methods": [
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "() {",
+          "name": "GetCurrentGH",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "Guild* GetCurrentGH()"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "() {",
+          "name": "GetGuildArray",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "GuildArray* GetGuildArray()"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": ": getGuildInfo,",
+          "name": "GetGuildInfo",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "Guild* GetGuildInfo(uint32_t guild_id)"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "() {",
+          "name": "GetPlayerGuild",
+          "nativeExported": false,
+          "nativeSignatures": [
+            "Guild* GetPlayerGuild()"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "() {",
+          "name": "GetPlayerGuildAnnouncement",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "wchar_t *GetPlayerGuildAnnouncement()"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "() {",
+          "name": "GetPlayerGuildAnnouncer",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "wchar_t *GetPlayerGuildAnnouncer()"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "() {",
+          "name": "GetPlayerGuildIndex",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "uint32_t GetPlayerGuildIndex()"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "() {",
+          "name": "LeaveGH",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool LeaveGH()"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "(key = null, unknown0 = 0) {",
+          "name": "TravelGH",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool TravelGH()",
+            "bool TravelGH(GHKey key)"
+          ],
+          "state": "implemented"
+        }
+      ],
+      "sourcePath": "GWCAjs/Source/GuildMgr.js"
+    },
+    {
+      "browserOnly": [],
+      "counts": {
+        "adapted": 0,
+        "browserOnly": 0,
+        "implemented": 0,
+        "nativeMethods": 50,
+        "notStarted": 50
+      },
+      "headerPath": "gwca/Include/GWCA/Managers/ItemMgr.h",
+      "manager": "ItemMgr",
+      "methods": [
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "AsyncGetItemName",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "void AsyncGetItemName(const Item *item,std::wstring& name)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "CanInteractWithItem",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool CanInteractWithItem(const Item *item)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "CountItemByModelId",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "uint32_t CountItemByModelId(uint32_t model_id,int bag_start = 1,int bag_end = 4)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "DepositGold",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "uint32_t DepositGold(uint32_t amount = 0)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "DestroyItem",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool DestroyItem(uint32_t item_id)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "DropGold",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool DropGold(uint32_t amount = 1)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "DropItem",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool DropItem(const Item *item,uint32_t quantity)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "EquipItem",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool EquipItem(const Item *item,uint32_t agent_id = 0)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetBag",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "Bag *GetBag(Constants::Bag bag_id)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetBagArray",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "Bag **GetBagArray()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetBagByIndex",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "Bag *GetBagByIndex(uint32_t bag_index)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetCompositeModelInfo",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "const CompositeModelInfo* GetCompositeModelInfo(uint32_t model_file_id)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetCompositeModelInfoArray",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "const Array<CompositeModelInfo>& GetCompositeModelInfoArray()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetEquipmentVisibility",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "EquipmentStatus GetEquipmentVisibility(EquipmentType type)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetGoldAmountInStorage",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "uint32_t GetGoldAmountInStorage()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetGoldAmountOnCharacter",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "uint32_t GetGoldAmountOnCharacter()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetHoveredItem",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "Item *GetHoveredItem()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetInventory",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "Inventory* GetInventory()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetIsStorageOpen",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool GetIsStorageOpen(void)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetItemArray",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "ItemArray* GetItemArray()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetItemById",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "Item *GetItemById(uint32_t item_id)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetItemByModelId",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "Item *GetItemByModelId(uint32_t model_id,int bag_start = 1,int bag_end = 4)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetItemByModelIdAndModifiers",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "Item* GetItemByModelIdAndModifiers(uint32_t modelid,const ItemModifier* modifiers,uint32_t modifiers_len,int bagStart = 1,int bagEnd = 4)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetItemBySlot",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "Item *GetItemBySlot(const Bag *bag,uint32_t slot)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetItemFormula",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "const ItemFormula* GetItemFormula(const GW::Item* item)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetMaterialSlot",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "Constants::MaterialSlot GetMaterialSlot(const Item *item)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetMaterialStorageStackSize",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "uint32_t GetMaterialStorageStackSize()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetPvPItemInfo",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "const PvPItemInfo* GetPvPItemInfo(uint32_t pvp_item_idx)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetPvPItemInfoArray",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "const Array<PvPItemInfo>& GetPvPItemInfoArray()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetPvPItemUpgrade",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "const PvPItemUpgradeInfo* GetPvPItemUpgrade(uint32_t pvp_item_upgrade_idx)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetPvPItemUpgradeEncodedDescription",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool GetPvPItemUpgradeEncodedDescription(uint32_t pvp_item_upgrade_idx,wchar_t** out)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetPvPItemUpgradeEncodedName",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool GetPvPItemUpgradeEncodedName(uint32_t pvp_item_upgrade_idx,wchar_t** out)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetPvPItemUpgradesArray",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "const Array<PvPItemUpgradeInfo>& GetPvPItemUpgradesArray()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetSalvageSessionInfo",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "SalvageSessionInfo* GetSalvageSessionInfo()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetStoragePage",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "GW::Constants::StoragePane GetStoragePage(void)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "IdentifyItem",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool IdentifyItem(uint32_t identification_kit_id,uint32_t item_id)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "MoveItem",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool MoveItem(const Item *from,Constants::Bag bag_id,uint32_t slot,uint32_t quantity = 0)",
+            "bool MoveItem(const Item *item,const Bag *bag,uint32_t slot,uint32_t quantity = 0)",
+            "bool MoveItem(const Item *from,const Item *to,uint32_t quantity = 0)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "OpenXunlaiWindow",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "void OpenXunlaiWindow(bool anniversary_pane_unlocked = true)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "PickUpItem",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool PickUpItem(const Item *item,uint32_t call_target = 0)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "PingWeaponSet",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool PingWeaponSet(uint32_t agent_id,uint32_t weapon_item_id,uint32_t offhand_item_id)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "RegisterItemClickCallback",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "void RegisterItemClickCallback(HookEntry *entry,const ItemClickCallback& callback)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "RemoveItemClickCallback",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "void RemoveItemClickCallback(HookEntry *entry)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "SalvageMaterials",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool SalvageMaterials()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "SalvageSessionCancel",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool SalvageSessionCancel()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "SalvageSessionDone",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool SalvageSessionDone()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "SalvageStart",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool SalvageStart(uint32_t salvage_kit_id,uint32_t item_id)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "SetEquipmentVisibility",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool SetEquipmentVisibility(EquipmentType type,EquipmentStatus state)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "UseItem",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool UseItem(const Item *item)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "UseItemByModelId",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool UseItemByModelId(uint32_t model_id,int bag_start = 1,int bag_end = 4)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "WithdrawGold",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "uint32_t WithdrawGold(uint32_t amount = 0)"
+          ],
+          "state": "not-started"
+        }
+      ],
+      "sourcePath": "GWCAjs/Source/ItemMgr.js"
+    },
+    {
+      "browserOnly": [
+        {
+          "expression": "(name, ...args) {",
+          "name": "CallInternalFunction"
+        },
+        {
+          "expression": "() {",
+          "name": "Describe"
+        },
+        {
+          "expression": "(options = {}) {",
+          "name": "FindBaseContextCandidates"
+        },
+        {
+          "expression": "(tableAddress, options = {}) {",
+          "name": "FindBasePtrSlotsForTable"
+        },
+        {
+          "expression": "(options = {}) {",
+          "name": "FindGameContextRootCandidates"
+        },
+        {
+          "expression": "(rootCandidate, options = {}) {",
+          "name": "FindGameContextRootReferences"
+        },
+        {
+          "expression": "(name, options = {}) {",
+          "name": "FindNativeCharContextsByPlayerName"
+        },
+        {
+          "expression": "(options = {}) {",
+          "name": "FindPropContextRootCandidates"
+        },
+        {
+          "expression": "(name) {",
+          "name": "GetActionStatus"
+        },
+        {
+          "expression": "() {",
+          "name": "GetActionStatuses"
+        },
+        {
+          "expression": "() {",
+          "name": "GetCharContextAddress"
+        },
+        {
+          "expression": "() {",
+          "name": "GetContextAddresses"
+        },
+        {
+          "expression": "() {",
+          "name": "GetGameplayContextAddress"
+        },
+        {
+          "expression": "(name) {",
+          "name": "GetInternalFunction"
+        },
+        {
+          "expression": "() {",
+          "name": "GetInternalFunctions"
+        },
+        {
+          "expression": "() {",
+          "name": "GetMapContextAddress"
+        },
+        {
+          "expression": "() {",
+          "name": "GetObserveMapID"
+        },
+        {
+          "expression": "() {",
+          "name": "GetObserveMapType"
+        },
+        {
+          "expression": "() {",
+          "name": "GetState"
+        },
+        {
+          "expression": "() {",
+          "name": "GetStateAddress"
+        },
+        {
+          "expression": "(name) {",
+          "name": "GetUnsupportedAction"
+        },
+        {
+          "expression": "(address, gameContextAddress) {",
+          "name": "InspectBaseContextTable"
+        },
+        {
+          "expression": "(address) {",
+          "name": "InspectGameContextRoot"
+        },
+        {
+          "expression": "(address) {",
+          "name": "InspectNativeCharContext"
+        },
+        {
+          "expression": "(address, options = {}) {",
+          "name": "InspectPropContextRoot"
+        },
+        {
+          "expression": "() {",
+          "name": "IsAvailable"
+        },
+        {
+          "expression": "() {",
+          "name": "MapTestGetState"
+        },
+        {
+          "expression": "(",
+          "name": "MapTestStartUnsafe"
+        },
+        {
+          "expression": "(target, options = {}) {",
+          "name": "PromoteBaseContextCandidate"
+        },
+        {
+          "expression": "(target, options = {}) {",
+          "name": "PromoteGameContextRootCandidate"
+        },
+        {
+          "expression": "(address) {",
+          "name": "PromoteNativeCharContextAddress"
+        },
+        {
+          "expression": "(name, options = {}) {",
+          "name": "PromoteNativeCharContextByPlayerName"
+        }
+      ],
+      "counts": {
+        "adapted": 0,
+        "browserOnly": 32,
+        "implemented": 33,
+        "nativeMethods": 33,
+        "notStarted": 0
+      },
+      "headerPath": "gwca/Include/GWCA/Managers/MapMgr.h",
+      "manager": "MapMgr",
+      "methods": [
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "() {",
+          "name": "CancelEnterChallenge",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool CancelEnterChallenge()"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "(identifier = 0x36d) {",
+          "name": "EnterChallenge",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool EnterChallenge()"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "() {",
+          "name": "GetCurrentMapInfo",
+          "nativeExported": false,
+          "nativeSignatures": [
+            "inline AreaInfo *GetCurrentMapInfo()"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "() {",
+          "name": "GetDistrict",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "int GetDistrict()"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "() {",
+          "name": "GetFoesKilled",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "uint32_t GetFoesKilled()"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "() {",
+          "name": "GetFoesToKill",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "uint32_t GetFoesToKill()"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "() {",
+          "name": "GetInstanceInfoPtr",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "uintptr_t GetInstanceInfoPtr()"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "() {",
+          "name": "GetInstanceTime",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "uint32_t GetInstanceTime()"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "() {",
+          "name": "GetInstanceType",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "Constants::InstanceType GetInstanceType()"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "() {",
+          "name": "GetIsInCinematic",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool GetIsInCinematic()"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "() {",
+          "name": "GetIsMapLoaded",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool GetIsMapLoaded()"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "(mapId) {",
+          "name": "GetIsMapUnlocked",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool GetIsMapUnlocked(Constants::MapID map_id)"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "() {",
+          "name": "GetIsObserving",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool GetIsObserving()"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "() {",
+          "name": "GetLanguage",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "GW::Constants::Language GetLanguage()"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "() {",
+          "name": "GetMapID",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "Constants::MapID GetMapID()"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "(mapId = 0) {",
+          "name": "GetMapInfo",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "AreaInfo *GetMapInfo(Constants::MapID map_id = (Constants::MapID)0)"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "(regionType) {",
+          "name": "GetMapTypeInstanceInfo",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "MapTypeInstanceInfo* GetMapTypeInstanceInfo(RegionType map_type)"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "() {",
+          "name": "GetMissionMapContext",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "MissionMapContext* GetMissionMapContext()"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "() {",
+          "name": "GetMissionMapIconArray",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "MissionMapIconArray* GetMissionMapIconArray()"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "() {",
+          "name": "GetPathingMap",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "PathingMapArray* GetPathingMap()"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "() {",
+          "name": "GetRegion",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "GW::Constants::ServerRegion GetRegion()"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "() {",
+          "name": "GetServerRegionPtr",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "uintptr_t GetServerRegionPtr()"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "() {",
+          "name": "GetWorldMapContext",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "WorldMapContext* GetWorldMapContext()"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "(district) {",
+          "name": "LanguageFromDistrict",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "Constants::Language LanguageFromDistrict(const GW::Constants::District _district)"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "() {",
+          "name": "MapTestGetCount",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "uint32_t MapTestGetCount()"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "() {",
+          "name": "MapTestGetStatus",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "const char* MapTestGetStatus()"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "() {",
+          "name": "MapTestIsActive",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool MapTestIsActive()"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "() {",
+          "name": "MapTestStart",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool MapTestStart(uint32_t map_id,uint32_t alt_map_id,int number = 2,uint32_t count = 3,uint32_t delay_ms = 0,uint32_t timeout_ms = 10000,uint32_t message_id = 0x10000098)"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "() {",
+          "name": "MapTestStop",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "void MapTestStop()"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "(position, radiusOrY = 0, outputOrZ = null, radius = 0, output = null) {",
+          "name": "QueryAltitude",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "int QueryAltitude(const GamePos& pos,float radius,float& alt,Vec3f* terrain_normal = nullptr)"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "(district) {",
+          "name": "RegionFromDistrict",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "Constants::ServerRegion RegionFromDistrict(const GW::Constants::District _district)"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "() {",
+          "name": "SkipCinematic",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool SkipCinematic()"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "(",
+          "name": "Travel",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool Travel(Constants::MapID map_id,GW::Constants::ServerRegion region,int district_number = 0,GW::Constants::Language language = (GW::Constants::Language)0)",
+            "bool Travel(Constants::MapID map_id,Constants::District district = (Constants::District)0,int district_number = 0)"
+          ],
+          "state": "implemented"
+        }
+      ],
+      "sourcePath": "GWCAjs/Source/MapMgr.js"
+    },
+    {
+      "browserOnly": [],
+      "counts": {
+        "adapted": 0,
+        "browserOnly": 0,
+        "implemented": 0,
+        "nativeMethods": 7,
+        "notStarted": 7
+      },
+      "headerPath": "gwca/Include/GWCA/Managers/MemoryMgr.h",
+      "manager": "MemoryMgr",
+      "methods": [
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetGWVersion",
+          "nativeExported": false,
+          "nativeSignatures": [
+            "static uint32_t GetGWVersion()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetGWWindowHandle",
+          "nativeExported": false,
+          "nativeSignatures": [
+            "static HWND GetGWWindowHandle()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetSkillTimer",
+          "nativeExported": false,
+          "nativeSignatures": [
+            "static DWORD GetSkillTimer()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "MemAlloc",
+          "nativeExported": false,
+          "nativeSignatures": [
+            "static void* MemAlloc(size_t size)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "MemFree",
+          "nativeExported": false,
+          "nativeSignatures": [
+            "static void MemFree(void* buf)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "MemRealloc",
+          "nativeExported": false,
+          "nativeSignatures": [
+            "static void* MemRealloc(void* buf,size_t newSize)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "Scan",
+          "nativeExported": false,
+          "nativeSignatures": [
+            "static bool Scan()"
+          ],
+          "state": "not-started"
+        }
+      ],
+      "sourcePath": "GWCAjs/Source/MemoryMgr.js"
+    },
+    {
+      "browserOnly": [],
+      "counts": {
+        "adapted": 0,
+        "browserOnly": 0,
+        "implemented": 0,
+        "nativeMethods": 3,
+        "notStarted": 3
+      },
+      "headerPath": "gwca/Include/GWCA/Managers/MerchantMgr.h",
+      "manager": "MerchantMgr",
+      "methods": [
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetMerchantItemsArray",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "MerchItemArray* GetMerchantItemsArray()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "RequestQuote",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool RequestQuote(TransactionType type,QuoteInfo give,QuoteInfo recv)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "TransactItems",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool TransactItems(TransactionType type,uint32_t gold_give,TransactionInfo give,uint32_t gold_recv,TransactionInfo recv)"
+          ],
+          "state": "not-started"
+        }
+      ],
+      "sourcePath": "GWCAjs/Source/MerchantMgr.js"
+    },
+    {
+      "browserOnly": [
+        {
+          "expression": "(partyId) {",
+          "name": "CancelPartyInvite"
+        },
+        {
+          "expression": "(heroIndex = 1) {",
+          "name": "DecodeHeroNameByIndex"
+        },
+        {
+          "expression": "(ownerAgentId = 0) {",
+          "name": "DecodePetName"
+        },
+        {
+          "expression": "() {",
+          "name": "Describe"
+        },
+        {
+          "expression": ": getActionStatus,",
+          "name": "GetActionStatus"
+        },
+        {
+          "expression": ": getAllActionStatuses,",
+          "name": "GetActionStatuses"
+        },
+        {
+          "expression": "(heroIndex = 1) {",
+          "name": "GetHeroInfoByIndex"
+        },
+        {
+          "expression": ": getHeroPartyMember,",
+          "name": "GetHeroPartyMember"
+        },
+        {
+          "expression": ": getContext,",
+          "name": "GetPartyContext"
+        },
+        {
+          "expression": "() {",
+          "name": "GetPartyRequests"
+        },
+        {
+          "expression": "() {",
+          "name": "GetPartySearchArray"
+        },
+        {
+          "expression": "() {",
+          "name": "GetPendingPartyRequests"
+        },
+        {
+          "expression": "() {",
+          "name": "GetSendingPartyRequests"
+        },
+        {
+          "expression": ": textDecoder.getStatus,",
+          "name": "GetTextDecoderStatus"
+        },
+        {
+          "expression": ": getActionStatus,",
+          "name": "GetUnsupportedAction"
+        },
+        {
+          "expression": ": HERO_BEHAVIOR,",
+          "name": "HeroBehavior"
+        }
+      ],
+      "counts": {
+        "adapted": 6,
+        "browserOnly": 16,
+        "implemented": 36,
+        "nativeMethods": 42,
+        "notStarted": 0
+      },
+      "headerPath": "gwca/Include/GWCA/Managers/PartyMgr.h",
+      "manager": "PartyMgr",
+      "methods": [
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "(agentId) {",
+          "name": "AddHenchman",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool AddHenchman(uint32_t agent_id)"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "(heroId) {",
+          "name": "AddHero",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool AddHero(uint32_t heroid)"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "explicit-unavailable",
+          "browserExpression": ": unsupported,",
+          "name": "FlagAll",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool FlagAll(GamePos pos)"
+          ],
+          "state": "adapted"
+        },
+        {
+          "adaptation": "explicit-unavailable",
+          "browserExpression": ": unsupported,",
+          "name": "FlagHero",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool FlagHero(uint32_t hero_index,GamePos pos)"
+          ],
+          "state": "adapted"
+        },
+        {
+          "adaptation": "explicit-unavailable",
+          "browserExpression": ": unsupported,",
+          "name": "FlagHeroAgent",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool FlagHeroAgent(AgentID agent_id,GamePos pos)"
+          ],
+          "state": "adapted"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "(agentId) {",
+          "name": "GetAgentAttributes",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "Attribute* GetAgentAttributes(uint32_t agent_id)"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "(agentId) {",
+          "name": "GetAgentHeroID",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "uint32_t GetAgentHeroID(uint32_t agent_id)"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "(heroIndex) {",
+          "name": "GetHeroAgentID",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "uint32_t GetHeroAgentID(uint32_t hero_index)"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "(heroId) {",
+          "name": "GetHeroInfo",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "HeroInfo* GetHeroInfo(uint32_t hero_id)"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "() {",
+          "name": "GetIsHardModeUnlocked",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool GetIsHardModeUnlocked()"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "() {",
+          "name": "GetIsLeader",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool GetIsLeader()"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "() {",
+          "name": "GetIsPartyDefeated",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool GetIsPartyDefeated()"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "() {",
+          "name": "GetIsPartyInHardMode",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool GetIsPartyInHardMode()"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "() {",
+          "name": "GetIsPartyLoaded",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool GetIsPartyLoaded()"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "() {",
+          "name": "GetIsPartyTicked",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool GetIsPartyTicked()"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "(playerIndex = -1) {",
+          "name": "GetIsPlayerLoaded",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool GetIsPlayerLoaded(uint32_t player_index = -1)"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "(playerIndex = -1) {",
+          "name": "GetIsPlayerTicked",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool GetIsPlayerTicked(uint32_t player_index = -1)"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "() {",
+          "name": "GetPartyHenchmanCount",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "uint32_t GetPartyHenchmanCount()"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "() {",
+          "name": "GetPartyHeroCount",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "uint32_t GetPartyHeroCount()"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": ": getPartyInfo,",
+          "name": "GetPartyInfo",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "PartyInfo *GetPartyInfo(uint32_t party_id = 0)"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "() {",
+          "name": "GetPartyPlayerCount",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "uint32_t GetPartyPlayerCount()"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": ": getPartySearch,",
+          "name": "GetPartySearch",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "PartySearch* GetPartySearch(uint32_t party_search_id = 0)"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "() {",
+          "name": "GetPartySize",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "uint32_t GetPartySize()"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": ": getPetInfo,",
+          "name": "GetPetInfo",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "PetInfo* GetPetInfo(uint32_t owner_agent_id = 0)"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "(player) {",
+          "name": "InvitePlayer",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool InvitePlayer(uint32_t player_id)",
+            "bool InvitePlayer(const wchar_t* player_name)"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "() {",
+          "name": "KickAllHeroes",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool KickAllHeroes()"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "(agentId) {",
+          "name": "KickHenchman",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool KickHenchman(uint32_t agent_id)"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "(heroId) {",
+          "name": "KickHero",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool KickHero(uint32_t heroid)"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "(playerId) {",
+          "name": "KickPlayer",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool KickPlayer(uint32_t player_id)"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "() {",
+          "name": "LeaveParty",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool LeaveParty()"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "(partyId, accept = true) {",
+          "name": "RespondToPartyRequest",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool RespondToPartyRequest(uint32_t party_id,bool accept)"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "() {",
+          "name": "ReturnToOutpost",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool ReturnToOutpost()"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "(searchType, advertisement = \"\") {",
+          "name": "SearchParty",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool SearchParty(uint32_t search_type,const wchar_t* advertisement = nullptr)"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "() {",
+          "name": "SearchPartyCancel",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool SearchPartyCancel()"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "explicit-unavailable",
+          "browserExpression": ": unsupported,",
+          "name": "SearchPartyReply",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool SearchPartyReply(bool accept)"
+          ],
+          "state": "adapted"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "(enabled = true) {",
+          "name": "SetHardMode",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool SetHardMode(bool flag)"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "(agentId, behavior) {",
+          "name": "SetHeroBehavior",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool SetHeroBehavior(uint32_t agent_id,HeroBehavior behavior)"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "(behavior, lockTargetId = 0) {",
+          "name": "SetPetBehavior",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool SetPetBehavior(HeroBehavior behavior,uint32_t lock_target_id = 0)"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "() {",
+          "name": "SetTickToggle",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "void SetTickToggle(bool enable)"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": ": tick,",
+          "name": "Tick",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool Tick(bool flag = true)"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "explicit-unavailable",
+          "browserExpression": ": unsupported,",
+          "name": "UnflagAll",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool UnflagAll()"
+          ],
+          "state": "adapted"
+        },
+        {
+          "adaptation": "explicit-unavailable",
+          "browserExpression": ": unsupported,",
+          "name": "UnflagHero",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool UnflagHero(uint32_t hero_index)"
+          ],
+          "state": "adapted"
+        }
+      ],
+      "sourcePath": "GWCAjs/Source/PartyMgr.js"
+    },
+    {
+      "browserOnly": [
+        {
+          "expression": "(name, ...args) {",
+          "name": "CallInternalFunction"
+        },
+        {
+          "expression": "() {",
+          "name": "ClearPromotions"
+        },
+        {
+          "expression": "() {",
+          "name": "Describe"
+        },
+        {
+          "expression": "() {",
+          "name": "DescribeFastPlayerPath"
+        },
+        {
+          "expression": "(options = {}) {",
+          "name": "DiscoverAgent"
+        },
+        {
+          "expression": "(agentId, options = {}) {",
+          "name": "FindAgentLivingCandidatesByAgentId"
+        },
+        {
+          "expression": "(playerNumber, options = {}) {",
+          "name": "FindAgentLivingCandidatesByPlayerNumber"
+        },
+        {
+          "expression": "(name) {",
+          "name": "GetActionStatus"
+        },
+        {
+          "expression": "() {",
+          "name": "GetActionStatuses"
+        },
+        {
+          "expression": "() {",
+          "name": "GetActiveTitleName"
+        },
+        {
+          "expression": "(options = {}) {",
+          "name": "GetAgent"
+        },
+        {
+          "expression": "(options = {}) {",
+          "name": "GetAgentAddress"
+        },
+        {
+          "expression": "() {",
+          "name": "GetCharacterName"
+        },
+        {
+          "expression": "(agentId) {",
+          "name": "GetDirectAgentAddressByAgentId"
+        },
+        {
+          "expression": "() {",
+          "name": "GetDirectAgentContext"
+        },
+        {
+          "expression": "(agentId) {",
+          "name": "GetDirectAgentPositionByAgentId"
+        },
+        {
+          "expression": "(name) {",
+          "name": "GetInternalFunction"
+        },
+        {
+          "expression": "() {",
+          "name": "GetInternalFunctions"
+        },
+        {
+          "expression": "(playerId = 0) {",
+          "name": "GetPlayer"
+        },
+        {
+          "expression": "(playerId = 0) {",
+          "name": "GetPlayerAddress"
+        },
+        {
+          "expression": "(playerId = 0) {",
+          "name": "GetPlayerEncodedName"
+        },
+        {
+          "expression": ": getPosition,",
+          "name": "GetPosition"
+        },
+        {
+          "expression": "() {",
+          "name": "GetStoredCharacterName"
+        },
+        {
+          "expression": "() {",
+          "name": "GetTitleArray"
+        },
+        {
+          "expression": "(name) {",
+          "name": "GetTitleIdByName"
+        },
+        {
+          "expression": "(titleId) {",
+          "name": "GetTitleName"
+        },
+        {
+          "expression": "() {",
+          "name": "GetTitleNames"
+        },
+        {
+          "expression": "(name) {",
+          "name": "GetUnsupportedAction"
+        },
+        {
+          "expression": "() {",
+          "name": "InspectAgentContextCandidates"
+        },
+        {
+          "expression": "() {",
+          "name": "IsAvailable"
+        },
+        {
+          "expression": "(address) {",
+          "name": "PromoteAgentAddress"
+        },
+        {
+          "expression": "(address) {",
+          "name": "PromotePlayerAddress"
+        }
+      ],
+      "counts": {
+        "adapted": 0,
+        "browserOnly": 32,
+        "implemented": 17,
+        "nativeMethods": 17,
+        "notStarted": 0
+      },
+      "headerPath": "gwca/Include/GWCA/Managers/PlayerMgr.h",
+      "manager": "PlayerMgr",
+      "methods": [
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "(profession, heroIndex = 0) {",
+          "name": "ChangeSecondProfession",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool ChangeSecondProfession(Constants::Profession prof,uint32_t hero_index = 0)"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "(allegiance, amount = 5000) {",
+          "name": "DepositFaction",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool DepositFaction(uint32_t allegiance)"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "() {",
+          "name": "GetActiveTitle",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "Title* GetActiveTitle()"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "() {",
+          "name": "GetActiveTitleId",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "Constants::TitleID GetActiveTitleId()"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "() {",
+          "name": "GetAmountOfPlayersInInstance",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "uint32_t GetAmountOfPlayersInInstance()"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "(playerId = 0) {",
+          "name": "GetPlayerAgentId",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "uint32_t GetPlayerAgentId(uint32_t player_id)"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "() {",
+          "name": "GetPlayerArray",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "PlayerArray* GetPlayerArray()"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "(playerId = 0) {",
+          "name": "GetPlayerByID",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "Player *GetPlayerByID(uint32_t player_id = 0)"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "(name) {",
+          "name": "GetPlayerByName",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "Player *GetPlayerByName(const wchar_t *name)"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "(playerId = 0) {",
+          "name": "GetPlayerName",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "wchar_t *GetPlayerName(uint32_t player_id = 0)"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "() {",
+          "name": "GetPlayerNumber",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "PlayerNumber GetPlayerNumber()"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "(titleId) {",
+          "name": "GetTitleData",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "TitleClientData* GetTitleData(Constants::TitleID title_id)"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "() {",
+          "name": "GetTitleIDs",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "std::vector<int> GetTitleIDs()"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "(titleId) {",
+          "name": "GetTitleTrack",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "Title* GetTitleTrack(Constants::TitleID title_id)"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "() {",
+          "name": "RemoveActiveTitle",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool RemoveActiveTitle()"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "(titleId) {",
+          "name": "SetActiveTitle",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool SetActiveTitle(Constants::TitleID title_id)"
+          ],
+          "state": "implemented"
+        },
+        {
+          "adaptation": "exact-name",
+          "browserExpression": "(playerId = 0, replaceName = \"\") {",
+          "name": "SetPlayerName",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "wchar_t* SetPlayerName(uint32_t player_id,const wchar_t *replace_name)"
+          ],
+          "state": "implemented"
+        }
+      ],
+      "sourcePath": "GWCAjs/Source/PlayerMgr.js"
+    },
+    {
+      "browserOnly": [],
+      "counts": {
+        "adapted": 0,
+        "browserOnly": 0,
+        "implemented": 0,
+        "nativeMethods": 17,
+        "notStarted": 17
+      },
+      "headerPath": "gwca/Include/GWCA/Managers/QuestMgr.h",
+      "manager": "QuestMgr",
+      "methods": [
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "AbandonQuest",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool AbandonQuest(Quest* quest)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "AbandonQuestId",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool AbandonQuestId(Constants::QuestID quest_id)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "AsyncDecodeAnyEncStr",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "void AsyncDecodeAnyEncStr(const wchar_t* str,std::wstring& res)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "AsyncGetQuestDescription",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "void AsyncGetQuestDescription(const Quest* quest,std::wstring& res)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "AsyncGetQuestLocation",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "void AsyncGetQuestLocation(const Quest* quest,std::wstring& res)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "AsyncGetQuestName",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "void AsyncGetQuestName(const Quest* quest,std::wstring& res)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "AsyncGetQuestNPC",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "void AsyncGetQuestNPC(const Quest* quest,std::wstring& res)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "AsyncGetQuestObjectives",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "void AsyncGetQuestObjectives(const Quest* quest,std::wstring& res)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetActiveQuest",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "Quest* GetActiveQuest()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetActiveQuestId",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "GW::Constants::QuestID GetActiveQuestId()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetQuest",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "Quest* GetQuest(GW::Constants::QuestID)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetQuestEntryGroupName",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool GetQuestEntryGroupName(GW::Constants::QuestID quest_id,wchar_t* out,size_t out_len)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetQuestLog",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "QuestLog* GetQuestLog()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "RequestQuestInfo",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool RequestQuestInfo(const Quest* quest,bool update_markers=false)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "RequestQuestInfoId",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool RequestQuestInfoId(Constants::QuestID quest_id,bool update_markers=false)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "SetActiveQuest",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool SetActiveQuest(Quest* quest)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "SetActiveQuestId",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool SetActiveQuestId(Constants::QuestID quest_id)"
+          ],
+          "state": "not-started"
+        }
+      ],
+      "sourcePath": "GWCAjs/Source/QuestMgr.js"
+    },
+    {
+      "browserOnly": [],
+      "counts": {
+        "adapted": 0,
+        "browserOnly": 0,
+        "implemented": 0,
+        "nativeMethods": 10,
+        "notStarted": 10
+      },
+      "headerPath": "gwca/Include/GWCA/Managers/RenderMgr.h",
+      "manager": "RenderMgr",
+      "methods": [
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetDevice",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "IDirect3DDevice9* GetDevice()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetFieldOfView",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "float GetFieldOfView()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetIsFullscreen",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "int GetIsFullscreen()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetIsInRenderLoop",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool GetIsInRenderLoop()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetRenderCallback",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "RenderCallback GetRenderCallback()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetTransform",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "Mat4x3f* GetTransform(Transform transform)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetViewportHeight",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "uint32_t GetViewportHeight()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetViewportWidth",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "uint32_t GetViewportWidth()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "SetRenderCallback",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "void SetRenderCallback(RenderCallback callback)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "SetResetCallback",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "void SetResetCallback(RenderCallback callback)"
+          ],
+          "state": "not-started"
+        }
+      ],
+      "sourcePath": "GWCAjs/Source/RenderMgr.js"
+    },
+    {
+      "browserOnly": [],
+      "counts": {
+        "adapted": 0,
+        "browserOnly": 0,
+        "implemented": 0,
+        "nativeMethods": 21,
+        "notStarted": 21
+      },
+      "headerPath": "gwca/Include/GWCA/Managers/SkillbarMgr.h",
+      "manager": "SkillbarMgr",
+      "methods": [
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "ChangeSecondProfession",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool ChangeSecondProfession(Constants::Profession profession,uint32_t hero_index = 0)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "DecodeSkillTemplate",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool DecodeSkillTemplate(SkillTemplate *result,const char *temp)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "EncodeSkillTemplate",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool EncodeSkillTemplate(const SkillTemplate& in,char* result,size_t result_len)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetAttributeConstantData",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "AttributeInfo* GetAttributeConstantData(Constants::Attribute attribute_id)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetHeroSkillbar",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "Skillbar* GetHeroSkillbar(uint32_t hero_index)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetHoveredSkill",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "Skill* GetHoveredSkill()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetIsSkillLearnt",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool GetIsSkillLearnt(Constants::SkillID skill_id)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetIsSkillUnlocked",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool GetIsSkillUnlocked(Constants::SkillID skill_id)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetPlayerSkillbar",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "Skillbar* GetPlayerSkillbar()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetSkillbarArray",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "SkillbarArray* GetSkillbarArray()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetSkillConstantData",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "Skill* GetSkillConstantData(Constants::SkillID skill_id)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetSkillSlot",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "int GetSkillSlot(Constants::SkillID skill_id)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetSkillTemplate",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "SkillTemplate GetSkillTemplate(uint32_t hero_index = 0)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "LoadSkillbar",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool LoadSkillbar(Constants::SkillID *skills,size_t n_skills,uint32_t hero_index = 0)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "LoadSkillTemplate",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool LoadSkillTemplate(const char *temp)",
+            "bool LoadSkillTemplate(const char *temp,uint32_t hero_index)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "PointBlankUseSkill",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool PointBlankUseSkill(uint32_t slot)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "RegisterUseSkillCallback",
+          "nativeExported": false,
+          "nativeSignatures": [
+            "void RegisterUseSkillCallback(HookEntry* entry,const UseSkillCallback& callback)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "RemoveUseSkillCallback",
+          "nativeExported": false,
+          "nativeSignatures": [
+            "void RemoveUseSkillCallback(HookEntry* entry)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "SetAttributes",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool SetAttributes(uint32_t attribute_count,uint32_t *attribute_ids,uint32_t *attribute_values,uint32_t hero_index = 0)",
+            "bool SetAttributes(Attribute *attributes,size_t n_attributes,uint32_t hero_index = 0)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "UseSkill",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool UseSkill(uint32_t slot,uint32_t target = 0)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "UseSkillByID",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool UseSkillByID(uint32_t skill_id,uint32_t target = 0)"
+          ],
+          "state": "not-started"
+        }
+      ],
+      "sourcePath": "GWCAjs/Source/SkillbarMgr.js"
+    },
+    {
+      "browserOnly": [],
+      "counts": {
+        "adapted": 0,
+        "browserOnly": 0,
+        "implemented": 0,
+        "nativeMethods": 6,
+        "notStarted": 6
+      },
+      "headerPath": "gwca/Include/GWCA/Managers/StoCMgr.h",
+      "manager": "StoCMgr",
+      "methods": [
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "EmulatePacket",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool EmulatePacket(Packet::StoC::PacketBase *packet)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "RegisterPacketCallback",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool RegisterPacketCallback(HookEntry *entry,uint32_t header,const PacketCallback& callback,int altitude = -0x8000)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "RegisterPostPacketCallback",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool RegisterPostPacketCallback(HookEntry* entry,uint32_t header,const PacketCallback& callback)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "RemoveCallback",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "size_t RemoveCallback(uint32_t header,HookEntry *entry)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "RemoveCallbacks",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "size_t RemoveCallbacks(HookEntry *entry)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "RemovePostCallback",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "void RemovePostCallback(uint32_t header,HookEntry* entry)"
+          ],
+          "state": "not-started"
+        }
+      ],
+      "sourcePath": "GWCAjs/Source/StoCMgr.js"
+    },
+    {
+      "browserOnly": [],
+      "counts": {
+        "adapted": 0,
+        "browserOnly": 0,
+        "implemented": 0,
+        "nativeMethods": 8,
+        "notStarted": 8
+      },
+      "headerPath": "gwca/Include/GWCA/Managers/TradeMgr.h",
+      "manager": "TradeMgr",
+      "methods": [
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "AcceptTrade",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool AcceptTrade()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "CancelTrade",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool CancelTrade()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "ChangeOffer",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool ChangeOffer()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "IsItemOffered",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "TradeItem* IsItemOffered(uint32_t item_id)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "OfferItem",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool OfferItem(uint32_t item_id,uint32_t quantity = 0)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "OpenTradeWindow",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool OpenTradeWindow(uint32_t agent_id)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "RemoveItem",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool RemoveItem(uint32_t slot)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "SubmitOffer",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool SubmitOffer(uint32_t gold)"
+          ],
+          "state": "not-started"
+        }
+      ],
+      "sourcePath": "GWCAjs/Source/TradeMgr.js"
+    },
+    {
+      "browserOnly": [],
+      "counts": {
+        "adapted": 0,
+        "browserOnly": 0,
+        "implemented": 0,
+        "nativeMethods": 161,
+        "notStarted": 161
+      },
+      "headerPath": "gwca/Include/GWCA/Managers/UIMgr.h",
+      "manager": "UIMgr",
+      "methods": [
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "AddFrameUIInteractionCallback",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool AddFrameUIInteractionCallback(Frame* frame,UIInteractionCallback callback,void* wparam)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "AddItem",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool AddItem(uint32_t flags,uint32_t child_offset_id,GW::UI::UIInteractionCallback callback)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "AddOption",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool AddOption(const wchar_t* label_enc_string,uint32_t value)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "AddTab",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "GW::UI::Frame* AddTab(const wchar_t* tab_name_enc,uint32_t flags,uint32_t child_offset_id,GW::UI::UIInteractionCallback callback,void* wparam = 0)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "AsyncDecodeStr",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "void AsyncDecodeStr(const wchar_t *enc_str,char *buffer,size_t size)",
+            "void AsyncDecodeStr(const wchar_t *enc_str,wchar_t *buffer,size_t size)",
+            "void AsyncDecodeStr(const wchar_t* enc_str,DecodeStr_Callback callback,void* callback_param = 0,GW::Constants::Language language_id = (GW::Constants::Language)0xff)",
+            "void AsyncDecodeStr(const wchar_t *enc_str,std::wstring *out,GW::Constants::Language language_id = (GW::Constants::Language)0xff)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "ButtonClick",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool ButtonClick(Frame* btn_frame)",
+            "bool ButtonClick(void* btn_frame)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "ChooseTab",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool ChooseTab(GW::UI::Frame* tab_frame)",
+            "bool ChooseTab(uint32_t tab_index)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "ClearFrameLogs",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "void ClearFrameLogs()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "ClearItems",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool ClearItems()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "ClearUIPayloads",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "void ClearUIPayloads()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "Click",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool Click()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "Create",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "static ButtonFrame* Create(uint32_t parent_frame_id,uint32_t flags = 0x300,uint32_t child_offset_id = 0xff,const wchar_t* button_label = nullptr,const wchar_t* frame_label = nullptr)",
+            "static ScrollableFrame* Create(uint32_t parent_frame_id,uint32_t flags = 0x20000,uint32_t child_offset_id = 0xff,ScrollablePageContext* context = nullptr,const wchar_t* frame_label = nullptr)",
+            "static TextLabelFrame* Create(uint32_t parent_frame_id,uint32_t flags = 0x300,uint32_t child_offset_id = 0xff,const wchar_t* text_label_enc_string = nullptr,const wchar_t* frame_label = nullptr)",
+            "static CheckboxFrame* Create(uint32_t parent_frame_id,uint32_t flags = 0x8000,uint32_t child_offset_id = 0xff,const wchar_t* text_label_enc_string = nullptr,const wchar_t* frame_label = nullptr)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "CreateButtonFrame",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "Frame* CreateButtonFrame(uint32_t parent_frame_id,uint32_t component_flags,uint32_t child_index = 0,wchar_t* name_enc = nullptr,wchar_t* component_label = nullptr)",
+            "Frame* CreateButtonFrame(Frame* parent,uint32_t component_flags,uint32_t child_index = 0,wchar_t* name_enc = nullptr,wchar_t* component_label = nullptr)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "CreateCheckboxFrame",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "Frame* CreateCheckboxFrame(uint32_t parent_frame_id,uint32_t component_flags,uint32_t child_index = 0,wchar_t* name_enc = nullptr,wchar_t* component_label = nullptr)",
+            "Frame* CreateCheckboxFrame(Frame* parent,uint32_t component_flags,uint32_t child_index = 0,wchar_t* name_enc = nullptr,wchar_t* component_label = nullptr)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "CreateScrollableFrame",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "Frame* CreateScrollableFrame(uint32_t parent_frame_id,uint32_t component_flags,uint32_t child_index = 0,void* page_context = nullptr,wchar_t* component_label = nullptr)",
+            "Frame* CreateScrollableFrame(Frame* parent,uint32_t component_flags,uint32_t child_index = 0,void* page_context = nullptr,wchar_t* component_label = nullptr)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "CreateTextLabelFrame",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "Frame* CreateTextLabelFrame(uint32_t parent_frame_id,uint32_t component_flags,uint32_t child_index = 0,wchar_t* name_enc = nullptr,wchar_t* component_label = nullptr)",
+            "Frame* CreateTextLabelFrame(Frame* parent,uint32_t component_flags,uint32_t child_index = 0,wchar_t* name_enc = nullptr,wchar_t* component_label = nullptr)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "CreateUIComponent",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "uint32_t CreateUIComponent(uint32_t parent_frame_id,uint32_t component_flags,uint32_t tab_index,UIInteractionCallback event_callback,void* wparam,const wchar_t* component_label)",
+            "uint32_t CreateUIComponent(uint32_t frame_id,uint32_t component_flags,uint32_t tab_index,UIInteractionCallback event_callback,wchar_t* name_enc,wchar_t* component_label)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "Default_UICallback",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool Default_UICallback(InteractionMessage* interaction,void* wparam,void* lparam)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "DestroyUIComponent",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool DestroyUIComponent(Frame* frame)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "DisableTab",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool DisableTab(uint32_t tab_id)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "DoubleClick",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool DoubleClick()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "DrawOnCompass",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool DrawOnCompass(unsigned session_id,unsigned pt_count,CompassPoint* pts)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "EnableTab",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool EnableTab(uint32_t tab_id)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "EncStrToUInt32",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "uint32_t EncStrToUInt32(const wchar_t *enc_str)",
+            "uint32_t EncStrToUInt32(const wchar_t* enc_str)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetChildFrame",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "Frame* GetChildFrame(Frame* parent,uint32_t child_offset)",
+            "Frame* GetChildFrame(Frame* parent,std::initializer_list<uint32_t> child_offsets)",
+            "void* GetChildFrame(void* parent,uint32_t child_offset)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetChildFrameID",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "uint32_t GetChildFrameID(uint32_t parent_hash,std::vector<uint32_t> child_offsets)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetChildFromNameHash",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "Frame* GetChildFromNameHash(Frame* parent,uint32_t name_hash)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetCommandLinePref",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool GetCommandLinePref(const wchar_t* label,wchar_t** out)",
+            "bool GetCommandLinePref(const wchar_t* label,uint32_t* out)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetCommandLinePref_String",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool GetCommandLinePref_String(const wchar_t* label,wchar_t** out)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetCommandLinePref_UInt",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool GetCommandLinePref_UInt(const wchar_t* label,uint32_t* out)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetCount",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool GetCount(uint32_t* size)",
+            "bool GetCount(uint32_t* count)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetCurrentTab",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "GW::UI::Frame* GetCurrentTab()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetCurrentTabIndex",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool GetCurrentTabIndex(uint32_t* tab_id)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetCurrentTooltip",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "TooltipInfo* GetCurrentTooltip()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetDecodedLabel",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "const wchar_t* GetDecodedLabel()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetEncodedLabel",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "const wchar_t* GetEncodedLabel()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetFirstChildFrameId",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "uint32_t GetFirstChildFrameId(uint32_t* _offset_of_child_out = nullptr)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetFrameArray",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "std::vector<uint32_t> GetFrameArray()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetFrameById",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "Frame* GetFrameById(uint32_t frame_id)",
+            "void* GetFrameById(uint32_t frame_id)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetFrameByLabel",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "Frame* GetFrameByLabel(const wchar_t* frame_label)",
+            "void* GetFrameByLabel(const wchar_t* frame_label)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetFrameClientBorder",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool GetFrameClientBorder(Frame* frame,float* left,float* top,float* right,float* bottom)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetFrameClipRect",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool GetFrameClipRect(Frame* frame,float* left,float* top,float* right,float* bottom)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetFrameCode",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "uint32_t GetFrameCode(Frame* frame)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetFrameContext",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "void* GetFrameContext(Frame* frame)",
+            "void* GetFrameContext(void* frame)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetFrameCoordsByHash",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "std::vector<std::pair<uint32_t,uint32_t>> GetFrameCoordsByHash(uint32_t frame_hash)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetFrameHierarchy",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "std::vector<std::tuple<uint32_t,uint32_t,uint32_t,uint32_t>> GetFrameHierarchy()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetFrameIDByHash",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "uint32_t GetFrameIDByHash(uint32_t hash)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetFrameIDByLabel",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "uint32_t GetFrameIDByLabel(const wchar_t* frame_label)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetFrameLayer",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "uint32_t GetFrameLayer(Frame* frame)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetFrameLimit",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "uint32_t GetFrameLimit()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetFrameLogs",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "std::vector<std::tuple<uint64_t,uint32_t,std::string>> GetFrameLogs()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetFrameMinSize",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool GetFrameMinSize(Frame* frame,float* width,float* height)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetFrameNativeSize",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool GetFrameNativeSize(Frame* frame,float* width,float* height)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetFrameOpacity",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "float GetFrameOpacity(Frame* frame)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetFramePositionEx",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool GetFramePositionEx(Frame* frame,float* x,float* y,float* w,float* h,uint32_t* flags)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetFrameStateBit",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool GetFrameStateBit(Frame* frame,uint32_t bit)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetFrameTitle",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "const wchar_t* GetFrameTitle(Frame* frame)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetFrameUserParam",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "uint32_t GetFrameUserParam(Frame* frame)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetHashByLabel",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "uint32_t GetHashByLabel(const std::string& label)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetIsShiftScreenShot",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool GetIsShiftScreenShot()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetIsTabEnabled",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool GetIsTabEnabled(uint32_t tab_id,uint32_t* is_enabled)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetIsUIDrawn",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool GetIsUIDrawn()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetIsWorldMapShowing",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool GetIsWorldMapShowing()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetItemFrameId",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "uint32_t GetItemFrameId(uint32_t child_offset_id)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetItemRect",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool GetItemRect(uint32_t child_offset_id,float rect[4])"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetItems",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "uint32_t GetItems(uint32_t* child_frame_id_buffer = nullptr,uint32_t buffer_len = 0)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetLabel",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool GetLabel(const wchar_t** enc_string)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetLastChildFrameId",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "uint32_t GetLastChildFrameId(uint32_t* _offset_of_child_out = nullptr)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetNextChildFrameId",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "uint32_t GetNextChildFrameId(uint32_t _frame_id,uint32_t* _offset_of_child_out = nullptr)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetOptionIndex",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool GetOptionIndex(uint32_t value,uint32_t* index)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetOptions",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "std::vector<uint32_t> GetOptions()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetOptionValue",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool GetOptionValue(uint32_t index,uint32_t* value)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetOverlayFrames",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "std::vector<uint32_t> GetOverlayFrames()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetPage",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "GW::UI::Frame* GetPage()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetParentFrame",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "Frame* GetParentFrame(Frame* frame)",
+            "void* GetParentFrame(void* frame)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetParentFrameId",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "uint32_t GetParentFrameId(Frame* frame)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetPopupFrames",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "std::vector<uint32_t> GetPopupFrames()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetPreference",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "uint32_t GetPreference(EnumPreference pref)",
+            "uint32_t GetPreference(NumberPreference pref)",
+            "bool GetPreference(FlagPreference pref)",
+            "wchar_t* GetPreference(StringPreference pref)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetPreference_Enum",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "uint32_t GetPreference_Enum(uint32_t pref)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetPreference_Flag",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool GetPreference_Flag(uint32_t pref)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetPreference_Number",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "uint32_t GetPreference_Number(uint32_t pref)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetPreference_String",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "wchar_t* GetPreference_String(uint32_t pref)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetPreferenceOptions",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "uint32_t GetPreferenceOptions(EnumPreference pref,uint32_t** options_out = 0)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetPrevChildFrameId",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "uint32_t GetPrevChildFrameId(uint32_t _frame_id,uint32_t* _offset_of_child_out = nullptr)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetRelatedFrame",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "Frame* GetRelatedFrame(Frame* frame,FrameChild relation_kind,Frame* start_after = nullptr)",
+            "void* GetRelatedFrame(void* frame,uint32_t relation_kind,void* start_after)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetRelatedFrameById",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "Frame* GetRelatedFrameById(uint32_t frame_id,FrameChild relation_kind,uint32_t start_after_id = 0)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetRootFrame",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "Frame* GetRootFrame()",
+            "void* GetRootFrame(void)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetSelectedIndex",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool GetSelectedIndex(uint32_t* index)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetSelectedValue",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool GetSelectedValue(uint32_t* selected_value)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetSettings",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "ArrayByte* GetSettings()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetSortHandler",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "SortHandler_pt GetSortHandler()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetTabButton",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "GW::ButtonFrame* GetTabButton(GW::UI::Frame* tab_frame)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetTabByLabel",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "GW::UI::Frame* GetTabByLabel(const wchar_t* label)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetTabFrameId",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool GetTabFrameId(uint32_t tab_id,uint32_t* frame_id)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetTextLanguage",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "GW::Constants::Language GetTextLanguage()",
+            "uint32_t GetTextLanguage(void)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetUIPayloads",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "std::vector<std::tuple< uint64_t,uint32_t,bool,bool,uint32_t,std::vector<uint8_t>,std::vector<uint8_t> >> GetUIPayloads()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetValue",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "const wchar_t* GetValue()",
+            "uint32_t GetValue() override",
+            "bool GetValue(uint32_t* selected_value)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "GetWindowPosition",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "UI::WindowPosition* GetWindowPosition(UI::WindowID window_id)",
+            "void* GetWindowPosition(uint32_t window_id)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "HasValueMapping",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool HasValueMapping()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "IsAncestorOf",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool IsAncestorOf(Frame* frame,Frame* other)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "IsChecked",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool IsChecked()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "IsInControllerCursorMode",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool IsInControllerCursorMode()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "IsInControllerMode",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool IsInControllerMode()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "IsReadOnly",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool IsReadOnly()"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "IsValidEncStr",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool IsValidEncStr(const wchar_t* enc_str)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "Keydown",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool Keydown(ControlAction key,Frame* target = nullptr)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "Keypress",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool Keypress(ControlAction key,Frame* target = nullptr)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "Keyup",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool Keyup(ControlAction key,Frame* target = nullptr)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "LoadSettings",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "void LoadSettings(size_t size,uint8_t *data)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "MouseAction",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool MouseAction(UI::UIPacket::ActionState action)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "RegisterCreateUIComponentCallback",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "void RegisterCreateUIComponentCallback(HookEntry *entry,const CreateUIComponentCallback& callback,int altitude = -0x8000)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "RegisterFrameUIMessageCallback",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "void RegisterFrameUIMessageCallback(HookEntry *entry,UIMessage message_id,const FrameUIMessageCallback& callback,int altitude = -0x8000)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "RegisterKeydownCallback",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "void RegisterKeydownCallback(HookEntry* entry,const KeyCallback& callback)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "RegisterKeyupCallback",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "void RegisterKeyupCallback(HookEntry* entry,const KeyCallback& callback)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "RegisterUIMessageCallback",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "void RegisterUIMessageCallback(HookEntry *entry,UIMessage message_id,const UIMessageCallback& callback,int altitude = -0x8000)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "RemoveCreateUIComponentCallback",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "void RemoveCreateUIComponentCallback(HookEntry *entry)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "RemoveFrameUIMessageCallback",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "void RemoveFrameUIMessageCallback(HookEntry *entry)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "RemoveItem",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool RemoveItem(uint32_t child_offset_id)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "RemoveKeydownCallback",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "void RemoveKeydownCallback(HookEntry* entry)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "RemoveKeyupCallback",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "void RemoveKeyupCallback(HookEntry* entry)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "RemoveTab",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool RemoveTab(uint32_t tab_id)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "RemoveUIMessageCallback",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "void RemoveUIMessageCallback(HookEntry *entry,UIMessage message_id = UIMessage::kNone)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "SelectDropdownOption",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool SelectDropdownOption(Frame* frame,uint32_t value)",
+            "bool SelectDropdownOption(void* frame,uint32_t value)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "SelectIndex",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool SelectIndex(uint32_t index)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "SelectOption",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool SelectOption(uint32_t value)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "SendFrameUIMessage",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool SendFrameUIMessage(UI::Frame* frame,UI::UIMessage message_id,void* wParam,void* lParam = nullptr)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "SendUIMessage",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool SendUIMessage(UI::UIMessage msgid,void* wParam = nullptr,void* lParam = nullptr,bool skip_hooks = false)",
+            "bool SendUIMessage(uint32_t msgid,void* wParam,void* lParam)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "SetChecked",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool SetChecked(bool checked)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "SetColorId",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool SetColorId(uint32_t color_id)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "SetCommandLinePref",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool SetCommandLinePref(const wchar_t* label,wchar_t* value)",
+            "bool SetCommandLinePref(const wchar_t* label,uint32_t value)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "SetCommandLinePref_String",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool SetCommandLinePref_String(const wchar_t* label,wchar_t* value)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "SetCommandLinePref_UInt",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool SetCommandLinePref_UInt(const wchar_t* label,uint32_t value)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "SetFont",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool SetFont(uint32_t font_id)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "SetFrameDisabled",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool SetFrameDisabled(UI::Frame* frame,bool flag)",
+            "bool SetFrameDisabled(void* frame,bool flag)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "SetFrameLayer",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool SetFrameLayer(Frame* frame,uint32_t layer)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "SetFrameLimit",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool SetFrameLimit(uint32_t value)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "SetFrameMargins",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool SetFrameMargins(Frame* frame,uint32_t flags,float size[4],float input_mask[4],uint32_t type)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "SetFrameOpacity",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool SetFrameOpacity(Frame* frame,float opacity,float fade_time = 0.0f)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "SetFrameTitle",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool SetFrameTitle(void* frame,const wchar_t* title)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "SetFrameVisible",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool SetFrameVisible(UI::Frame* frame,bool flag)",
+            "bool SetFrameVisible(void* frame,bool flag)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "SetLabel",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool SetLabel(const wchar_t* enc_string)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "SetMax",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool SetMax(uint32_t value)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "SetMaxLength",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool SetMaxLength(uint32_t max_length)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "SetOpenLinks",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "void SetOpenLinks(bool toggle)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "SetPage",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "GW::UI::Frame* SetPage(ScrollablePageContext*)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "SetPreference",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool SetPreference(EnumPreference pref,uint32_t value)",
+            "bool SetPreference(NumberPreference pref,uint32_t value)",
+            "bool SetPreference(FlagPreference pref,bool value)",
+            "bool SetPreference(StringPreference pref,wchar_t* value)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "SetPreference_Enum",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool SetPreference_Enum(uint32_t pref,uint32_t value)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "SetPreference_Flag",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool SetPreference_Flag(uint32_t pref,bool value)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "SetPreference_Number",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool SetPreference_Number(uint32_t pref,uint32_t value)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "SetPreference_String",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool SetPreference_String(uint32_t pref,wchar_t* value)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "SetReadOnly",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool SetReadOnly(bool readonly)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "SetSortHandler",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool SetSortHandler(SortHandler_pt sortHandler)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "SetStyle",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool SetStyle(ProgressBarStyle style)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "SetValue",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool SetValue(const wchar_t* value)",
+            "bool SetValue(uint32_t value) override"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "SetWindowPosition",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool SetWindowPosition(UI::WindowID window_id,UI::WindowPosition* info)",
+            "bool SetWindowPosition(uint32_t window_id,void* info)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "SetWindowVisible",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool SetWindowVisible(UI::WindowID window_id,bool is_visible)",
+            "bool SetWindowVisible(uint32_t window_id,bool is_visible)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "ShowFrame",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool ShowFrame(Frame* frame,bool show)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "TestMouseAction",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool TestMouseAction(uint32_t frame_id,uint32_t current_state,uint32_t wparam,uint32_t lparam)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "TestMouseClickAction",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool TestMouseClickAction(uint32_t frame_id,uint32_t current_state,uint32_t wparam,uint32_t lparam)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "TriggerFrameRedraw",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool TriggerFrameRedraw(Frame* frame)"
+          ],
+          "state": "not-started"
+        },
+        {
+          "adaptation": null,
+          "browserExpression": null,
+          "name": "UInt32ToEncStr",
+          "nativeExported": true,
+          "nativeSignatures": [
+            "bool UInt32ToEncStr(uint32_t value,wchar_t *buffer,size_t count)",
+            "bool UInt32ToEncStr(uint32_t value,wchar_t* buffer,size_t count)"
+          ],
+          "state": "not-started"
+        }
+      ],
+      "sourcePath": "GWCAjs/Source/UIMgr.js"
+    }
+  ],
+  "schemaVersion": 1,
+  "scope": {
+    "browser": "Top-level capitalized entries in each GWCAjs manager API object.",
+    "native": "Unique GWCA_API declarations plus a conservative allowlist of public inline or non-exported manager helpers.",
+    "verification": "Representation only. Static and live proof are tracked in the evidence ledger."
+  },
+  "totals": {
+    "adapted": 6,
+    "browserOnly": 94,
+    "implemented": 95,
+    "nativeMethods": 480,
+    "notStarted": 379
+  }
+}

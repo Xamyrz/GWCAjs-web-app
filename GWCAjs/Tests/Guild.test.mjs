@@ -306,6 +306,10 @@ state.hook.getRawExports = () => ({
   __gwca_msg_send_travel_guild_hall() {},
   __gwca_msg_send_travel_mission_login() {},
 });
+state.hook.getPatchStatus = () => ({
+  actionPatchesEnabled: true,
+  reason: "known-build",
+});
 state.hook.callExport = (name, ...args) => {
   internalCalls.push({ args, name });
 };
@@ -335,6 +339,7 @@ assert.equal(view.getUint32(0x2d004, true), 0x22222222);
 assert.equal(view.getUint32(0x2d008, true), 0);
 assert.equal(view.getUint32(0x2d00c, true), 0);
 delete state.hook.getRawExports;
+delete state.hook.getPatchStatus;
 delete state.hook.callExport;
 delete state.hook.writeU32;
 delete state.memory.temporaryBuffers;

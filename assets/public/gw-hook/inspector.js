@@ -464,10 +464,19 @@ function updateRuntimeStatus() {
   elements.buildSummary.textContent = buildStatusSummary();
   setPill(elements.runtimeStatus, "connected", "ok");
   setPill(elements.targetStatus, new URL(win.location.href).pathname, "ok");
+  const patchStatus = captureState?.patchStatus || state.buildInfo?.patchStatus;
+  const patchTone =
+    patchStatus?.reason === "unsupported-build" ||
+    patchStatus?.reason === "manifest-mismatch"
+      ? "warn"
+      : "ok";
+  const captureLabel = captureState
+    ? String(captureState.captures.length) + " captures"
+    : "ready";
   setPill(
     elements.captureStatus,
-    captureState ? String(captureState.captures.length) + " captures" : "ready",
-    "ok"
+    patchStatus ? captureLabel + " / " + patchStatus.reason : captureLabel,
+    patchTone
   );
   if (mapState && typeof mapState.mapId === "number") {
     setPill(elements.mapStatus, "map " + mapState.mapId, "ok");

@@ -1,481 +1,39 @@
-const INTERNAL_FUNCTIONS = Object.freeze({
-  AddHenchman: Object.freeze({
-    address: "ram:80388d1b",
-    callable: false,
-    exportName: "__gwca_msg_send_invite_henchman",
-    functionName: "PartyClient::MsgSendInviteHenchman(unsigned int)",
-    functionIndex: 10610,
-    message: Object.freeze({
-      opcode: 0x9f,
-      size: 0x08,
-      fields: Object.freeze(["opcode", "agentId"]),
-    }),
-    reason:
-      "Experimental: lower-level henchman invitation sender patched into the runtime exports.",
-    rawWasmSignature: "(i32) -> nil",
-    signature: "void(agentId)",
-  }),
-  AddHero: Object.freeze({
-    address: "ram:802bf6da",
-    callable: false,
-    exportName: "__gwca_msg_send_hero_activate",
-    functionName: "CharMsgSendHeroActivate(EHero)",
-    functionIndex: 6872,
-    message: Object.freeze({
-      opcode: 0x1e,
-      size: 0x08,
-      fields: Object.freeze(["opcode", "heroId"]),
-    }),
-    reason:
-      "Experimental: lower-level hero activation sender patched into the runtime exports.",
-    rawWasmSignature: "(i32) -> nil",
-    signature: "void(heroId)",
-  }),
-  LockPetTarget: Object.freeze({
-    address: "ram:802bf4c0",
-    callable: false,
-    exportName: "__gwca_msg_send_command_ai_priority_target",
-    functionName:
-      "CharMsgSendCommandAiPriorityTarget(unsigned long, unsigned long)",
-    functionIndex: 6865,
-    message: Object.freeze({
-      opcode: 0x16,
-      size: 0x0c,
-      fields: Object.freeze(["opcode", "agentId", "targetAgentId"]),
-    }),
-    reason:
-      "Experimental: lower-level hero/pet priority-target sender patched into the runtime exports.",
-    rawWasmSignature: "(i32, i32) -> nil",
-    signature: "void(agentId, targetAgentId)",
-  }),
-  SetHeroBehavior: Object.freeze({
-    address: "ram:802bf477",
-    callable: false,
-    exportName: "__gwca_msg_send_command_ai_mode",
-    functionName: "CharMsgSendCommandAiMode(unsigned long, ECharAiMode)",
-    functionIndex: 6864,
-    message: Object.freeze({
-      opcode: 0x15,
-      size: 0x0c,
-      fields: Object.freeze(["opcode", "agentId", "behavior"]),
-    }),
-    reason:
-      "Experimental: lower-level hero/pet behavior sender patched into the runtime exports.",
-    rawWasmSignature: "(i32, i32) -> nil",
-    signature: "void(agentId, behavior)",
-  }),
-  KickHenchman: Object.freeze({
-    address: "ram:80388f2d",
-    callable: false,
-    exportName: "__gwca_msg_send_remove_henchman",
-    functionName: "PartyClient::MsgSendRemoveHenchman(unsigned int)",
-    functionIndex: 10618,
-    message: Object.freeze({
-      opcode: 0xa8,
-      size: 0x08,
-      fields: Object.freeze(["opcode", "agentId"]),
-    }),
-    reason:
-      "Experimental: lower-level henchman removal sender patched into the runtime exports.",
-    rawWasmSignature: "(i32) -> nil",
-    signature: "void(agentId)",
-  }),
-  KickAllHeroes: Object.freeze({
-    address: "ram:802bf71c",
-    callable: false,
-    exportName: "__gwca_msg_send_hero_deactivate",
-    functionName: "CharMsgSendHeroDeactivate(EHero)",
-    functionIndex: 6873,
-    message: Object.freeze({
-      opcode: 0x1f,
-      size: 0x08,
-      fields: Object.freeze(["opcode", "heroId"]),
-    }),
-    reason:
-      "Experimental: hero deactivation sender using GWCA's all-heroes sentinel.",
-    rawWasmSignature: "(i32) -> nil",
-    signature: "void(0x26)",
-  }),
-  KickHero: Object.freeze({
-    address: "ram:802bf71c",
-    callable: false,
-    exportName: "__gwca_msg_send_hero_deactivate",
-    functionName: "CharMsgSendHeroDeactivate(EHero)",
-    functionIndex: 6873,
-    message: Object.freeze({
-      opcode: 0x1f,
-      size: 0x08,
-      fields: Object.freeze(["opcode", "heroId"]),
-    }),
-    reason:
-      "Experimental: lower-level hero deactivation sender patched into the runtime exports.",
-    rawWasmSignature: "(i32) -> nil",
-    signature: "void(heroId)",
-  }),
-  InvitePlayer: Object.freeze({
-    address: "ram:80388d5e",
-    callable: false,
-    exportName: "__gwca_msg_send_invite_member",
-    functionName: "PartyClient::MsgSendInviteMember(unsigned int)",
-    functionIndex: 10611,
-    message: Object.freeze({
-      opcode: 0xa0,
-      size: 0x08,
-      fields: Object.freeze(["opcode", "playerId"]),
-    }),
-    reason:
-      "Experimental: lower-level numeric party invitation sender patched into the runtime exports.",
-    rawWasmSignature: "(i32) -> nil",
-    signature: "void(playerId)",
-  }),
-  InvitePlayerByName: Object.freeze({
-    address: "ram:80388da1",
-    callable: false,
-    exportName: "__gwca_msg_send_invite_member_by_name",
-    functionName: "PartyClient::MsgSendInviteMemberByName(wchar_t const*)",
-    functionIndex: 10612,
-    message: Object.freeze({
-      opcode: 0xa1,
-      size: 0x2c,
-      fields: Object.freeze(["opcode", "name[20]"]),
-    }),
-    reason:
-      "Experimental: lower-level named party invitation sender patched into the runtime exports.",
-    rawWasmSignature: "(i32) -> nil",
-    signature: "void(nameAddress)",
-  }),
-  CancelPartyInvite: Object.freeze({
-    address: "ram:80388786",
-    callable: false,
-    exportName: "__gwca_party_cancel_invitation",
-    functionName: "PartyCliCancelInvitation(unsigned int)",
-    functionIndex: 10561,
-    mode: "partyClientWrapper",
-    reason:
-      "Experimental: party-client sent-invite cancellation wrapper patched into the runtime exports.",
-    requiresPropContext: true,
-    rawWasmSignature: "(i32) -> nil",
-    signature: "void(partyId)",
-  }),
-  KickPlayer: Object.freeze({
-    address: "ram:80388f70",
-    callable: false,
-    exportName: "__gwca_msg_send_remove_member",
-    functionName: "PartyClient::MsgSendRemoveMember(unsigned int)",
-    functionIndex: 10619,
-    message: Object.freeze({
-      opcode: 0xa9,
-      size: 0x08,
-      fields: Object.freeze(["opcode", "playerId"]),
-    }),
-    reason:
-      "Experimental: lower-level party-member removal sender patched into the runtime exports.",
-    rawWasmSignature: "(i32) -> nil",
-    signature: "void(playerId)",
-  }),
-  SearchParty: Object.freeze({
-    address: "ram:80388fb3",
-    callable: false,
-    exportName: "__gwca_msg_send_search_begin",
-    functionName:
-      "PartyClient::MsgSendSearchBeginRequest(EPartySearchMode, wchar_t const*, unsigned int)",
-    functionIndex: 10620,
-    message: Object.freeze({
-      opcode: 0xaa,
-      size: 0x4c,
-      fields: Object.freeze(["opcode", "searchType", "advertisement[32]", "unknown0"]),
-    }),
-    reason:
-      "Experimental: lower-level party-search advertisement sender patched into the runtime exports.",
-    rawWasmSignature: "(i32, i32, i32) -> nil",
-    signature: "void(searchType, advertisementAddress, unknown0)",
-  }),
-  SearchPartyCancel: Object.freeze({
-    address: "ram:8038900f",
-    callable: false,
-    exportName: "__gwca_msg_send_search_end",
-    functionName: "PartyClient::MsgSendSearchEndRequest()",
-    functionIndex: 10621,
-    message: Object.freeze({
-      opcode: 0xab,
-      size: 0x04,
-      fields: Object.freeze(["opcode"]),
-    }),
-    reason:
-      "Experimental: lower-level party-search advertisement cancellation sender patched into the runtime exports.",
-    rawWasmSignature: "() -> nil",
-    signature: "void()",
-  }),
-  LeaveParty: Object.freeze({
-    address: "ram:805c138c",
-    callable: false,
-    exportName: "__gwca_party_button_on_click",
-    functionName: "IUi::Game::Party::CPartyButtonFrame::OnClick(int)",
-    functionIndex: 16298,
-    mode: "uiCallback",
-    reason:
-      "Experimental: exact party-window Leave callback path patched into the runtime exports.",
-    requiresPropContext: true,
-    rawWasmSignature: "(i32, i32) -> nil",
-    signature: "void(buttonContext, notifyParent)",
-  }),
-  ReturnToOutpost: Object.freeze({
-    address: "ram:80388914",
-    callable: false,
-    exportName: "__gwca_party_select_offer",
-    functionName: "PartyCliSelectOffer()",
-    functionIndex: 10579,
-    mode: "partyClientWrapper",
-    reason:
-      "Experimental: party-client redirect offer wrapper patched into the runtime exports.",
-    requiresPropContext: true,
-    rawWasmSignature: "() -> nil",
-    signature: "void()",
-  }),
-  RespondToPartyRequestAccept: Object.freeze({
-    address: "ram:80388dec",
-    callable: false,
-    exportName: "__gwca_msg_send_invite_accept",
-    functionName: "PartyClient::MsgSendInviteAccept(unsigned int)",
-    functionIndex: 10613,
-    message: Object.freeze({
-      opcode: 0x9c,
-      size: 0x08,
-      fields: Object.freeze(["opcode", "partyId"]),
-    }),
-    reason:
-      "Experimental: lower-level party invitation acceptance sender patched into the runtime exports.",
-    rawWasmSignature: "(i32) -> nil",
-    signature: "void(partyId)",
-  }),
-  RespondToPartyRequestDecline: Object.freeze({
-    address: "ram:80388e72",
-    callable: false,
-    exportName: "__gwca_msg_send_invite_decline",
-    functionName: "PartyClient::MsgSendInviteDecline(unsigned int)",
-    functionIndex: 10615,
-    message: Object.freeze({
-      opcode: 0x9e,
-      size: 0x08,
-      fields: Object.freeze(["opcode", "partyId"]),
-    }),
-    reason:
-      "Experimental: lower-level party invitation decline sender patched into the runtime exports.",
-    rawWasmSignature: "(i32) -> nil",
-    signature: "void(partyId)",
-  }),
-  SetHardMode: Object.freeze({
-    address: "ram:80389237",
-    callable: false,
-    exportName: "__gwca_msg_send_hard_mode_set",
-    functionName: "PartyClient::MsgSendHardModeSet(int)",
-    functionIndex: 10629,
-    message: Object.freeze({
-      opcode: 0x9b,
-      size: 0x08,
-      fields: Object.freeze(["opcode", "enabled"]),
-    }),
-    reason:
-      "Experimental: lower-level hard-mode packet sender patched into the runtime exports.",
-    rawWasmSignature: "(i32) -> nil",
-    signature: "void(enabled)",
-  }),
-  Tick: Object.freeze({
-    address: "ram:8038927a",
-    callable: false,
-    exportName: "__gwca_msg_send_signal",
-    functionName: "PartyClient::MsgSendSignal(int)",
-    functionIndex: 10630,
-    message: Object.freeze({
-      opcode: 0xaf,
-      size: 0x08,
-      fields: Object.freeze(["opcode", "enabled"]),
-    }),
-    reason:
-      "Experimental: lower-level ready-status packet sender patched into the runtime exports.",
-    rawWasmSignature: "(i32) -> nil",
-    signature: "void(enabled)",
-  }),
-});
+import { PARTY_INTERNAL_CALLS } from "../Evidence/InternalCalls.js";
+import { createInternalCallRuntime } from "./InternalCallRuntime.js";
 
 const PARTY_BUTTON_CONTEXT_SIZE = 0x38;
 const PARTY_BUTTON_MODE_OFFSET = 0x34;
 const PARTY_BUTTON_MODE_LEAVE = 1;
-const PROP_CONTEXT_SLOT_ADDRESS = 0x28b680;
-
-function getRawExports(state) {
-  if (typeof state?.hook?.getRawExports !== "function") {
-    return null;
-  }
-  try {
-    return state.hook.getRawExports();
-  } catch (error) {
-    return null;
-  }
-}
-
-function isCallable(state, value) {
-  const exportsObject = getRawExports(state);
-  return !!(
-    value?.exportName &&
-    exportsObject &&
-    typeof exportsObject[value.exportName] === "function"
-  );
-}
-
-function cloneFunctionInfo(state, value) {
-  if (!value || typeof value !== "object") {
-    return null;
-  }
-  const callable = isCallable(state, value);
-  return {
-    ...value,
-    callable,
-    exportAvailable: callable,
-    reason: callable
-      ? "Export patched into the runtime; call semantics still need in-game verification."
-      : value.reason,
-  };
-}
-
 export function createPartyInternals(state) {
-  function getActivePropContextAddress() {
-    const anchoredAddress = state?.anchors?.gameplayContextAddress || 0;
-    if (anchoredAddress) {
-      return anchoredAddress >>> 0;
-    }
-    if (typeof state?.scanner?.tryResolveAddress === "function") {
-      return (
-        state.scanner.tryResolveAddress("modules.gameplay.contextAddress") || 0
-      ) >>> 0;
-    }
-    return 0;
-  }
-
-  function withPropContext(callback) {
-    if (
-      typeof state?.hook?.readU32 !== "function" ||
-      typeof state?.hook?.writeU32 !== "function"
-    ) {
-      return callback();
-    }
-    const propContextAddress = getActivePropContextAddress();
-    if (!propContextAddress) {
-      return callback();
-    }
-
-    const previous = state.hook.readU32(PROP_CONTEXT_SLOT_ADDRESS) || 0;
-    state.hook.writeU32(PROP_CONTEXT_SLOT_ADDRESS, propContextAddress);
-    try {
-      return callback();
-    } finally {
-      state.hook.writeU32(PROP_CONTEXT_SLOT_ADDRESS, previous);
-    }
-  }
-
-  function getInternalFunction(name) {
-    return cloneFunctionInfo(state, INTERNAL_FUNCTIONS[name]);
-  }
-
-  function getActionStatus(name) {
-    const internalFunction = getInternalFunction(name);
-    return {
-      available: internalFunction?.callable === true,
-      internalFunction,
-      mode: internalFunction?.callable
-        ? internalFunction.mode || "messageFunction"
-        : "unavailable",
-      reason:
-        internalFunction?.reason ||
-        "No internal party function metadata is available.",
-    };
-  }
-
-  function call(name, args) {
-    const info = INTERNAL_FUNCTIONS[name];
-    const internalFunction = getInternalFunction(name);
-    if (!info?.exportName) {
-      return {
-        called: false,
-        internalFunction,
-        reason: "Unknown internal function.",
-      };
-    }
-    if (
-      !internalFunction?.callable ||
-      typeof state?.hook?.callExport !== "function"
-    ) {
-      return {
-        called: false,
-        internalFunction,
-        reason: "Internal function export is not available in this runtime.",
-      };
-    }
-
-    try {
-      return {
-        called: true,
-        internalFunction,
-        result: info.requiresPropContext
-          ? withPropContext(() => state.hook.callExport(info.exportName, ...args))
-          : state.hook.callExport(info.exportName, ...args),
-      };
-    } catch (error) {
-      return {
-        called: false,
-        error: error instanceof Error ? error.message : String(error),
-        internalFunction,
-        reason: "Internal function call failed.",
-      };
-    }
-  }
+  const runtime = createInternalCallRuntime(state, PARTY_INTERNAL_CALLS, {
+    defaultMode: "messageFunction",
+  });
 
   return Object.freeze({
-    call,
-    callMessage(name, args) {
-      return call(name, args).called === true;
-    },
-    getActionStatus,
-    getActionStatuses() {
-      return Object.fromEntries(
-        Object.keys(INTERNAL_FUNCTIONS).map((name) => [
-          name,
-          getActionStatus(name),
-        ])
-      );
-    },
-    getInternalFunction,
-    getInternalFunctions() {
-      return Object.fromEntries(
-        Object.entries(INTERNAL_FUNCTIONS).map(([name, value]) => [
-          name,
-          cloneFunctionInfo(state, value),
-        ])
-      );
-    },
+    ...runtime,
     setHardMode(enabled) {
-      return call("SetHardMode", [enabled ? 1 : 0]).called === true;
+      return runtime.call("SetHardMode", [enabled ? 1 : 0]).called === true;
     },
     addHenchman(agentId) {
-      return call("AddHenchman", [agentId]).called === true;
+      return runtime.call("AddHenchman", [agentId]).called === true;
     },
     addHero(heroId) {
-      return call("AddHero", [heroId]).called === true;
+      return runtime.call("AddHero", [heroId]).called === true;
     },
     lockPetTarget(agentId, targetAgentId) {
-      return call("LockPetTarget", [agentId, targetAgentId]).called === true;
+      return runtime.call("LockPetTarget", [agentId, targetAgentId]).called === true;
     },
     kickHenchman(agentId) {
-      return call("KickHenchman", [agentId]).called === true;
+      return runtime.call("KickHenchman", [agentId]).called === true;
     },
     kickAllHeroes() {
-      return call("KickAllHeroes", [0x26]).called === true;
+      return runtime.call("KickAllHeroes", [0x26]).called === true;
     },
     kickHero(heroId) {
-      return call("KickHero", [heroId]).called === true;
+      return runtime.call("KickHero", [heroId]).called === true;
     },
     invitePlayer(playerId) {
-      return call("InvitePlayer", [playerId]).called === true;
+      return runtime.call("InvitePlayer", [playerId]).called === true;
     },
     invitePlayerByName(name) {
       if (typeof state?.hook?.withUtf16 !== "function") {
@@ -483,17 +41,17 @@ export function createPartyInternals(state) {
       }
       try {
         return state.hook.withUtf16(name, (nameAddress) =>
-          call("InvitePlayerByName", [nameAddress]).called === true
+          runtime.call("InvitePlayerByName", [nameAddress]).called === true
         );
       } catch (error) {
         return false;
       }
     },
     cancelPartyInvite(partyId) {
-      return call("CancelPartyInvite", [partyId]).called === true;
+      return runtime.call("CancelPartyInvite", [partyId]).called === true;
     },
     kickPlayer(playerId) {
-      return call("KickPlayer", [playerId]).called === true;
+      return runtime.call("KickPlayer", [playerId]).called === true;
     },
     searchParty(searchType, advertisement) {
       if (typeof state?.hook?.withUtf16 !== "function") {
@@ -501,7 +59,7 @@ export function createPartyInternals(state) {
       }
       try {
         return state.hook.withUtf16(advertisement, (advertisementAddress) =>
-          call("SearchParty", [searchType, advertisementAddress, 0]).called ===
+          runtime.call("SearchParty", [searchType, advertisementAddress, 0]).called ===
           true
         );
       } catch (error) {
@@ -509,7 +67,7 @@ export function createPartyInternals(state) {
       }
     },
     searchPartyCancel() {
-      return call("SearchPartyCancel", []).called === true;
+      return runtime.call("SearchPartyCancel", []).called === true;
     },
     leaveParty() {
       if (
@@ -533,7 +91,7 @@ export function createPartyInternals(state) {
               contextAddress + PARTY_BUTTON_MODE_OFFSET,
               PARTY_BUTTON_MODE_LEAVE
             );
-            return call("LeaveParty", [contextAddress, 0]).called === true;
+            return runtime.call("LeaveParty", [contextAddress, 0]).called === true;
           }
         );
       } catch (error) {
@@ -541,19 +99,19 @@ export function createPartyInternals(state) {
       }
     },
     returnToOutpost() {
-      return call("ReturnToOutpost", []).called === true;
+      return runtime.call("ReturnToOutpost", []).called === true;
     },
     setHeroBehavior(agentId, behavior) {
-      return call("SetHeroBehavior", [agentId, behavior]).called === true;
+      return runtime.call("SetHeroBehavior", [agentId, behavior]).called === true;
     },
     tick(enabled) {
-      return call("Tick", [enabled ? 1 : 0]).called === true;
+      return runtime.call("Tick", [enabled ? 1 : 0]).called === true;
     },
     respondToPartyRequest(partyId, accept) {
       const name = accept
         ? "RespondToPartyRequestAccept"
         : "RespondToPartyRequestDecline";
-      return call(name, [partyId]).called === true;
+      return runtime.call(name, [partyId]).called === true;
     },
   });
 }

@@ -1,5 +1,35 @@
 # JSPI Version Mapping Guide
 
+## Everyday Reverse-Engineering Checks
+
+Before the build-to-build mapping workflow below, use these lightweight
+offline checks during ordinary manager work:
+
+```bash
+node GWCAjs/Tools/re.mjs check
+node GWCAjs/Tools/re.mjs show Map.QueryAltitude
+node GWCAjs/Tools/run-scenarios.mjs
+node GWCAjs/Tools/generate-api-parity.mjs --check
+```
+
+- `re.mjs` joins callable evidence with the current symbol mapping, exact-build
+  patch manifest, and source paths.
+- `run-scenarios.mjs` validates sanitized pointer-rebased snapshots without a
+  live game.
+- `generate-api-parity.mjs` derives native-to-browser method coverage from the
+  manager headers and browser manager exports.
+
+Regenerate committed views after changing their source data:
+
+```bash
+node GWCAjs/Tools/re.mjs generate
+node GWCAjs/Tools/generate-api-parity.mjs
+```
+
+Use `capture-snapshot-live.mjs` only with a deliberately started Chromium CDP
+session. It attaches to the existing page and writes sanitized data; it does
+not launch the browser or game.
+
 Use this guide when a new Guild Wars web build changes `Gw.jspi.wasm` and
 the previous function names need to be carried forward into Ghidra.
 

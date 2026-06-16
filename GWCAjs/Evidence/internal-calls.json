@@ -1,0 +1,945 @@
+{
+  "audit": {
+    "errorCount": 0,
+    "ok": true,
+    "warningCount": 1
+  },
+  "schemaVersion": 1,
+  "entries": [
+    {
+      "buildId": "103f50bb0ce2d744bfbf88a91afce2328b",
+      "evidence": [
+        "GWCAjs/SymbolMapping/38615/function-map.json",
+        "GWCAjs/Ghidra-Notes.md",
+        "GWCAjs/HANDOVER.md"
+      ],
+      "gameBuild": 38615,
+      "id": "Guild.LeaveGH",
+      "manager": "Guild",
+      "address": "ram:80389377",
+      "exportName": "__gwca_msg_send_travel_mission_login",
+      "functionIndex": 10633,
+      "functionName": "PartyClient::MsgSendTravelMissionLogin(int)",
+      "message": {
+        "fields": [
+          "opcode",
+          "unknown0"
+        ],
+        "opcode": 178,
+        "size": 8
+      },
+      "rawWasmSignature": "(i32) -> nil",
+      "signature": "void(unknown0)",
+      "typeIndex": 0,
+      "verification": "live-action"
+    },
+    {
+      "buildId": "103f50bb0ce2d744bfbf88a91afce2328b",
+      "evidence": [
+        "GWCAjs/SymbolMapping/38615/function-map.json",
+        "GWCAjs/Ghidra-Notes.md",
+        "GWCAjs/HANDOVER.md"
+      ],
+      "gameBuild": 38615,
+      "id": "Guild.TravelGH",
+      "manager": "Guild",
+      "address": "ram:803892bd",
+      "exportName": "__gwca_msg_send_travel_guild_hall",
+      "functionIndex": 10631,
+      "functionName": "PartyClient::MsgSendTravelGuildHall(Guid const&, int)",
+      "message": {
+        "fields": [
+          "opcode",
+          "guid[4]",
+          "unknown0"
+        ],
+        "opcode": 176,
+        "size": 24
+      },
+      "rawWasmSignature": "(i32, i32) -> nil",
+      "signature": "void(ghKeyPtr, unknown0)",
+      "typeIndex": 2,
+      "verification": "live-action"
+    },
+    {
+      "buildId": "103f50bb0ce2d744bfbf88a91afce2328b",
+      "evidence": [
+        "GWCAjs/SymbolMapping/38615/function-map.json",
+        "GWCAjs/Ghidra-Notes.md",
+        "GWCAjs/HANDOVER.md"
+      ],
+      "gameBuild": 38615,
+      "id": "Map.QueryAltitude",
+      "manager": "Map",
+      "address": "ram:80256d05",
+      "exportName": "__gwca_map_query_altitude",
+      "functionIndex": 5557,
+      "functionName": "MapQueryAltitude(MapPoint const&, float, float*, Coord3f*)",
+      "rawWasmSignature": "(i32, f32, i32, i32) -> i32",
+      "requiresPropContext": true,
+      "signature": "int(MapPoint*, radius, float*, Coord3f*)",
+      "typeIndex": 109,
+      "verification": "live-action"
+    },
+    {
+      "buildId": "103f50bb0ce2d744bfbf88a91afce2328b",
+      "evidence": [
+        "GWCAjs/SymbolMapping/38615/function-map.json",
+        "GWCAjs/Ghidra-Notes.md",
+        "GWCAjs/HANDOVER.md"
+      ],
+      "gameBuild": 38615,
+      "id": "Map.Travel",
+      "manager": "Map",
+      "exportName": "__gwca_msg_send_travel_mission",
+      "functionIndex": 10632,
+      "functionName": "PartyClient::MsgSendTravelMission(EMission, ETerritory, unsigned int, ELanguage, int)",
+      "message": {
+        "fields": [
+          "opcode",
+          "mapId",
+          "region",
+          "districtNumber",
+          "language",
+          "unknown0"
+        ],
+        "opcode": 177,
+        "size": 24
+      },
+      "rawWasmSignature": "(i32, i32, i32, i32, i32) -> nil",
+      "signature": "void(mapId, region, districtNumber, language, unknown0)",
+      "typeIndex": 21,
+      "verification": "live-action"
+    },
+    {
+      "buildId": "103f50bb0ce2d744bfbf88a91afce2328b",
+      "evidence": [
+        "GWCAjs/SymbolMapping/38615/function-map.json",
+        "GWCAjs/Ghidra-Notes.md",
+        "GWCAjs/HANDOVER.md"
+      ],
+      "gameBuild": 38615,
+      "id": "Map.SkipCinematic",
+      "manager": "Map",
+      "exportName": "__gwca_msg_send_abort_cinematic",
+      "functionIndex": 7768,
+      "functionName": "Cinematic::MsgSendAbortRequest()",
+      "message": {
+        "fields": [
+          "opcode"
+        ],
+        "opcode": 99,
+        "size": 4
+      },
+      "rawWasmSignature": "() -> nil",
+      "signature": "void()",
+      "typeIndex": 4,
+      "verification": "live-action"
+    },
+    {
+      "buildId": "103f50bb0ce2d744bfbf88a91afce2328b",
+      "evidence": [
+        "GWCAjs/SymbolMapping/38615/function-map.json",
+        "GWCAjs/Ghidra-Notes.md",
+        "GWCAjs/HANDOVER.md"
+      ],
+      "gameBuild": 38615,
+      "id": "Map.EnterChallenge",
+      "manager": "Map",
+      "exportName": "__gwca_party_select_challenge_mission",
+      "functionIndex": 10577,
+      "functionName": "PartyCliSelectMission(int)",
+      "rawWasmSignature": "(i32) -> nil",
+      "requiresPropContext": true,
+      "signature": "void(identifier)",
+      "typeIndex": 0,
+      "verification": "live-action"
+    },
+    {
+      "buildId": "103f50bb0ce2d744bfbf88a91afce2328b",
+      "evidence": [
+        "GWCAjs/SymbolMapping/38615/function-map.json",
+        "GWCAjs/Ghidra-Notes.md",
+        "GWCAjs/HANDOVER.md"
+      ],
+      "gameBuild": 38615,
+      "id": "Map.CancelEnterChallenge",
+      "manager": "Map",
+      "exportName": "__gwca_party_cancel_enter_challenge",
+      "functionIndex": 10574,
+      "functionName": "PartyCliRedirectCancel()",
+      "rawWasmSignature": "() -> nil",
+      "requiresPropContext": true,
+      "signature": "void()",
+      "typeIndex": 4,
+      "verification": "live-action"
+    },
+    {
+      "buildId": "103f50bb0ce2d744bfbf88a91afce2328b",
+      "evidence": [
+        "GWCAjs/SymbolMapping/38615/function-map.json",
+        "GWCAjs/Ghidra-Notes.md",
+        "GWCAjs/HANDOVER.md"
+      ],
+      "gameBuild": 38615,
+      "id": "Party.AddHenchman",
+      "manager": "Party",
+      "address": "ram:80388d1b",
+      "exportName": "__gwca_msg_send_invite_henchman",
+      "functionIndex": 10610,
+      "functionName": "PartyClient::MsgSendInviteHenchman(unsigned int)",
+      "message": {
+        "fields": [
+          "opcode",
+          "agentId"
+        ],
+        "opcode": 159,
+        "size": 8
+      },
+      "rawWasmSignature": "(i32) -> nil",
+      "signature": "void(agentId)",
+      "typeIndex": 0,
+      "verification": "live-action"
+    },
+    {
+      "buildId": "103f50bb0ce2d744bfbf88a91afce2328b",
+      "evidence": [
+        "GWCAjs/SymbolMapping/38615/function-map.json",
+        "GWCAjs/Ghidra-Notes.md",
+        "GWCAjs/HANDOVER.md"
+      ],
+      "gameBuild": 38615,
+      "id": "Party.AddHero",
+      "manager": "Party",
+      "address": "ram:802bf6da",
+      "exportName": "__gwca_msg_send_hero_activate",
+      "functionIndex": 6872,
+      "functionName": "CharMsgSendHeroActivate(EHero)",
+      "message": {
+        "fields": [
+          "opcode",
+          "heroId"
+        ],
+        "opcode": 30,
+        "size": 8
+      },
+      "rawWasmSignature": "(i32) -> nil",
+      "signature": "void(heroId)",
+      "typeIndex": 0,
+      "verification": "live-action"
+    },
+    {
+      "buildId": "103f50bb0ce2d744bfbf88a91afce2328b",
+      "evidence": [
+        "GWCAjs/SymbolMapping/38615/function-map.json",
+        "GWCAjs/Ghidra-Notes.md",
+        "GWCAjs/HANDOVER.md"
+      ],
+      "gameBuild": 38615,
+      "id": "Party.LockPetTarget",
+      "manager": "Party",
+      "address": "ram:802bf4c0",
+      "exportName": "__gwca_msg_send_command_ai_priority_target",
+      "functionIndex": 6865,
+      "functionName": "CharMsgSendCommandAiPriorityTarget(unsigned long, unsigned long)",
+      "message": {
+        "fields": [
+          "opcode",
+          "agentId",
+          "targetAgentId"
+        ],
+        "opcode": 22,
+        "size": 12
+      },
+      "rawWasmSignature": "(i32, i32) -> nil",
+      "signature": "void(agentId, targetAgentId)",
+      "typeIndex": 2,
+      "verification": "static-tested"
+    },
+    {
+      "buildId": "103f50bb0ce2d744bfbf88a91afce2328b",
+      "evidence": [
+        "GWCAjs/SymbolMapping/38615/function-map.json",
+        "GWCAjs/Ghidra-Notes.md",
+        "GWCAjs/HANDOVER.md"
+      ],
+      "gameBuild": 38615,
+      "id": "Party.SetHeroBehavior",
+      "manager": "Party",
+      "address": "ram:802bf477",
+      "exportName": "__gwca_msg_send_command_ai_mode",
+      "functionIndex": 6864,
+      "functionName": "CharMsgSendCommandAiMode(unsigned long, ECharAiMode)",
+      "message": {
+        "fields": [
+          "opcode",
+          "agentId",
+          "behavior"
+        ],
+        "opcode": 21,
+        "size": 12
+      },
+      "rawWasmSignature": "(i32, i32) -> nil",
+      "signature": "void(agentId, behavior)",
+      "typeIndex": 2,
+      "verification": "static-tested"
+    },
+    {
+      "buildId": "103f50bb0ce2d744bfbf88a91afce2328b",
+      "evidence": [
+        "GWCAjs/SymbolMapping/38615/function-map.json",
+        "GWCAjs/Ghidra-Notes.md",
+        "GWCAjs/HANDOVER.md"
+      ],
+      "gameBuild": 38615,
+      "id": "Party.KickHenchman",
+      "manager": "Party",
+      "address": "ram:80388f2d",
+      "exportName": "__gwca_msg_send_remove_henchman",
+      "functionIndex": 10618,
+      "functionName": "PartyClient::MsgSendRemoveHenchman(unsigned int)",
+      "message": {
+        "fields": [
+          "opcode",
+          "agentId"
+        ],
+        "opcode": 168,
+        "size": 8
+      },
+      "rawWasmSignature": "(i32) -> nil",
+      "signature": "void(agentId)",
+      "typeIndex": 0,
+      "verification": "live-action"
+    },
+    {
+      "buildId": "103f50bb0ce2d744bfbf88a91afce2328b",
+      "evidence": [
+        "GWCAjs/SymbolMapping/38615/function-map.json",
+        "GWCAjs/Ghidra-Notes.md",
+        "GWCAjs/HANDOVER.md"
+      ],
+      "gameBuild": 38615,
+      "id": "Party.KickAllHeroes",
+      "manager": "Party",
+      "address": "ram:802bf71c",
+      "exportName": "__gwca_msg_send_hero_deactivate",
+      "functionIndex": 6873,
+      "functionName": "CharMsgSendHeroDeactivate(EHero)",
+      "message": {
+        "fields": [
+          "opcode",
+          "heroId"
+        ],
+        "opcode": 31,
+        "size": 8
+      },
+      "rawWasmSignature": "(i32) -> nil",
+      "signature": "void(0x26)",
+      "typeIndex": 0,
+      "verification": "live-action"
+    },
+    {
+      "buildId": "103f50bb0ce2d744bfbf88a91afce2328b",
+      "evidence": [
+        "GWCAjs/SymbolMapping/38615/function-map.json",
+        "GWCAjs/Ghidra-Notes.md",
+        "GWCAjs/HANDOVER.md"
+      ],
+      "gameBuild": 38615,
+      "id": "Party.KickHero",
+      "manager": "Party",
+      "address": "ram:802bf71c",
+      "exportName": "__gwca_msg_send_hero_deactivate",
+      "functionIndex": 6873,
+      "functionName": "CharMsgSendHeroDeactivate(EHero)",
+      "message": {
+        "fields": [
+          "opcode",
+          "heroId"
+        ],
+        "opcode": 31,
+        "size": 8
+      },
+      "rawWasmSignature": "(i32) -> nil",
+      "signature": "void(heroId)",
+      "typeIndex": 0,
+      "verification": "live-action"
+    },
+    {
+      "buildId": "103f50bb0ce2d744bfbf88a91afce2328b",
+      "evidence": [
+        "GWCAjs/SymbolMapping/38615/function-map.json",
+        "GWCAjs/Ghidra-Notes.md",
+        "GWCAjs/HANDOVER.md"
+      ],
+      "gameBuild": 38615,
+      "id": "Party.InvitePlayer",
+      "manager": "Party",
+      "address": "ram:80388d5e",
+      "exportName": "__gwca_msg_send_invite_member",
+      "functionIndex": 10611,
+      "functionName": "PartyClient::MsgSendInviteMember(unsigned int)",
+      "message": {
+        "fields": [
+          "opcode",
+          "playerId"
+        ],
+        "opcode": 160,
+        "size": 8
+      },
+      "rawWasmSignature": "(i32) -> nil",
+      "signature": "void(playerId)",
+      "typeIndex": 0,
+      "verification": "live-action"
+    },
+    {
+      "buildId": "103f50bb0ce2d744bfbf88a91afce2328b",
+      "evidence": [
+        "GWCAjs/SymbolMapping/38615/function-map.json",
+        "GWCAjs/Ghidra-Notes.md",
+        "GWCAjs/HANDOVER.md"
+      ],
+      "gameBuild": 38615,
+      "id": "Party.InvitePlayerByName",
+      "manager": "Party",
+      "address": "ram:80388da1",
+      "exportName": "__gwca_msg_send_invite_member_by_name",
+      "functionIndex": 10612,
+      "functionName": "PartyClient::MsgSendInviteMemberByName(wchar_t const*)",
+      "message": {
+        "fields": [
+          "opcode",
+          "name[20]"
+        ],
+        "opcode": 161,
+        "size": 44
+      },
+      "rawWasmSignature": "(i32) -> nil",
+      "signature": "void(nameAddress)",
+      "typeIndex": 0,
+      "verification": "live-action"
+    },
+    {
+      "buildId": "103f50bb0ce2d744bfbf88a91afce2328b",
+      "evidence": [
+        "GWCAjs/SymbolMapping/38615/function-map.json",
+        "GWCAjs/Ghidra-Notes.md",
+        "GWCAjs/HANDOVER.md"
+      ],
+      "gameBuild": 38615,
+      "id": "Party.CancelPartyInvite",
+      "manager": "Party",
+      "address": "ram:80388786",
+      "exportName": "__gwca_party_cancel_invitation",
+      "functionIndex": 10561,
+      "functionName": "PartyCliCancelInvitation(unsigned int)",
+      "mode": "partyClientWrapper",
+      "rawWasmSignature": "(i32) -> nil",
+      "requiresPropContext": true,
+      "signature": "void(partyId)",
+      "typeIndex": 0,
+      "verification": "live-action"
+    },
+    {
+      "buildId": "103f50bb0ce2d744bfbf88a91afce2328b",
+      "evidence": [
+        "GWCAjs/SymbolMapping/38615/function-map.json",
+        "GWCAjs/Ghidra-Notes.md",
+        "GWCAjs/HANDOVER.md"
+      ],
+      "gameBuild": 38615,
+      "id": "Party.KickPlayer",
+      "manager": "Party",
+      "address": "ram:80388f70",
+      "exportName": "__gwca_msg_send_remove_member",
+      "functionIndex": 10619,
+      "functionName": "PartyClient::MsgSendRemoveMember(unsigned int)",
+      "message": {
+        "fields": [
+          "opcode",
+          "playerId"
+        ],
+        "opcode": 169,
+        "size": 8
+      },
+      "rawWasmSignature": "(i32) -> nil",
+      "signature": "void(playerId)",
+      "typeIndex": 0,
+      "verification": "live-action"
+    },
+    {
+      "buildId": "103f50bb0ce2d744bfbf88a91afce2328b",
+      "evidence": [
+        "GWCAjs/SymbolMapping/38615/function-map.json",
+        "GWCAjs/Ghidra-Notes.md",
+        "GWCAjs/HANDOVER.md"
+      ],
+      "gameBuild": 38615,
+      "id": "Party.SearchParty",
+      "manager": "Party",
+      "address": "ram:80388fb3",
+      "exportName": "__gwca_msg_send_search_begin",
+      "functionIndex": 10620,
+      "functionName": "PartyClient::MsgSendSearchBeginRequest(EPartySearchMode, wchar_t const*, unsigned int)",
+      "message": {
+        "fields": [
+          "opcode",
+          "searchType",
+          "advertisement[32]",
+          "unknown0"
+        ],
+        "opcode": 170,
+        "size": 76
+      },
+      "rawWasmSignature": "(i32, i32, i32) -> nil",
+      "signature": "void(searchType, advertisementAddress, unknown0)",
+      "typeIndex": 5,
+      "verification": "static-tested"
+    },
+    {
+      "buildId": "103f50bb0ce2d744bfbf88a91afce2328b",
+      "evidence": [
+        "GWCAjs/SymbolMapping/38615/function-map.json",
+        "GWCAjs/Ghidra-Notes.md",
+        "GWCAjs/HANDOVER.md"
+      ],
+      "gameBuild": 38615,
+      "id": "Party.SearchPartyCancel",
+      "manager": "Party",
+      "address": "ram:8038900f",
+      "exportName": "__gwca_msg_send_search_end",
+      "functionIndex": 10621,
+      "functionName": "PartyClient::MsgSendSearchEndRequest()",
+      "message": {
+        "fields": [
+          "opcode"
+        ],
+        "opcode": 171,
+        "size": 4
+      },
+      "rawWasmSignature": "() -> nil",
+      "signature": "void()",
+      "typeIndex": 4,
+      "verification": "static-tested"
+    },
+    {
+      "buildId": "103f50bb0ce2d744bfbf88a91afce2328b",
+      "evidence": [
+        "GWCAjs/SymbolMapping/38615/function-map.json",
+        "GWCAjs/Ghidra-Notes.md",
+        "GWCAjs/HANDOVER.md"
+      ],
+      "gameBuild": 38615,
+      "id": "Party.SearchInviteCancel",
+      "manager": "Party",
+      "address": "ram:8038e90e",
+      "exportName": "__gwca_party_search_invite_cancel",
+      "functionIndex": 10733,
+      "functionName": "PartyClient::CSearchTable::InviteCancel(unsigned int)",
+      "rawWasmSignature": "(i32, i32) -> nil",
+      "signature": "void(searchTable, partySearchId)",
+      "typeIndex": 2,
+      "verification": "static-verified"
+    },
+    {
+      "buildId": "103f50bb0ce2d744bfbf88a91afce2328b",
+      "evidence": [
+        "GWCAjs/SymbolMapping/38615/function-map.json",
+        "GWCAjs/Ghidra-Notes.md",
+        "GWCAjs/HANDOVER.md"
+      ],
+      "gameBuild": 38615,
+      "id": "Party.LeaveParty",
+      "manager": "Party",
+      "address": "ram:805c138c",
+      "exportName": "__gwca_party_button_on_click",
+      "functionIndex": 16298,
+      "functionName": "IUi::Game::Party::CPartyButtonFrame::OnClick(int)",
+      "mode": "uiCallback",
+      "rawWasmSignature": "(i32, i32) -> nil",
+      "requiresPropContext": true,
+      "signature": "void(buttonContext, notifyParent)",
+      "typeIndex": 2,
+      "verification": "live-action"
+    },
+    {
+      "buildId": "103f50bb0ce2d744bfbf88a91afce2328b",
+      "evidence": [
+        "GWCAjs/SymbolMapping/38615/function-map.json",
+        "GWCAjs/Ghidra-Notes.md",
+        "GWCAjs/HANDOVER.md"
+      ],
+      "gameBuild": 38615,
+      "id": "Party.ReturnToOutpost",
+      "manager": "Party",
+      "address": "ram:80388914",
+      "exportName": "__gwca_party_select_offer",
+      "functionIndex": 10579,
+      "functionName": "PartyCliSelectOffer()",
+      "mode": "partyClientWrapper",
+      "rawWasmSignature": "() -> nil",
+      "requiresPropContext": true,
+      "signature": "void()",
+      "typeIndex": 4,
+      "verification": "static-tested"
+    },
+    {
+      "buildId": "103f50bb0ce2d744bfbf88a91afce2328b",
+      "evidence": [
+        "GWCAjs/SymbolMapping/38615/function-map.json",
+        "GWCAjs/Ghidra-Notes.md",
+        "GWCAjs/HANDOVER.md"
+      ],
+      "gameBuild": 38615,
+      "id": "Party.RespondToPartyRequestAccept",
+      "manager": "Party",
+      "address": "ram:80388dec",
+      "exportName": "__gwca_msg_send_invite_accept",
+      "functionIndex": 10613,
+      "functionName": "PartyClient::MsgSendInviteAccept(unsigned int)",
+      "message": {
+        "fields": [
+          "opcode",
+          "partyId"
+        ],
+        "opcode": 156,
+        "size": 8
+      },
+      "rawWasmSignature": "(i32) -> nil",
+      "signature": "void(partyId)",
+      "typeIndex": 0,
+      "verification": "live-action"
+    },
+    {
+      "buildId": "103f50bb0ce2d744bfbf88a91afce2328b",
+      "evidence": [
+        "GWCAjs/SymbolMapping/38615/function-map.json",
+        "GWCAjs/Ghidra-Notes.md",
+        "GWCAjs/HANDOVER.md"
+      ],
+      "gameBuild": 38615,
+      "id": "Party.RespondToPartyRequestDecline",
+      "manager": "Party",
+      "address": "ram:80388e72",
+      "exportName": "__gwca_msg_send_invite_decline",
+      "functionIndex": 10615,
+      "functionName": "PartyClient::MsgSendInviteDecline(unsigned int)",
+      "message": {
+        "fields": [
+          "opcode",
+          "partyId"
+        ],
+        "opcode": 158,
+        "size": 8
+      },
+      "rawWasmSignature": "(i32) -> nil",
+      "signature": "void(partyId)",
+      "typeIndex": 0,
+      "verification": "live-action"
+    },
+    {
+      "buildId": "103f50bb0ce2d744bfbf88a91afce2328b",
+      "evidence": [
+        "GWCAjs/SymbolMapping/38615/function-map.json",
+        "GWCAjs/Ghidra-Notes.md",
+        "GWCAjs/HANDOVER.md"
+      ],
+      "gameBuild": 38615,
+      "id": "Party.SetHardMode",
+      "manager": "Party",
+      "address": "ram:80389237",
+      "exportName": "__gwca_msg_send_hard_mode_set",
+      "functionIndex": 10629,
+      "functionName": "PartyClient::MsgSendHardModeSet(int)",
+      "message": {
+        "fields": [
+          "opcode",
+          "enabled"
+        ],
+        "opcode": 155,
+        "size": 8
+      },
+      "rawWasmSignature": "(i32) -> nil",
+      "signature": "void(enabled)",
+      "typeIndex": 0,
+      "verification": "live-action"
+    },
+    {
+      "buildId": "103f50bb0ce2d744bfbf88a91afce2328b",
+      "evidence": [
+        "GWCAjs/SymbolMapping/38615/function-map.json",
+        "GWCAjs/Ghidra-Notes.md",
+        "GWCAjs/HANDOVER.md"
+      ],
+      "gameBuild": 38615,
+      "id": "Party.Tick",
+      "manager": "Party",
+      "address": "ram:8038927a",
+      "exportName": "__gwca_msg_send_signal",
+      "functionIndex": 10630,
+      "functionName": "PartyClient::MsgSendSignal(int)",
+      "message": {
+        "fields": [
+          "opcode",
+          "enabled"
+        ],
+        "opcode": 175,
+        "size": 8
+      },
+      "rawWasmSignature": "(i32) -> nil",
+      "signature": "void(enabled)",
+      "typeIndex": 0,
+      "verification": "live-action"
+    },
+    {
+      "buildId": "103f50bb0ce2d744bfbf88a91afce2328b",
+      "evidence": [
+        "GWCAjs/SymbolMapping/38615/function-map.json",
+        "GWCAjs/Ghidra-Notes.md",
+        "GWCAjs/HANDOVER.md"
+      ],
+      "gameBuild": 38615,
+      "id": "Player.ChangeSecondProfession",
+      "manager": "Player",
+      "address": "ram:80c50e1e",
+      "calls": "SendOrderSetProfessionSecondary",
+      "disabled": true,
+      "exportName": "__gwca_change_second_profession",
+      "functionIndex": 9265,
+      "functionName": "CharCliProfSetSecondary(unsigned long, ECharProfession)",
+      "rawWasmSignature": "(i32, i32, i32, i32) -> nil",
+      "reason": "Disabled because the containing WASM function enters an incompatible asyncify/prologue path.",
+      "signature": "void(agentId, profession)",
+      "verification": "rejected"
+    },
+    {
+      "buildId": "103f50bb0ce2d744bfbf88a91afce2328b",
+      "evidence": [
+        "GWCAjs/SymbolMapping/38615/function-map.json",
+        "GWCAjs/Ghidra-Notes.md",
+        "GWCAjs/HANDOVER.md"
+      ],
+      "gameBuild": 38615,
+      "id": "Player.DepositFaction",
+      "manager": "Player",
+      "address": "ram:80c4c3a0",
+      "calls": "SendOrderGuildAdjustFaction",
+      "disabled": true,
+      "exportName": "__gwca_deposit_faction",
+      "functionIndex": 9222,
+      "functionName": "CharCliPlayerOrderGuildAdjustFaction(unsigned int, ECharFaction, unsigned int)",
+      "rawWasmSignature": "(i32, f32, i32, i32, i32) -> nil",
+      "reason": "Disabled because the containing WASM function enters an incompatible asyncify/prologue path.",
+      "signature": "void(always0, allegiance, amount)",
+      "verification": "rejected"
+    },
+    {
+      "buildId": "103f50bb0ce2d744bfbf88a91afce2328b",
+      "evidence": [
+        "GWCAjs/SymbolMapping/38615/function-map.json",
+        "GWCAjs/Ghidra-Notes.md",
+        "GWCAjs/HANDOVER.md"
+      ],
+      "gameBuild": 38615,
+      "id": "Player.GetTitleData",
+      "manager": "Player",
+      "address": "ram:818b4f92",
+      "dataAddress": 2584416,
+      "functionName": "ConstGetTitleClientData(ETitle)",
+      "rawWasmSignature": "(i32) -> nil",
+      "reason": "Read directly from the resolved linear-memory data table.",
+      "signature": "TitleClientData*(titleId)",
+      "verification": "live-readonly"
+    },
+    {
+      "buildId": "103f50bb0ce2d744bfbf88a91afce2328b",
+      "evidence": [
+        "GWCAjs/SymbolMapping/38615/function-map.json",
+        "GWCAjs/Ghidra-Notes.md",
+        "GWCAjs/HANDOVER.md"
+      ],
+      "gameBuild": 38615,
+      "id": "Player.RemoveActiveTitle",
+      "manager": "Player",
+      "address": "ram:80c501af",
+      "calls": "SendSetTitleNone",
+      "disabled": true,
+      "exportName": "__gwca_remove_active_title",
+      "functionIndex": 9253,
+      "functionName": "CharCliPlayerSetTitleNone()",
+      "rawWasmSignature": "(i32) -> i32",
+      "reason": "Disabled because the containing WASM function enters an incompatible asyncify/prologue path.",
+      "signature": "void()",
+      "verification": "rejected"
+    },
+    {
+      "buildId": "103f50bb0ce2d744bfbf88a91afce2328b",
+      "evidence": [
+        "GWCAjs/SymbolMapping/38615/function-map.json",
+        "GWCAjs/Ghidra-Notes.md",
+        "GWCAjs/HANDOVER.md"
+      ],
+      "gameBuild": 38615,
+      "id": "Player.SetActiveTitle",
+      "manager": "Player",
+      "address": "ram:80c500f6",
+      "calls": "SendSetTitle",
+      "disabled": true,
+      "exportName": "__gwca_set_active_title",
+      "functionIndex": 9252,
+      "functionName": "CharCliPlayerSetTitle(unsigned int)",
+      "rawWasmSignature": "(i32) -> i32",
+      "reason": "Disabled because the containing WASM function enters an incompatible asyncify/prologue path.",
+      "signature": "void(titleId)",
+      "verification": "rejected"
+    },
+    {
+      "buildId": "103f50bb0ce2d744bfbf88a91afce2328b",
+      "evidence": [
+        "GWCAjs/SymbolMapping/38615/function-map.json",
+        "GWCAjs/Ghidra-Notes.md",
+        "GWCAjs/HANDOVER.md"
+      ],
+      "gameBuild": 38615,
+      "id": "Player.SendOrderGuildAdjustFaction",
+      "manager": "Player",
+      "address": "ram:80a148d6",
+      "exportName": "__gwca_msg_send_order_guild_adjust_faction",
+      "functionIndex": 6893,
+      "functionName": "CharMsgSendOrderGuildAdjustFaction(unsigned int, ECharFaction, unsigned int)",
+      "message": {
+        "fields": [
+          "opcode",
+          "always0",
+          "allegiance",
+          "amount"
+        ],
+        "opcode": 53,
+        "size": 16
+      },
+      "rawWasmSignature": "(i32, i32, i32) -> nil",
+      "signature": "void(always0, allegiance, amount)",
+      "typeIndex": 5,
+      "verification": "live-action"
+    },
+    {
+      "buildId": "103f50bb0ce2d744bfbf88a91afce2328b",
+      "evidence": [
+        "GWCAjs/SymbolMapping/38615/function-map.json",
+        "GWCAjs/Ghidra-Notes.md",
+        "GWCAjs/HANDOVER.md"
+      ],
+      "gameBuild": 38615,
+      "id": "Player.SendOrderSetProfessionSecondary",
+      "manager": "Player",
+      "address": "ram:80a15825",
+      "exportName": "__gwca_msg_send_order_set_profession_secondary",
+      "functionIndex": 6903,
+      "functionName": "CharMsgSendOrderSetProfessionSecondary(unsigned long, ECharProfession)",
+      "message": {
+        "fields": [
+          "opcode",
+          "agentId",
+          "profession"
+        ],
+        "opcode": 65,
+        "size": 12
+      },
+      "rawWasmSignature": "(i32, i32) -> nil",
+      "signature": "void(agentId, profession)",
+      "typeIndex": 2,
+      "verification": "live-action"
+    },
+    {
+      "buildId": "103f50bb0ce2d744bfbf88a91afce2328b",
+      "evidence": [
+        "GWCAjs/SymbolMapping/38615/function-map.json",
+        "GWCAjs/Ghidra-Notes.md",
+        "GWCAjs/HANDOVER.md"
+      ],
+      "gameBuild": 38615,
+      "id": "Player.SendSetTitle",
+      "manager": "Player",
+      "address": "ram:80a19238",
+      "exportName": "__gwca_msg_send_set_title",
+      "functionIndex": 6924,
+      "functionName": "CharMsgSendSetTitle(unsigned int)",
+      "message": {
+        "fields": [
+          "opcode",
+          "titleId"
+        ],
+        "opcode": 88,
+        "size": 8
+      },
+      "rawWasmSignature": "(i32) -> nil",
+      "signature": "void(titleId)",
+      "typeIndex": 0,
+      "verification": "live-action"
+    },
+    {
+      "buildId": "103f50bb0ce2d744bfbf88a91afce2328b",
+      "evidence": [
+        "GWCAjs/SymbolMapping/38615/function-map.json",
+        "GWCAjs/Ghidra-Notes.md",
+        "GWCAjs/HANDOVER.md"
+      ],
+      "gameBuild": 38615,
+      "id": "Player.SendSetTitleNone",
+      "manager": "Player",
+      "address": "ram:80a1938b",
+      "exportName": "__gwca_msg_send_set_title_none",
+      "functionIndex": 6925,
+      "functionName": "CharMsgSendSetTitleNone()",
+      "message": {
+        "fields": [
+          "opcode"
+        ],
+        "opcode": 89,
+        "size": 4
+      },
+      "rawWasmSignature": "() -> nil",
+      "signature": "void()",
+      "typeIndex": 4,
+      "verification": "live-action"
+    },
+    {
+      "buildId": "103f50bb0ce2d744bfbf88a91afce2328b",
+      "evidence": [
+        "GWCAjs/SymbolMapping/38615/function-map.json",
+        "GWCAjs/Ghidra-Notes.md",
+        "GWCAjs/HANDOVER.md"
+      ],
+      "gameBuild": 38615,
+      "id": "Text.Decode",
+      "manager": "Text",
+      "exportName": "__gwca_text_resolve_issue",
+      "functionIndex": 5864,
+      "functionName": "TextResolveIssue(wchar_t const*, void (*)(void*, wchar_t const*), void*)",
+      "rawWasmSignature": "(i32, i32, i32) -> nil",
+      "requiresPropContext": true,
+      "signature": "void(encodedAddress, callbackIndex, callbackParam)",
+      "typeIndex": 5,
+      "verification": "live-action"
+    },
+    {
+      "buildId": "103f50bb0ce2d744bfbf88a91afce2328b",
+      "evidence": [
+        "GWCAjs/SymbolMapping/38615/function-map.json",
+        "GWCAjs/Ghidra-Notes.md",
+        "GWCAjs/HANDOVER.md"
+      ],
+      "gameBuild": 38615,
+      "id": "Text.GetHeroCodedName",
+      "manager": "Text",
+      "exportName": "__gwca_char_get_coded_name",
+      "functionIndex": 9107,
+      "functionName": "CharCliAgentGetCodedName(unsigned long)",
+      "rawWasmSignature": "(i32) -> i32",
+      "requiresPropContext": true,
+      "signature": "wchar_t*(agentId)",
+      "typeIndex": 12,
+      "verification": "live-action"
+    }
+  ]
+}
